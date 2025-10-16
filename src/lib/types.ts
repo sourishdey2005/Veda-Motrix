@@ -56,14 +56,6 @@ export type Appointment = {
   notes: string;
 };
 
-export type CapaRcaEntry = {
-  id: string;
-  component: string;
-  issuePattern: string;
-  suggestion: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
-};
-
 export type UebaEvent = {
   id: string;
   agentId: string;

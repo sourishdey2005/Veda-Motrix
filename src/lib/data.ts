@@ -1,5 +1,6 @@
-import type { User, Vehicle, ServiceCenter, Appointment, CapaRcaEntry, UebaEvent, CustomerFeedback } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback } from './types';
 import { PlaceHolderImages } from './placeholder-images';
+import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 
 // A simple hashing function for demonstration. Do not use in production.
 const simpleHash = (s: string) => {
@@ -24,14 +25,17 @@ const vehicleImg1 = PlaceHolderImages.find(img => img.id === 'vehicle-1');
 const vehicleImg2 = PlaceHolderImages.find(img => img.id === 'vehicle-2');
 const vehicleImg3 = PlaceHolderImages.find(img => img.id === 'vehicle-3');
 
+const indianMakes = ['Maruti Suzuki', 'Tata', 'Mahindra', 'Hyundai', 'Kia', 'Toyota', 'Honda', 'Skoda', 'Volkswagen', 'MG'];
+const indianModels = ['Swift', 'Nexon', 'XUV700', 'Creta', 'Seltos', 'Innova', 'City', 'Kushaq', 'Virtus', 'Hector'];
+
 export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   const healthStatus = i % 3 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
   const selectedImg = i % 3 === 0 ? vehicleImg1 : i % 2 === 0 ? vehicleImg2 : vehicleImg3;
   return {
     id: `V${1001 + i}`,
     ownerId: '3', // All owned by Rohan Joshi for simplicity
-    make: ['Maruti Suzuki', 'Tata', 'Mahindra', 'Hyundai', 'Kia', 'Toyota', 'Honda', 'Skoda', 'Volkswagen', 'MG'][i],
-    model: ['Swift', 'Nexon', 'XUV700', 'Creta', 'Seltos', 'Innova', 'City', 'Kushaq', 'Virtus', 'Hector'][i],
+    make: indianMakes[i],
+    model: indianModels[i],
     year: 2020 + (i % 4),
     vin: `VIN${Math.random().toString(36).substring(2, 15).toUpperCase()}`,
     imageUrl: selectedImg?.imageUrl || '',
@@ -64,12 +68,6 @@ export const appointments: Appointment[] = [
   { id: 'A3', vehicleId: 'V1003', serviceCenterId: 'SC3', date: '2024-08-03', time: '14:00', status: 'Booked', notes: 'Customer reports high vibration during braking.' },
 ];
 
-export const capaRcaEntries: CapaRcaEntry[] = [
-  { id: 'C1', component: 'Clutch Assembly', issuePattern: 'Premature wear reported in Tata Nexon under 30,000 kms in city driving.', suggestion: 'Investigate clutch plate material for higher durability.', status: 'Pending' },
-  { id: 'C2', component: 'AC Compressor', issuePattern: 'Failure in Hyundai Creta models in regions with high ambient temperature.', suggestion: 'Evaluate higher-rated AC compressor units for hot climates.', status: 'Approved' },
-  { id: 'C3', component: 'Suspension Bushings', issuePattern: 'Frequent wear and tear in Mahindra XUV700 on rough roads.', suggestion: 'Test polyurethane bushings as a potential replacement for standard rubber.', status: 'Pending' },
-];
-
 export const uebaEvents: UebaEvent[] = [
   { id: 'UEBA1', agentId: 'Data Analysis Agent', action: 'Accessed V1005 sensor data', timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(), anomalyScore: 0.1, isAnomalous: false, explanation: 'Routine data access for health monitoring.' },
   { id: 'UEBA2', agentId: 'Diagnosis Agent', action: 'Predicted failure for V1005', timestamp: new Date(Date.now() - 1000 * 60 * 4).toISOString(), anomalyScore: 0.2, isAnomalous: false, explanation: 'Standard diagnostic procedure following data analysis.' },
@@ -84,12 +82,9 @@ export const customerFeedbackData: CustomerFeedback[] = [
     { id: 'F3', userId: '3', vehicleId: 'V1007', rating: 4, comment: 'Good experience in Bengaluru. The lounge was clean and they fixed the issue promptly. Price was reasonable.', date: '2024-07-25' },
 ];
 
-
-// New Analytics Data
-const indianMakes = ['Tata', 'Mahindra', 'Maruti'];
 const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata'];
 const components = ['Engine', 'Transmission', 'Suspension', 'Brakes', 'AC System'];
-const topParts = ['Clutch', 'Brake Pad', 'Injector', 'Air Filter', 'Oil Filter', 'Spark Plug', 'Battery', 'Tyre', 'Wiper Blade', 'Headlight'];
+const topParts = ['Clutch', 'Brake Pad', 'Injector', 'Air Filter', 'Oil Filter'];
 
 export const analyticsData = {
   kpis: {
@@ -99,10 +94,10 @@ export const analyticsData = {
     preventiveSavings: 1250000,
   },
   predictiveBreakdown: components.flatMap(component => 
-    indianMakes.map(model => ({
+    indianMakes.slice(0,5).map(model => ({
       component,
       model,
-      probability: Math.random() * 0.8
+      probability: Math.random()
     }))
   ),
   maintenanceForecast: indianCities.map(city => ({
@@ -114,7 +109,7 @@ export const analyticsData = {
     { name: 'Delhi SC', workload: 90, backlog: 25 },
     { name: 'Bengaluru SC', workload: 110, backlog: 10 },
   ],
-  ageVsFailureRate: indianMakes.flatMap(make => 
+  ageVsFailureRate: indianMakes.slice(0,3).flatMap(make => 
     Array.from({length: 5}, (_, i) => ({
       make,
       age: i + 1,
@@ -133,5 +128,58 @@ export const analyticsData = {
     'Clutch': 50 + Math.random() * 20,
     'Brake Pad': 80 + Math.random() * 30,
     'Injector': 30 + Math.random() * 15,
+  }))
+};
+
+
+// RCA / CAPA Analytics Data
+const rcaMakes = ['Tata', 'Mahindra', 'Maruti'];
+const rcaSuppliers = ['Bosch India', 'Minda Corp', 'Bharat Forge', 'Lumax', 'Uno Minda'];
+const rcaComponents = ['ECU', 'Fuel Injector', 'ABS Module', 'Wiring Harness', 'Infotainment Unit'];
+
+export const rcaCapaAnalyticsData = {
+  rcaClusters: [
+    { name: 'ECU_Software_Glitch', count: 25, make: 'Tata', x: 0.2, y: 0.3 },
+    { name: 'Injector_Clogging', count: 40, make: 'Mahindra', x: 0.6, y: 0.7 },
+    { name: 'Wiring_Harness_Short', count: 15, make: 'Maruti', x: 0.8, y: 0.2 },
+    { name: 'ABS_Sensor_Failure', count: 30, make: 'Tata', x: 0.25, y: 0.35 },
+    { name: 'Infotainment_Lag', count: 50, make: 'Mahindra', x: 0.65, y: 0.75 },
+  ],
+  defectRecurrence: Array.from({ length: 7 }, (_, i) => ({
+    days: (i + 1) * 30,
+    postCapa: 15 * Math.exp(-i * 0.4) + Math.random() * 2,
+  })),
+  capaEffectiveness: {
+    successful: 82,
+    failed: 18,
+  },
+  failureChain: [
+    { stage: 'Root Cause', detail: 'Inconsistent torque specs on assembly line', icon: Settings },
+    { stage: 'Sub-Cause', detail: 'Vibration loosens fuel line connector', icon: CircuitBoard },
+    { stage: 'Effect', detail: 'Fuel leak reported by vehicle sensors', icon: Factory },
+    { stage: 'Resolution', detail: 'CAPA #812 issued, torque wrenches recalibrated', icon: CheckCircle },
+  ],
+  supplierDefectCorrelation: rcaSuppliers.map(supplier => ({
+    supplier,
+    issues: rcaComponents.map(component => ({
+      name: component,
+      count: Math.floor(Math.random() * 20),
+    })),
+  })),
+  designVulnerability: indianModels.slice(0, 5).map(model => ({
+    model,
+    riskScore: 20 + Math.random() * 70,
+  })),
+  aiRecommendations: [
+    { issue: "Recurring coolant leak on Nexon EV", recommendation: "Investigate thermal expansion properties of hose connector material under high-voltage battery load.", confidence: 0.88 },
+    { issue: "XUV700 infotainment screen freeze", recommendation: "Analyze memory allocation logs for potential overflow during multi-app usage. Suggest firmware patch.", confidence: 0.92 },
+  ],
+  assemblyLineRisk: Array.from({length: 5}, (_, i) => ({
+      lotId: `PUNE-A${101+i}`,
+      failureRate: 0.01 + Math.random() * 0.08
+  })),
+  componentImpact: rcaComponents.map(c => ({
+      component: c,
+      impactScore: 10 + Math.random() * 90,
   }))
 };
