@@ -8,9 +8,11 @@ import { ComponentHealthTrends } from "@/components/dashboard/user/component-hea
 import { PredictiveCostEstimator } from "@/components/dashboard/user/predictive-cost-estimator";
 import { ServiceCenterLocator } from "@/components/dashboard/user/service-center-locator";
 import { VedaMotrixLogo } from "@/components/icons";
+import { useParams } from "next/navigation";
 
-export default function VehicleDetailsPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function VehicleDetailsPage() {
+  const params = useParams();
+  const id = params.id as string;
   const { vehicles, loading } = useAuth();
   
   if (loading) {
