@@ -146,13 +146,11 @@ export function ManagerDashboard() {
                             </CardHeader>
                             <CardContent className="flex-grow flex flex-col justify-end">
                                 <Badge variant={issue.risk === 'High' || issue.risk === 'Critical' ? 'destructive' : 'secondary'} className="mb-2 w-full justify-center text-xs">{issue.risk} Risk: {issue.issue}</Badge>
-                                <Link href={`/dashboard/vehicles/${vehicle.id}`} legacyBehavior>
-                                    <a className="w-full">
-                                        <Button variant="outline" size="sm" className="w-full">
-                                            <Eye className="mr-2 h-3 w-3"/>
-                                            View Details
-                                        </Button>
-                                    </a>
+                                <Link href={`/dashboard/vehicles/${vehicle.id}`} className="w-full">
+                                    <Button variant="outline" size="sm" className="w-full">
+                                        <Eye className="mr-2 h-3 w-3"/>
+                                        View Details
+                                    </Button>
                                 </Link>
                             </CardContent>
                         </Card>
