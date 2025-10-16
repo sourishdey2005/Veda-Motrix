@@ -1,32 +1,97 @@
+
 "use client";
 
+import * as React from "react";
 import type { Vehicle } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Wrench } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronsRight, Star as StarIcon, IndianRupee } from "lucide-react";
 import { format } from "date-fns";
+import { serviceCenters } from "@/lib/data";
+import { Badge } from "@/components/ui/badge";
+
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <div className="flex items-center">
+      {[...Array(5)].map((_, i) => (
+        <StarIcon
+          key={i}
+          className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+        />
+      ))}
+    </div>
+  );
+}
+
 
 export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
+  const [openItems, setOpenItems] = React.useState<string[]>([]);
+
+  const toggleItem = (id: string) => {
+    setOpenItems(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]);
+  };
+  
+  const getServiceCenterName = (id: string) => {
+    return serviceCenters.find(sc => sc.id === id)?.name || 'Unknown Center';
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Maintenance History</CardTitle>
-        <CardDescription>A log of all service and maintenance performed on this vehicle.</CardDescription>
+        <CardTitle>Past Service History</CardTitle>
+        <CardDescription>An interactive log of all service and maintenance for this vehicle.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="relative pl-6">
-          <div className="absolute left-0 top-0 h-full w-0.5 bg-border -translate-x-1/2 ml-3"></div>
-          {vehicle.maintenanceHistory.map((item, index) => (
-            <div key={item.id} className="relative mb-8">
-              <div className="absolute -left-0.5 top-1 h-3 w-3 rounded-full bg-primary ring-4 ring-background -translate-x-1/2 ml-0.5"></div>
-              <p className="font-semibold">{item.service}</p>
-              <p className="text-sm text-muted-foreground">{format(new Date(item.date), "dd MMM yyyy")} at {item.mileage.toLocaleString('en-IN')} km</p>
-              <p className="text-sm mt-1">{item.notes}</p>
-            </div>
-          ))}
-        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12"></TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Service</TableHead>
+              <TableHead>Service Center</TableHead>
+              <TableHead className="text-right">Cost</TableHead>
+              <TableHead className="text-right">Rating</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {vehicle.maintenanceHistory.map((item) => (
+              <Collapsible asChild key={item.id} open={openItems.includes(item.id)} onOpenChange={() => toggleItem(item.id)}>
+                <>
+                  <TableRow className="cursor-pointer hover:bg-muted/50">
+                    <TableCell>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="sm" className="w-9 p-0">
+                           <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openItems.includes(item.id) ? 'rotate-180' : ''}`} />
+                           <span className="sr-only">Toggle details</span>
+                        </Button>
+                      </CollapsibleTrigger>
+                    </TableCell>
+                    <TableCell className="font-medium">{format(new Date(item.date), "dd MMM yyyy")}</TableCell>
+                    <TableCell>{item.service}</TableCell>
+                    <TableCell>{getServiceCenterName(item.serviceCenterId)}</TableCell>
+                    <TableCell className="text-right font-mono flex items-center justify-end gap-1"><IndianRupee size={12}/>{item.cost.toLocaleString('en-IN')}</TableCell>
+                    <TableCell className="text-right"><StarRating rating={item.rating} /></TableCell>
+                  </TableRow>
+                  <CollapsibleContent asChild>
+                    <TableRow>
+                        <TableCell colSpan={6} className="p-0">
+                            <div className="p-4 bg-muted/20">
+                               <p className="font-semibold">Service Notes:</p>
+                               <p className="text-sm text-muted-foreground">{item.notes}</p>
+                               <p className="text-xs text-muted-foreground mt-2">Mileage: {item.mileage.toLocaleString('en-IN')} km</p>
+                               <Button variant="outline" size="sm" className="mt-2">Rebook Similar Service</Button>
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                  </CollapsibleContent>
+                </>
+              </Collapsible>
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
 }
-
-    

@@ -38,6 +38,9 @@ export type MaintenanceLog = {
   mileage: number;
   service: string;
   notes: string;
+  serviceCenterId: string;
+  cost: number;
+  rating: number; // 1-5
 };
 
 export type PredictedAlert = {

@@ -31,11 +31,22 @@ export const indianMakes = ['Hero', 'Mahindra', 'Tata', 'Maruti Suzuki'];
 export const indianModels = ['Splendor', 'Xtreme', 'XUV700', 'Scorpio', 'Pleasure+', 'Thar', 'Passion', 'Jawa', 'Karizma', 'Bolero', 'Nexon', 'Harrier', 'Swift', 'Baleno'];
 export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad'];
 
-const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => [
-    { id: `M${vehicleIndex}1`, date: '2023-03-10', mileage: 12000 + vehicleIndex*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK.' },
-    { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters.' },
-    { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up.' },
+export const serviceCenters: ServiceCenter[] = [
+  { id: 'SC1', name: 'VedaMotrix Andheri', city: 'Mumbai', lat: 19.119, lng: 72.847, capacity: 15, availableSlots: ['09:30', '11:30', '14:30'], rating: 4.8, avgCompletionTime: 2.5 },
+  { id: 'SC2', name: 'VedaMotrix Koramangala', city: 'Bengaluru', lat: 12.935, lng: 77.624, capacity: 12, availableSlots: ['10:00', '13:00', '16:00'], rating: 4.6, avgCompletionTime: 3.1 },
+  { id: 'SC3', name: 'VedaMotrix Connaught Place', city: 'Delhi', lat: 28.632, lng: 77.219, capacity: 10, availableSlots: ['09:00', '11:00', '14:00', '17:00'], rating: 4.7, avgCompletionTime: 2.8 },
+  { id: 'SC4', name: 'VedaMotrix T. Nagar', city: 'Chennai', lat: 13.04, lng: 80.23, capacity: 8, availableSlots: ['10:30', '14:30'], rating: 4.5, avgCompletionTime: 3.5 },
+  { id: 'SC5', name: 'VedaMotrix Park Street', city: 'Kolkata', lat: 22.55, lng: 88.35, capacity: 9, availableSlots: ['09:00', '12:00', '15:00'], rating: 4.6, avgCompletionTime: 3.2 },
 ];
+
+const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => {
+    const history: MaintenanceLog[] = [
+        { id: `M${vehicleIndex}1`, date: '2023-03-10', mileage: 12000 + vehicleIndex*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK. Replaced oil filter and topped up fluids.', serviceCenterId: 'SC1', cost: 4500, rating: 5 },
+        { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters. Cleaned throttle body.', serviceCenterId: 'SC2', cost: 2500, rating: 4 },
+        { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up. Customer reported slight shudder, but not reproducible.', serviceCenterId: 'SC1', cost: 7800, rating: 4 },
+    ];
+    return history;
+};
 
 const generateUsageHistory = (): UsageDataPoint[] => {
     const today = new Date();
@@ -117,15 +128,6 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
 });
 
 export const allVehicles = vehicles;
-
-export const serviceCenters: ServiceCenter[] = [
-  { id: 'SC1', name: 'VedaMotrix Andheri', city: 'Mumbai', lat: 19.119, lng: 72.847, capacity: 15, availableSlots: ['09:30', '11:30', '14:30'], rating: 4.8, avgCompletionTime: 2.5 },
-  { id: 'SC2', name: 'VedaMotrix Koramangala', city: 'Bengaluru', lat: 12.935, lng: 77.624, capacity: 12, availableSlots: ['10:00', '13:00', '16:00'], rating: 4.6, avgCompletionTime: 3.1 },
-  { id: 'SC3', name: 'VedaMotrix Connaught Place', city: 'Delhi', lat: 28.632, lng: 77.219, capacity: 10, availableSlots: ['09:00', '11:00', '14:00', '17:00'], rating: 4.7, avgCompletionTime: 2.8 },
-  { id: 'SC4', name: 'VedaMotrix T. Nagar', city: 'Chennai', lat: 13.04, lng: 80.23, capacity: 8, availableSlots: ['10:30', '14:30'], rating: 4.5, avgCompletionTime: 3.5 },
-  { id: 'SC5', name: 'VedaMotrix Park Street', city: 'Kolkata', lat: 22.55, lng: 88.35, capacity: 9, availableSlots: ['09:00', '12:00', '15:00'], rating: 4.6, avgCompletionTime: 3.2 },
-];
-
 
 export const appointments: Appointment[] = [
   { id: 'A1', vehicleId: 'V1001', serviceCenterId: 'SC1', date: '2024-08-01', time: '09:30', status: 'Completed', notes: 'Diagnosed high engine temperature.' },
