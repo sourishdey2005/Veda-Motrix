@@ -4,7 +4,7 @@ import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/com
 import { AlertTriangle, Bot, Cpu, Car, Eye } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
-import { vehicles as allVehicles, analyticsData } from "@/lib/data"
+import { vehicles as allVehicles } from "@/lib/data"
 import type { Vehicle } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -164,7 +164,7 @@ export function ManagerDashboard() {
               </Link>
             </CardTitle>
             <Car className="h-4 w-4 text-muted-foreground" />
-          </header>
+          </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">10</div>
             <p className="text-xs text-muted-foreground">Vehicle models being monitored.</p>
