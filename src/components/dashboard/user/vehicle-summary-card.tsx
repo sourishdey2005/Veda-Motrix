@@ -38,6 +38,8 @@ export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }) {
         }, 3000 + Math.random() * 1000);
         return () => clearInterval(interval);
     }, [vehicle.predictedAlerts]);
+    
+    const isValidDate = (date: any) => date && !isNaN(new Date(date).getTime());
 
     return (
         <Card className="flex flex-col">
@@ -50,10 +52,10 @@ export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }) {
                     <div className="relative h-20 w-20">
                         <svg className="h-full w-full" viewBox="0 0 36 36">
                             <path className="text-muted" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="2" />
-                            <path className={cn("transition-all duration-500", getHealthColor(healthScore))} stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray={`${healthScore.toFixed(0)}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path className={cn("transition-all duration-500", getHealthColor(healthScore))} stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray={`${healthScore ? healthScore.toFixed(0) : 0}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-2xl font-bold">{healthScore.toFixed(0)}%</span>
+                            <span className="text-2xl font-bold">{healthScore ? healthScore.toFixed(0) : 'N/A'}%</span>
                         </div>
                     </div>
                 </div>
@@ -67,8 +69,8 @@ export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }) {
                       </Badge>
                     )}
                      <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                        <div className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Last: {format(new Date(vehicle.lastService), "dd MMM yyyy")}</div>
-                        <div className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Next: {format(new Date(vehicle.nextServiceDue), "dd MMM yyyy")}</div>
+                        <div className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Last: {isValidDate(vehicle.lastService) ? format(new Date(vehicle.lastService), "dd MMM yyyy") : 'N/A'}</div>
+                        <div className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Next: {isValidDate(vehicle.nextServiceDue) ? format(new Date(vehicle.nextServiceDue), "dd MMM yyyy") : 'N/A'}</div>
                     </div>
                 </div>
                  <Link href={`/dashboard/vehicles/${vehicle.id}`} className="w-full">
