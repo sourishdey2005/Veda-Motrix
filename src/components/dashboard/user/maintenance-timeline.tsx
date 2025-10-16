@@ -60,7 +60,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
           <TableBody>
             {vehicle.maintenanceHistory.map((item) => (
               <Collapsible asChild key={item.id} open={openItems.includes(item.id)} onOpenChange={() => toggleItem(item.id)}>
-                <>
+                <tbody>
                   <TableRow className="cursor-pointer hover:bg-muted/50">
                     <TableCell>
                       <CollapsibleTrigger asChild>
@@ -88,7 +88,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                         </TableCell>
                     </TableRow>
                   </CollapsibleContent>
-                </>
+                </tbody>
               </Collapsible>
             ))}
           </TableBody>
@@ -97,5 +97,3 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
     </Card>
   );
 }
-
-  
