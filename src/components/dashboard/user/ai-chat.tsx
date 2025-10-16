@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Bot, Send, User } from "lucide-react"
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { answerQuestion } from '@/ai/flows/vehicle-qna';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -15,6 +14,36 @@ interface Message {
     role: 'user' | 'model';
     content: string;
 }
+
+// Simple search function to find a matching answer
+const getHardcodedAnswer = (question: string): string => {
+    const lowerCaseQuestion = question.toLowerCase().trim();
+    // Prioritize exact or near-exact matches
+    const exactMatch = qnaData.find(item => item.question.toLowerCase().trim() === lowerCaseQuestion);
+    if (exactMatch) {
+        return exactMatch.answer;
+    }
+
+    // Simple keyword matching as a fallback
+    const keywords = lowerCaseQuestion.split(/\s+/).filter(k => k.length > 2);
+    let bestMatch = { score: 0, answer: "I'm sorry, I don't have information on that topic right now. I can help with vehicle maintenance, service, and general questions." };
+
+    qnaData.forEach(item => {
+        let currentScore = 0;
+        const itemQuestionLower = item.question.toLowerCase();
+        keywords.forEach(keyword => {
+            if (itemQuestionLower.includes(keyword)) {
+                currentScore++;
+            }
+        });
+        if (currentScore > bestMatch.score) {
+            bestMatch = { score: currentScore, answer: item.answer };
+        }
+    });
+
+    return bestMatch.answer;
+}
+
 
 export function AIChat() {
     const [messages, setMessages] = useState<Message[]>([
@@ -53,32 +82,17 @@ export function AIChat() {
         if (!messageContent.trim() || loading) return;
 
         const userMessage: Message = { role: 'user', content: messageContent };
-        const newMessages = [...messages, userMessage];
-        setMessages(newMessages);
+        setMessages(prev => [...prev, userMessage]);
         setLoading(true);
 
-        try {
-            const conversationHistory = newMessages.slice(-10).map(msg => ({
-                role: msg.role,
-                content: msg.content,
-            }));
+        // Simulate thinking time
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-            const response = await answerQuestion({
-                question: messageContent,
-                conversationHistory
-            });
+        const answer = getHardcodedAnswer(messageContent);
+        const aiMessage: Message = { role: 'model', content: answer };
+        setMessages(prev => [...prev, aiMessage]);
 
-            const aiMessage: Message = { role: 'model', content: response.answer };
-            setMessages(prev => [...prev, aiMessage]);
-        } catch (error) {
-            toast({
-                title: "AI Assistant Error",
-                description: "Sorry, I'm having trouble connecting right now. Please try again later.",
-                variant: 'destructive',
-            })
-        } finally {
-            setLoading(false);
-        }
+        setLoading(false);
     }
 
     const handleSendMessage = async (e: React.FormEvent) => {
@@ -88,7 +102,9 @@ export function AIChat() {
     }
 
     const handleSuggestionClick = (question: string) => {
+        setInput(question);
         sendMessage(question);
+        setInput('');
     }
 
     return (
