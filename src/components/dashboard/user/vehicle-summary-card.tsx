@@ -55,7 +55,7 @@ export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }) {
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-between space-y-4">
                 <div>
-                    <Badge variant="outline" className={cn("w-full justify-center py-1", getRiskColor(predictedAlert.priority))}>
+                    <Badge variant="outline" className={cn("w-full justify-center py-1 relative", getRiskColor(predictedAlert.priority))}>
                         {predictedAlert.issue} - {predictedAlert.priority} Risk
                         {predictedAlert.priority === 'High' && <span className="absolute top-1 right-1 flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>}
                     </Badge>
@@ -66,7 +66,7 @@ export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }) {
                 </div>
                  <Link href={`/dashboard/vehicles/${vehicle.id}`} className="w-full">
                     <Button className="w-full">
-                        <Wrench className="mr-2 h-4 w-4" /> View Details & Book Service
+                        <Wrench className="mr-2 h-4 w-4" /> Book Service
                     </Button>
                 </Link>
             </CardContent>

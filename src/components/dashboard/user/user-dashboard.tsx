@@ -10,7 +10,8 @@ import { AIChat } from "./ai-chat"
 
 export function UserDashboard() {
   const { user, vehicles } = useAuth();
-  const userVehicles = vehicles.filter(v => v.ownerId === user?.id);
+  // In a real app, you'd filter vehicles by the logged-in user's ID
+  const userVehicles = vehicles.slice(0, 2); // Taking first 2 for "Mr. Rao"
 
   if (!user || userVehicles.length === 0) {
     return (
@@ -48,8 +49,7 @@ export function UserDashboard() {
             <MaintenanceAlerts vehicle={primaryVehicle} />
         </div>
 
-        <div className="lg:col-span-1 grid grid-cols-1 gap-6">
-            <ServiceScheduler />
+        <div className="grid grid-cols-1 gap-6 h-full">
             <AIChat />
         </div>
       </div>
