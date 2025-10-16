@@ -83,3 +83,55 @@ export const customerFeedbackData: CustomerFeedback[] = [
     { id: 'F2', userId: '3', vehicleId: 'V1004', rating: 3, comment: 'The service in Delhi took a bit longer than I was told. The car is fine now, but the wait was too long.', date: '2024-07-28' },
     { id: 'F3', userId: '3', vehicleId: 'V1007', rating: 4, comment: 'Good experience in Bengaluru. The lounge was clean and they fixed the issue promptly. Price was reasonable.', date: '2024-07-25' },
 ];
+
+
+// New Analytics Data
+const indianMakes = ['Tata', 'Mahindra', 'Maruti'];
+const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata'];
+const components = ['Engine', 'Transmission', 'Suspension', 'Brakes', 'AC System'];
+const topParts = ['Clutch', 'Brake Pad', 'Injector', 'Air Filter', 'Oil Filter', 'Spark Plug', 'Battery', 'Tyre', 'Wiper Blade', 'Headlight'];
+
+export const analyticsData = {
+  kpis: {
+    downtimeReduction: 12.5,
+    predictionAccuracy: 88.2,
+    fleetUtilization: 92.3,
+    preventiveSavings: 1250000,
+  },
+  predictiveBreakdown: components.flatMap(component => 
+    indianMakes.map(model => ({
+      component,
+      model,
+      probability: Math.random() * 0.8
+    }))
+  ),
+  maintenanceForecast: indianCities.map(city => ({
+    city,
+    demand: 50 + Math.floor(Math.random() * 100),
+  })),
+  serviceLoad: [
+    { name: 'Mumbai SC', workload: 120, backlog: 15 },
+    { name: 'Delhi SC', workload: 90, backlog: 25 },
+    { name: 'Bengaluru SC', workload: 110, backlog: 10 },
+  ],
+  ageVsFailureRate: indianMakes.flatMap(make => 
+    Array.from({length: 5}, (_, i) => ({
+      make,
+      age: i + 1,
+      failureRate: (i + 1) * 2 + Math.random() * 5,
+      vehicleCount: 100 + Math.random() * 200,
+    }))
+  ),
+  failureSeverity: [
+    { name: 'Low', count: 120 },
+    { name: 'Medium', count: 75 },
+    { name: 'High', count: 40 },
+    { name: 'Critical', count: 15 },
+  ],
+  partsReplacementTrend: ['January', 'February', 'March', 'April', 'May', 'June'].map(month => ({
+    month,
+    'Clutch': 50 + Math.random() * 20,
+    'Brake Pad': 80 + Math.random() * 30,
+    'Injector': 30 + Math.random() * 15,
+  }))
+};
