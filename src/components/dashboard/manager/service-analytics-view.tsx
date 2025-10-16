@@ -66,8 +66,8 @@ export function ServiceAnalyticsView() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <Card className="md:col-span-2">
+    <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+      <Card className="lg:col-span-2">
         <CardHeader>
           <CardTitle>Predictive Maintenance</CardTitle>
           <CardDescription>Use AI to predict potential vehicle failures based on current data.</CardDescription>

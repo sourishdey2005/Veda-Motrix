@@ -32,7 +32,7 @@ export function ManagerDashboard() {
       </Card>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="lg:col-span-4">
+        <Card className="col-span-1 lg:col-span-4">
             <CardHeader>
                 <CardTitle>
                   <Link href="/dashboard/master" className="hover:underline">
@@ -53,7 +53,7 @@ export function ManagerDashboard() {
                             <span className="text-xs text-center font-medium w-24">{agent.name}</span>
                             </div>
                         </Link>
-                        {index < agents.length -1 && <ArrowRight className="h-6 w-6 text-muted-foreground" />}
+                        {index < agents.length -1 && <ArrowRight className="h-6 w-6 text-muted-foreground hidden sm:block" />}
                     </React.Fragment>
                     ))}
                 </div>

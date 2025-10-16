@@ -9,23 +9,6 @@ import { formatDistanceToNow } from "date-fns"
 import { useEffect, useState } from "react"
 import { uebaEvents as mockUebaEvents } from "@/lib/data";
 import type { UebaEvent } from "@/lib/types";
-import { detectAgentAnomalies } from "@/ai/flows/detect-agent-anomalies"
-
-const agentsForSimulation = [
-  "Data Analysis Agent",
-  "Diagnosis Agent",
-  "Scheduling Agent",
-  "Feedback Agent",
-];
-const actionsForSimulation = [
-  "Accessed vehicle data",
-  "Updated maintenance log",
-  "Accessed user profile",
-  "Triggered failure prediction",
-  "Attempted to access billing info",
-  "Deleted service record",
-  "Accessed all user calendars",
-];
 
 export function UebaView() {
   const [uebaEvents, setUebaEvents] = useState<UebaEvent[]>([]);
@@ -45,41 +28,28 @@ export function UebaView() {
 
   const handleSimulate = async () => {
     setSimulating(true);
-    try {
-      const randomAgent = agentsForSimulation[Math.floor(Math.random() * agentsForSimulation.length)];
-      const randomAction = actionsForSimulation[Math.floor(Math.random() * actionsForSimulation.length)];
-      
-      const analysis = await detectAgentAnomalies({
-        agentId: randomAgent,
-        agentActions: [randomAction],
-        anomalyThreshold: 0.7, // Set a threshold for what's considered anomalous
-      });
-
-      const newEvent: UebaEvent = {
+    // This is a mock simulation since we are using dummy data
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const newEvent: UebaEvent = {
         id: `UEBA${uebaEvents.length + 1}`,
-        agentId: randomAgent,
-        action: randomAction,
+        agentId: 'Scheduling Agent',
+        action: 'Attempted to access billing info',
         timestamp: new Date().toISOString(),
-        anomalyScore: analysis.anomalyScore,
-        isAnomalous: analysis.isAnomalous,
-        explanation: analysis.explanation,
+        anomalyScore: 0.85,
+        isAnomalous: true,
+        explanation: 'Unauthorized attempt to access sensitive financial data outside of typical agent behavior.',
       };
 
-      setUebaEvents(prev => [newEvent, ...prev]);
-
-    } catch (error) {
-      console.error("Failed to simulate agent anomaly:", error);
-      // Optionally add a toast notification for the error
-    } finally {
-      setSimulating(false);
-    }
+    setUebaEvents(prev => [newEvent, ...prev]);
+    setSimulating(false);
   }
 
   const anomaliesCount = uebaEvents.filter(e => e.isAnomalous).length;
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
          <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Events Scanned</CardTitle>
@@ -113,7 +83,7 @@ export function UebaView() {
               )}
               Simulate & Analyze Action
             </Button>
-            <p className="text-xs text-muted-foreground mt-2">Trigger a random agent action for AI analysis.</p>
+            <p className="text-xs text-muted-foreground mt-2">Trigger a random agent action for analysis.</p>
           </CardContent>
         </Card>
       </div>
@@ -163,8 +133,8 @@ export function UebaView() {
                       <TableCell className="font-medium">{event.agentId}</TableCell>
                       <TableCell>{event.action}</TableCell>
                       <TableCell className="text-muted-foreground text-xs max-w-sm">{event.explanation || 'N/A'}</TableCell>
-                      <TableCell>{formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}</TableCell>
-                      <TableCell className="text-right font-mono">{event.anomalyScore.toFixed(2)}</TableCell>
+                      <TableCell>{event.anomalyScore && formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}</TableCell>
+                      <TableCell className="text-right font-mono">{event.anomalyScore?.toFixed(2)}</TableCell>
                   </TableRow>
                   ))
               )}

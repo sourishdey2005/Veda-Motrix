@@ -8,7 +8,7 @@ export default function ServiceCenterLoginPage() {
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
       <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
+        <div className="mx-auto grid w-full max-w-sm gap-6 px-4">
           <div className="grid gap-2 text-center">
             <VedaMotrixLogo className="h-12 w-12 mx-auto" />
             <h1 className="text-3xl font-bold font-headline">VEDA-MOTRIX AI</h1>
