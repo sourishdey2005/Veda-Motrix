@@ -1,6 +1,7 @@
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
+import { subDays, format } from 'date-fns';
 
 // A simple hashing function for demonstration. Do not use in production.
 const simpleHash = (s: string) => {
@@ -34,6 +35,24 @@ const generateMaintenanceHistory = (vehicleIndex: number) => [
     { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters.' },
     { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up.' },
 ];
+
+const generateUsageHistory = (): UsageDataPoint[] => {
+    const today = new Date();
+    return Array.from({ length: 30 }).map((_, i) => {
+        const date = subDays(today, 29 - i);
+        let anomaly: UsageDataPoint['anomaly'] | undefined = undefined;
+        if (Math.random() < 0.05) anomaly = 'high_vibration';
+        if (Math.random() < 0.03) anomaly = 'overheating';
+
+        return {
+            date: format(date, 'yyyy-MM-dd'),
+            distance: 20 + Math.random() * 80,
+            avgSpeed: 30 + Math.random() * 40,
+            consumption: 15 + Math.random() * 10,
+            anomaly: anomaly,
+        };
+    });
+};
 
 export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   const healthStatus = i % 3 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
@@ -73,6 +92,7 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
       fuel_level: Math.random(),
     },
     maintenanceHistory: generateMaintenanceHistory(i),
+    usageHistory: generateUsageHistory(),
   };
 });
 

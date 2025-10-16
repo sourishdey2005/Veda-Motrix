@@ -39,6 +39,14 @@ export type PredictedAlert = {
     estimatedCost: number;
 };
 
+export type UsageDataPoint = {
+    date: string;
+    distance: number;
+    avgSpeed: number;
+    consumption: number;
+    anomaly?: 'high_vibration' | 'overheating';
+};
+
 export type Vehicle = {
   id: string;
   ownerId: string;
@@ -56,6 +64,7 @@ export type Vehicle = {
   predictedAlerts: PredictedAlert[];
   sensorData: SensorData;
   maintenanceHistory: MaintenanceLog[];
+  usageHistory: UsageDataPoint[];
 };
 
 export type ServiceCenter = {

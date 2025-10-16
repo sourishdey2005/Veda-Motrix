@@ -7,6 +7,7 @@ import { VehicleHealthRadar } from "./vehicle-health-radar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ServiceScheduler } from "./service-scheduler"
 import { AIChat } from "./ai-chat"
+import { VehicleUsageAnalytics } from "./vehicle-usage-analytics"
 
 export function UserDashboard() {
   const { user, vehicles } = useAuth();
@@ -47,9 +48,13 @@ export function UserDashboard() {
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
             <VehicleHealthRadar vehicle={primaryVehicle} />
             <MaintenanceAlerts vehicle={primaryVehicle} />
+             <div className="md:col-span-2">
+                <VehicleUsageAnalytics vehicle={primaryVehicle} />
+            </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6 h-full">
+            <ServiceScheduler />
             <AIChat />
         </div>
       </div>

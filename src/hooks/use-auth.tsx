@@ -2,8 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import type { User, Vehicle } from '@/lib/types';
+import type { User, Vehicle, UsageDataPoint } from '@/lib/types';
 import { users as mockUsers, vehicles as mockVehicles } from '@/lib/data';
+import { subDays, format } from 'date-fns';
 
 interface AuthContextType {
   user: User | null;
@@ -13,7 +14,7 @@ interface AuthContextType {
   logout: () => void;
   loading: boolean;
   updateUser: (data: Partial<User>) => void;
-  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory'>) => void;
+  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory'>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,6 +26,24 @@ const simpleHash = (s: string) => {
     h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
   }
   return h.toString();
+};
+
+const generateUsageHistory = (): UsageDataPoint[] => {
+    const today = new Date();
+    return Array.from({ length: 30 }).map((_, i) => {
+        const date = subDays(today, 29 - i);
+        let anomaly: UsageDataPoint['anomaly'] | undefined = undefined;
+        if (Math.random() < 0.05) anomaly = 'high_vibration';
+        if (Math.random() < 0.03) anomaly = 'overheating';
+
+        return {
+            date: format(date, 'yyyy-MM-dd'),
+            distance: 20 + Math.random() * 80,
+            avgSpeed: 30 + Math.random() * 40,
+            consumption: 15 + Math.random() * 10,
+            anomaly: anomaly,
+        };
+    });
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -122,7 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory'>) => {
+  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory'>) => {
     const newVehicle: Vehicle = {
       ...data,
       id: `V${vehicles.length + 1001}`,
@@ -146,6 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         engine_temp: 90, oil_level: 0.9, vibration: 5, tire_pressure: 32, battery_voltage: 12.6, fuel_level: 1,
       },
       maintenanceHistory: [],
+      usageHistory: generateUsageHistory(),
     };
     const newVehicles = [...vehicles, newVehicle];
     setVehicles(newVehicles);
