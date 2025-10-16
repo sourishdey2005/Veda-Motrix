@@ -4,6 +4,7 @@
 
 
 
+
 export type User = {
   id: string;
   name: string;
@@ -205,6 +206,7 @@ export type InventoryPart = {
     avgUsePerWeek: number;
     reorderLevel: number;
     predictedShortageDate: string;
+    requestedAmount?: number;
 };
 
 export type PartConsumptionTrend = {

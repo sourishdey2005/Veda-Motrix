@@ -20,13 +20,13 @@ const chartConfig = {
 };
 
 export function InventoryManagement() {
-  const [parts, setParts] = useState(inventoryData);
+  const [parts, setParts] = useState<InventoryPart[]>(inventoryData);
   const [selectedPart, setSelectedPart] = useState<InventoryPart | null>(null);
   const [restockQuantity, setRestockQuantity] = useState<number>(50);
   const [isRequesting, setIsRequesting] = useState(false);
   const { toast } = useToast();
 
-  const getStockStatus = (part: typeof parts[0]) => {
+  const getStockStatus = (part: InventoryPart) => {
     if (part.inStock < part.reorderLevel) return "low";
     if (part.inStock < part.reorderLevel * 1.5) return "moderate";
     return "healthy";
@@ -52,6 +52,9 @@ export function InventoryManagement() {
     setIsRequesting(true);
     // Simulate API call
     setTimeout(() => {
+       setParts(prevParts => 
+         prevParts.map(p => p.id === selectedPart.id ? { ...p, requestedAmount: restockQuantity } : p)
+       );
        toast({
         title: "Restock Request Sent",
         description: `Request for ${restockQuantity} units of ${selectedPart.name} has been sent.`,
@@ -75,6 +78,7 @@ export function InventoryManagement() {
                 <TableHead>Part Name</TableHead>
                 <TableHead>In Stock</TableHead>
                 <TableHead>Avg Use/Wk</TableHead>
+                <TableHead>Requested</TableHead>
                 <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -90,6 +94,7 @@ export function InventoryManagement() {
                       </Badge>
                     </TableCell>
                     <TableCell className="font-mono">{part.avgUsePerWeek}</TableCell>
+                    <TableCell className="font-mono">{part.requestedAmount || '—'}</TableCell>
                     <TableCell className="text-right">
                        <Button variant="outline" size="sm" onClick={() => handleOpenDialog(part)}>
                             Request Restock
