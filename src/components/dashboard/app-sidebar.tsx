@@ -1,3 +1,4 @@
+
 "use client";
 
 import { VedaMotrixLogo } from "@/components/icons";
@@ -61,7 +62,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.name}>
                     <Link href={item.href} className="w-full">
                       <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.name}>
-                        <div>
+                        <div className="flex items-center gap-2">
                           <item.icon />
                           <span>{item.name}</span>
                         </div>
@@ -78,7 +79,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.name}>
                     <Link href={item.href} className="w-full">
                       <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.name}>
-                        <div>
+                        <div className="flex items-center gap-2">
                           <item.icon />
                           <span>{item.name}</span>
                         </div>
