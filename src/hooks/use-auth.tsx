@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import type { User, Vehicle, UsageDataPoint } from '@/lib/types';
+import type { User, Vehicle, UsageDataPoint, HealthHistoryEntry } from '@/lib/types';
 import { users as mockUsers, vehicles as mockVehicles } from '@/lib/data';
 import { subDays, format } from 'date-fns';
 
@@ -14,7 +14,7 @@ interface AuthContextType {
   logout: () => void;
   loading: boolean;
   updateUser: (data: Partial<User>) => void;
-  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory'>) => void;
+  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory' | 'healthHistory'>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,6 +44,21 @@ const generateUsageHistory = (): UsageDataPoint[] => {
             anomaly: anomaly,
         };
     });
+};
+
+const generateHealthHistory = (): HealthHistoryEntry[] => {
+  const today = new Date();
+  return Array.from({ length: 30 }).map((_, i) => {
+      const date = subDays(today, 29 - i);
+      return {
+          date: format(date, 'yyyy-MM-dd'),
+          engine: 90 - i * 0.2 + Math.random() * 5,
+          brakes: 95 - i * 0.3 + Math.random() * 8,
+          battery: 98 - i * 0.1 + Math.random() * 4,
+          suspension: 88 - i * 0.4 + Math.random() * 10,
+          sensors: 99 - i * 0.05 + Math.random() * 2,
+      };
+  });
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -141,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory'>) => {
+  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory' | 'healthHistory'>) => {
     const newVehicle: Vehicle = {
       ...data,
       id: `V${vehicles.length + 1001}`,
@@ -169,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       maintenanceHistory: [],
       usageHistory: generateUsageHistory(),
+      healthHistory: generateHealthHistory(),
     };
     const newVehicles = [...vehicles, newVehicle];
     setVehicles(newVehicles);
