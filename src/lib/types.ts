@@ -120,6 +120,9 @@ export type ServiceCenter = {
   availableSlots: string[];
   rating: number;
   avgCompletionTime: number;
+  workload?: number;
+  delayIndex?: number;
+  position?: { top: string; left: string; };
 };
 
 export type TechnicianPerformance = {
@@ -312,5 +315,3 @@ export type CustomerLifetimeValueData = {
     clv: number;
     retentionProbability: number;
 };
-
-
