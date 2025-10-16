@@ -99,7 +99,7 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
         </div>
       </CardHeader>
       <CardContent>
-        {healthData.length > 0 ? (
+        {healthData && healthData.length > 0 ? (
           <ChartContainer config={chartConfig} className="h-72">
             <LineChart data={filteredData} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
               <CartesianGrid vertical={false} />
