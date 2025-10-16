@@ -9,7 +9,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import {
-  BarChart, Bar, XAxis, YAxis, LabelList,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   LineChart, Line, CartesianGrid, Legend
 } from 'recharts';
@@ -18,7 +17,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { technicians } from '@/lib/data';
 
 const chartConfig: ChartConfig = {
-    vehiclesServiced: { label: "Vehicles Serviced", color: "hsl(var(--chart-1))" },
     skill: { label: "Proficiency", color: "hsl(var(--chart-2))" },
     turnaround: { label: "Avg. Time (hrs)", color: "hsl(var(--chart-3))" },
 };
@@ -28,50 +26,8 @@ export function TechnicianPerformance() {
 
   const selectedTech = technicians.find(t => t.id === selectedTechId) || technicians[0];
 
-  const allTechsPerformance = technicians.map(tech => ({
-    name: tech.name.split(' ')[0],
-    vehiclesServiced: tech.performance.vehiclesServicedToday
-  }));
-
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Vehicles Serviced Today</CardTitle>
-          <CardDescription>Productivity across all technicians.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="h-64">
-            <BarChart
-              data={allTechsPerformance}
-              layout="vertical"
-              margin={{ left: 10 }}
-            >
-              <YAxis
-                dataKey="name"
-                type="category"
-                tickLine={false}
-                axisLine={false}
-              />
-              <XAxis dataKey="vehiclesServiced" type="number" hide />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <Bar dataKey="vehiclesServiced" fill="var(--color-vehiclesServiced)" radius={4}>
-                 <LabelList
-                    dataKey="vehiclesServiced"
-                    position="right"
-                    offset={8}
-                    className="fill-foreground"
-                    fontSize={12}
-                />
-              </Bar>
-            </BarChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
-
+    <>
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -117,7 +73,7 @@ export function TechnicianPerformance() {
         </CardHeader>
         <CardContent>
              <ChartContainer config={chartConfig} className="h-64">
-                <LineChart data={selectedTech.performance.avgTurnaround}>
+                <LineChart data={selectedTech.performance.avgTurnaround} margin={{ left: -20, right: 20 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey="issueType" tickLine={false} axisLine={false} tickMargin={8} fontSize={10} />
                     <YAxis dataKey="time" unit="hr" />
@@ -125,6 +81,7 @@ export function TechnicianPerformance() {
                     <Line
                         type="monotone"
                         dataKey="time"
+                        name="Time (hrs)"
                         stroke="var(--color-turnaround)"
                         strokeWidth={2}
                         dot={true}
@@ -133,6 +90,6 @@ export function TechnicianPerformance() {
              </ChartContainer>
         </CardContent>
       </Card>
-    </div>
+    </>
   )
 }
