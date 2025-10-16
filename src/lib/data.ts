@@ -1,4 +1,5 @@
 
+
 import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
@@ -29,7 +30,7 @@ const vehicleImg3 = PlaceHolderImages.find(img => img.id === 'vehicle-3');
 
 export const indianMakes = ['Hero', 'Mahindra', 'Tata', 'Maruti Suzuki'];
 export const indianModels = ['Splendor', 'Xtreme', 'XUV700', 'Scorpio', 'Pleasure+', 'Thar', 'Passion', 'Jawa', 'Karizma', 'Bolero', 'Nexon', 'Harrier', 'Swift', 'Baleno'];
-export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad'];
+export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal', 'Visakhapatnam', 'Patna', 'Vadodara', 'Ghaziabad', 'Ludhiana', 'Agra', 'Nashik'];
 
 export const serviceCenters: ServiceCenter[] = [
   { id: 'SC1', name: 'VedaMotrix Andheri', city: 'Mumbai', lat: 19.119, lng: 72.847, capacity: 15, availableSlots: ['09:30', '11:30', '14:30'], rating: 4.8, avgCompletionTime: 2.5, workload: 80, delayIndex: 1.1 },
@@ -37,6 +38,26 @@ export const serviceCenters: ServiceCenter[] = [
   { id: 'SC3', name: 'VedaMotrix Connaught Place', city: 'Delhi', lat: 28.632, lng: 77.219, capacity: 10, availableSlots: ['09:00', '11:00', '14:00', '17:00'], rating: 4.7, avgCompletionTime: 2.8, workload: 75, delayIndex: 0.9 },
   { id: 'SC4', name: 'VedaMotrix T. Nagar', city: 'Chennai', lat: 13.04, lng: 80.23, capacity: 8, availableSlots: ['10:30', '14:30'], rating: 4.5, avgCompletionTime: 3.5, workload: 65, delayIndex: 1.0 },
   { id: 'SC5', name: 'VedaMotrix Park Street', city: 'Kolkata', lat: 22.55, lng: 88.35, capacity: 9, availableSlots: ['09:00', '12:00', '15:00'], rating: 4.6, avgCompletionTime: 3.2, workload: 85, delayIndex: 1.2 },
+  { id: 'SC6', name: 'VedaMotrix Deccan', city: 'Pune', lat: 18.52, lng: 73.85, capacity: 14, availableSlots: ['09:00', '12:30', '15:30'], rating: 4.9, avgCompletionTime: 2.2, workload: 78, delayIndex: 0.8 },
+  { id: 'SC7', name: 'VedaMotrix Jubilee Hills', city: 'Hyderabad', lat: 17.43, lng: 78.4, capacity: 11, availableSlots: ['10:00', '13:30', '16:30'], rating: 4.7, avgCompletionTime: 2.9, workload: 88, delayIndex: 1.1 },
+  { id: 'SC8', name: 'VedaMotrix SG Highway', city: 'Ahmedabad', lat: 23.02, lng: 72.57, capacity: 10, availableSlots: ['09:30', '11:30', '14:30'], rating: 4.5, avgCompletionTime: 3.0, workload: 70, delayIndex: 1.0 },
+  { id: 'SC9', name: 'VedaMotrix C-Scheme', city: 'Jaipur', lat: 26.91, lng: 75.78, capacity: 7, availableSlots: ['10:00', '14:00'], rating: 4.4, avgCompletionTime: 3.4, workload: 60, delayIndex: 1.3 },
+  { id: 'SC10', name: 'VedaMotrix Gomti Nagar', city: 'Lucknow', lat: 26.84, lng: 80.94, capacity: 8, availableSlots: ['09:00', '11:00', '15:00'], rating: 4.6, avgCompletionTime: 2.9, workload: 82, delayIndex: 1.0 },
+  { id: 'SC11', name: 'VedaMotrix The Mall', city: 'Kanpur', lat: 26.47, lng: 80.35, capacity: 6, availableSlots: ['10:00', '13:00'], rating: 4.3, avgCompletionTime: 3.6, workload: 95, delayIndex: 1.6 },
+  { id: 'SC12', name: 'VedaMotrix Sitabuldi', city: 'Nagpur', lat: 21.14, lng: 79.08, capacity: 7, availableSlots: ['09:30', '12:30', '15:30'], rating: 4.5, avgCompletionTime: 3.1, workload: 77, delayIndex: 0.9 },
+  { id: 'SC13', name: 'VedaMotrix Vijay Nagar', city: 'Indore', lat: 22.71, lng: 75.85, capacity: 9, availableSlots: ['10:00', '13:00', '16:00'], rating: 4.8, avgCompletionTime: 2.6, workload: 81, delayIndex: 0.8 },
+  { id: 'SC14', name: 'VedaMotrix Wagle Estate', city: 'Thane', lat: 19.19, lng: 72.96, capacity: 10, availableSlots: ['09:00', '11:30', '14:30', '16:30'], rating: 4.6, avgCompletionTime: 2.7, workload: 85, delayIndex: 1.1 },
+  { id: 'SC15', name: 'VedaMotrix MP Nagar', city: 'Bhopal', lat: 23.23, lng: 77.41, capacity: 6, availableSlots: ['10:00', '14:00'], rating: 4.2, avgCompletionTime: 3.8, workload: 68, delayIndex: 1.2 },
+  { id: 'SC16', name: 'VedaMotrix Dwaraka Nagar', city: 'Visakhapatnam', lat: 17.72, lng: 83.3, capacity: 7, availableSlots: ['09:30', '13:30'], rating: 4.5, avgCompletionTime: 3.3, workload: 72, delayIndex: 1.0 },
+  { id: 'SC17', name: 'VedaMotrix Boring Road', city: 'Patna', lat: 25.6, lng: 85.12, capacity: 5, availableSlots: ['10:00', '14:30'], rating: 4.1, avgCompletionTime: 4.0, workload: 90, delayIndex: 1.5 },
+  { id: 'SC18', name: 'VedaMotrix Alkapuri', city: 'Vadodara', lat: 22.3, lng: 73.18, capacity: 8, availableSlots: ['09:00', '12:00', '15:00'], rating: 4.6, avgCompletionTime: 2.9, workload: 79, delayIndex: 0.9 },
+  { id: 'SC19', name: 'VedaMotrix Indirapuram', city: 'Ghaziabad', lat: 28.63, lng: 77.37, capacity: 9, availableSlots: ['10:00', '13:00', '16:00'], rating: 4.4, avgCompletionTime: 3.1, workload: 84, delayIndex: 1.2 },
+  { id: 'SC20', name: 'VedaMotrix Feroze Gandhi Mkt', city: 'Ludhiana', lat: 30.9, lng: 75.85, capacity: 7, availableSlots: ['09:30', '12:30', '15:30'], rating: 4.5, avgCompletionTime: 3.2, workload: 76, delayIndex: 1.0 },
+  { id: 'SC21', name: 'VedaMotrix Fatehabad Road', city: 'Agra', lat: 27.16, lng: 78.04, capacity: 6, availableSlots: ['10:00', '14:00'], rating: 4.3, avgCompletionTime: 3.5, workload: 65, delayIndex: 1.1 },
+  { id: 'SC22', name: 'VedaMotrix College Road', city: 'Nashik', lat: 20.0, lng: 73.78, capacity: 8, availableSlots: ['09:00', '11:30', '15:00'], rating: 4.7, avgCompletionTime: 2.8, workload: 80, delayIndex: 0.9 },
+  { id: 'SC23', name: 'VedaMotrix Sector 18', city: 'Noida', lat: 28.57, lng: 77.32, capacity: 12, availableSlots: ['09:00', '12:00', '15:00', '17:00'], rating: 4.8, avgCompletionTime: 2.4, workload: 89, delayIndex: 1.0 },
+  { id: 'SC24', name: 'VedaMotrix Elante', city: 'Chandigarh', lat: 30.7, lng: 76.79, capacity: 10, availableSlots: ['10:00', '13:00', '16:00'], rating: 4.7, avgCompletionTime: 2.7, workload: 83, delayIndex: 0.9 },
+  { id: 'SC25', name: 'VedaMotrix G.S. Road', city: 'Guwahati', lat: 26.14, lng: 91.79, capacity: 6, availableSlots: ['09:30', '13:30'], rating: 4.4, avgCompletionTime: 3.3, workload: 71, delayIndex: 1.1 },
 ];
 
 const generateTechnicianPerformance = (): TechnicianPerformance => ({
