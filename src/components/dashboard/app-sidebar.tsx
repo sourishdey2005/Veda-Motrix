@@ -13,7 +13,7 @@ import {
   SidebarFooter,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { ActivitySquare, BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot, Briefcase, Smile, Settings, User as UserIcon, Warehouse, FileSearch, Server } from "lucide-react";
+import { ActivitySquare, BarChart, Car, Factory, LayoutDashboard, ShieldCheck, Users, Bot, Briefcase, Smile, Settings, User as UserIcon, Warehouse, FileSearch, Server } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
