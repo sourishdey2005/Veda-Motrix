@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList, Legend, ResponsiveContainer, LineChart, Line, ScatterChart, Scatter, ZAxis } from "recharts"
@@ -311,3 +312,5 @@ export function ManufacturingInsightsView() {
     </div>
   )
 }
+
+    
