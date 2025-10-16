@@ -3,13 +3,13 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { serviceCenters } from "@/lib/data";
-import { Map, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import Image from "next/image";
 
 export function ServiceCenterLocator() {
   // This is a static placeholder for a map component.
   // In a real app, you would integrate a library like Leaflet or Google Maps.
-  const mapPlaceholder = "https://picsum.photos/seed/map/800/600";
+  const mapPlaceholder = "https://picsum.photos/seed/citymap/800/600";
 
   return (
     <Card>
