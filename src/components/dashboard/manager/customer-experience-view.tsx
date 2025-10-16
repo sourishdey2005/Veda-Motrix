@@ -6,7 +6,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts"
 import type { ChartConfig } from "@/components/ui/chart"
 import { useState, useEffect, useCallback } from "react"
-import { TrendingUp, TrendingDown, Star, PhoneForwarded, MessageSquareQuote, CheckCheck, UserCheck, Repeat, Users, Network, Gauge } from "lucide-react"
+import { TrendingUp, TrendingDown, Star, PhoneForwarded, MessageSquareQuote, CheckCheck, UserCheck, Repeat, Users, Network, Gauge, Factory } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { customerExperienceData, serviceCenters } from "@/lib/data"
