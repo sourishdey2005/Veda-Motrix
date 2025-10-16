@@ -41,7 +41,7 @@ export type MaintenanceLog = {
   notes: string;
   serviceCenterId: string;
   cost: number;
-  rating: number;
+  rating?: number;
 };
 
 export type PredictedAlert = {
@@ -75,8 +75,8 @@ export type PredictiveInsight = {
 export type EnvironmentalData = {
   fuelEfficiencyTrend: { month: string; efficiency: number }[];
   carbonFootprint: {
-    current: number; // in kg CO2
-    reduction: number; // in kg CO2
+    current: number; // in g CO2/km
+    reduction: number; // in g CO2/km
   };
   ecoBadges: {
     id: string;
