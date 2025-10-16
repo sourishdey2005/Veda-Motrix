@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -9,6 +10,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 
 const GenerateExecutiveSummaryInputSchema = z.object({
@@ -39,6 +41,7 @@ export async function generateExecutiveSummary(
 
 const generateExecutiveSummaryPrompt = ai.definePrompt({
   name: 'generateExecutiveSummaryPrompt',
+  model: googleAI.model('gemini-2.5-flash'),
   input: {schema: GenerateExecutiveSummaryInputSchema},
   output: {schema: GenerateExecutiveSummaryOutputSchema},
   prompt: `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Your task is to analyze the provided JSON data and generate a clear, concise, and insightful summary for a management audience.

@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -9,6 +10,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 
 const DetectAgentAnomaliesInputSchema = z.object({
@@ -31,6 +33,7 @@ export async function detectAgentAnomalies(input: DetectAgentAnomaliesInput): Pr
 
 const prompt = ai.definePrompt({
   name: 'detectAgentAnomaliesPrompt',
+  model: googleAI.model('gemini-2.5-flash'),
   input: {schema: DetectAgentAnomaliesInputSchema},
   output: {schema: DetectAgentAnomaliesOutputSchema},
   prompt: `You are a UEBA (User and Entity Behavior Analytics) security agent responsible for detecting unauthorized or abnormal behavior from other AI agents.

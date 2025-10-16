@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -9,6 +10,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 
 const PredictVehicleFailureInputSchema = z.object({
@@ -37,6 +39,7 @@ export async function predictVehicleFailure(input: PredictVehicleFailureInput): 
 
 const prompt = ai.definePrompt({
   name: 'predictVehicleFailurePrompt',
+  model: googleAI.model('gemini-2.5-flash'),
   input: {schema: PredictVehicleFailureInputSchema},
   output: {schema: PredictVehicleFailureOutputSchema},
   prompt: `You are an AI diagnosis agent specializing in predicting vehicle failures.

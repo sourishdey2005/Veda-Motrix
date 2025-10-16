@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -12,6 +13,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 
 const GenerateManufacturingInsightsInputSchema = z.object({
@@ -36,6 +38,7 @@ export type GenerateManufacturingInsightsOutput = z.infer<
 
 const generateManufacturingInsightsPrompt = ai.definePrompt({
   name: 'generateManufacturingInsightsPrompt',
+  model: googleAI.model('gemini-2.5-flash'),
   input: {schema: GenerateManufacturingInsightsInputSchema},
   output: {schema: GenerateManufacturingInsightsOutputSchema},
   prompt: `You are a manufacturing insights expert. Analyze the following service data and generate improvement suggestions for RCA/CAPA.

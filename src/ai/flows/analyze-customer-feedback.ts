@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -9,6 +10,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 
 const AnalyzeCustomerFeedbackInputSchema = z.object({
@@ -49,6 +51,7 @@ export async function analyzeCustomerFeedback(
 
 const analyzeCustomerFeedbackPrompt = ai.definePrompt({
   name: 'analyzeCustomerFeedbackPrompt',
+  model: googleAI.model('gemini-2.5-flash'),
   input: {schema: AnalyzeCustomerFeedbackInputSchema},
   output: {schema: AnalyzeCustomerFeedbackOutputSchema},
   prompt: `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements.

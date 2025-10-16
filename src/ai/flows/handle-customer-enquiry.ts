@@ -10,6 +10,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 
 const HandleCustomerEnquiryInputSchema = z.object({
@@ -32,6 +33,7 @@ export async function handleCustomerEnquiry(
 
 const prompt = ai.definePrompt({
   name: 'handleCustomerEnquiryPrompt',
+  model: googleAI.model('gemini-2.5-flash'),
   input: {schema: HandleCustomerEnquiryInputSchema},
   output: {schema: HandleCustomerEnquiryOutputSchema},
   prompt: `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.

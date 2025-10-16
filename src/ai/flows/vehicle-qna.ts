@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Q&A agent for vehicle-related questions.
@@ -8,6 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 import { qnaData } from '@/lib/chatbot-qna';
 
@@ -31,6 +33,7 @@ export async function answerQuestion(input: AnswerQuestionInput): Promise<Answer
 
 const prompt = ai.definePrompt({
   name: 'vehicleQnAPrompt',
+  model: googleAI.model('gemini-2.5-flash'),
   input: {schema: AnswerQuestionInputSchema},
   output: {schema: AnswerQuestionOutputSchema},
   prompt: `You are VEDA, an expert AI assistant for VEDA-MOTRIX vehicle owners. Your goal is to answer questions professionally and concisely based on a knowledge base of predefined questions and answers.
