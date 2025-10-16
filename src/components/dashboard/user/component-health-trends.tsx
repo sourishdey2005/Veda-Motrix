@@ -22,7 +22,7 @@ type ComponentKey = keyof typeof chartConfig;
 
 export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
   const [showOnlyCritical, setShowOnlyCritical] = useState(false);
-  const [activeComponents, setActiveComponents] = useState<ComponentKey[]>(['engine', 'brakes']);
+  const [activeComponents, setActiveComponents] = useState<ComponentKey[]>(['engine', 'brakes', 'battery', 'suspension', 'sensors']);
 
   const healthData = vehicle.healthHistory || [];
   
@@ -36,15 +36,17 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
 
   const filteredData = healthData.map(entry => {
     const newEntry: any = { date: entry.date };
-    if (!showOnlyCritical) {
-      activeComponents.forEach(comp => newEntry[comp] = entry[comp]);
-    } else {
-      activeComponents.forEach(comp => {
-        if (entry[comp] < 50) {
+    (Object.keys(chartConfig) as ComponentKey[]).forEach(comp => {
+      if (activeComponents.includes(comp)) {
+        if (showOnlyCritical) {
+          if (entry[comp] < 50) {
+            newEntry[comp] = entry[comp];
+          }
+        } else {
           newEntry[comp] = entry[comp];
         }
-      });
-    }
+      }
+    });
     return newEntry;
   });
 
@@ -70,8 +72,12 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
                 <button
                     key={key}
                     onClick={() => toggleComponent(key as ComponentKey)}
-                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${activeComponents.includes(key as ComponentKey) ? 'bg-primary text-primary-foreground border-primary' : 'bg-transparent'}`}
-                    style={{ '--component-color': `var(--color-${key})` } as React.CSSProperties}
+                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${activeComponents.includes(key as ComponentKey) ? 'text-white' : 'bg-transparent'}`}
+                    style={{ 
+                      backgroundColor: activeComponents.includes(key as ComponentKey) ? `var(--color-${key})` : 'transparent',
+                      borderColor: `var(--color-${key})`,
+                      color: activeComponents.includes(key as ComponentKey) ? 'white' : `var(--color-${key})`
+                    } as React.CSSProperties}
                 >
                     {chartConfig[key as ComponentKey].label}
                 </button>
@@ -104,6 +110,7 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
                     stroke={`var(--color-${key})`}
                     strokeWidth={2}
                     dot={false}
+                    connectNulls
                  />
               ))}
               <ReferenceLine y={50} stroke="hsl(var(--destructive))" strokeDasharray="3 3">
