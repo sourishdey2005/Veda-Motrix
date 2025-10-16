@@ -1,5 +1,5 @@
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format } from 'date-fns';
@@ -31,7 +31,7 @@ export const indianMakes = ['Hero', 'Mahindra', 'Tata', 'Maruti Suzuki'];
 export const indianModels = ['Splendor', 'Xtreme', 'XUV700', 'Scorpio', 'Pleasure+', 'Thar', 'Passion', 'Jawa', 'Karizma', 'Bolero', 'Nexon', 'Harrier', 'Swift', 'Baleno'];
 export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad'];
 
-const generateMaintenanceHistory = (vehicleIndex: number) => [
+const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => [
     { id: `M${vehicleIndex}1`, date: '2023-03-10', mileage: 12000 + vehicleIndex*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK.' },
     { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters.' },
     { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up.' },
@@ -70,6 +70,12 @@ const generateHealthHistory = (): HealthHistoryEntry[] => {
   });
 };
 
+const generatePredictedAlerts = (): PredictedAlert[] => [
+    { id: 'PA1', issue: 'Brake Pad Wear', priority: 'High', recommendation: 'Replace front brake pads within 2 weeks.', estimatedTime: '2 hours', estimatedCost: 8000, parts: [{ name: 'Brake Pads', cost: 6000 }], laborCost: 2000 },
+    { id: 'PA2', issue: 'Battery Degradation', priority: 'Medium', recommendation: 'Voltage dropping. Test and potential replacement recommended at next service.', estimatedTime: '1 hour', estimatedCost: 12000, parts: [{ name: 'Battery', cost: 11000 }], laborCost: 1000 },
+    { id: 'PA3', issue: 'Tire Pressure Imbalance', priority: 'Low', recommendation: 'Check and adjust tire pressures. Monitor for slow leaks.', estimatedTime: '15 mins', estimatedCost: 200, parts: [], laborCost: 200 },
+];
+
 
 export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   const healthStatus = i % 3 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
@@ -95,11 +101,7 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
       { name: 'Suspension', health: 60 + Math.random() * 40, anomalyProbability: Math.random() * 0.3 },
       { name: 'Sensors', health: 95 + Math.random() * 5, anomalyProbability: Math.random() * 0.02 },
     ],
-    predictedAlerts: [
-        { id: 'PA1', issue: 'Brake Pad Wear', priority: 'High', recommendation: 'Replace front brake pads within 2 weeks.', estimatedTime: '2 hours', estimatedCost: 8000, parts: [{ name: 'Brake Pads', cost: 6000 }], laborCost: 2000 },
-        { id: 'PA2', issue: 'Battery Degradation', priority: 'Medium', recommendation: 'Voltage dropping. Test and potential replacement recommended at next service.', estimatedTime: '1 hour', estimatedCost: 12000, parts: [{ name: 'Battery', cost: 11000 }], laborCost: 1000 },
-        { id: 'PA3', issue: 'Tire Pressure Imbalance', priority: 'Low', recommendation: 'Check and adjust tire pressures. Monitor for slow leaks.', estimatedTime: '15 mins', estimatedCost: 200, parts: [], laborCost: 200 },
-    ],
+    predictedAlerts: generatePredictedAlerts(),
     sensorData: {
       engine_temp: 90 + Math.random() * 30 * (healthStatus === 'Critical' ? 1.2 : 1),
       oil_level: 0.5 + Math.random() * 0.5 * (healthStatus === 'Warning' ? 0.8 : 1),
@@ -316,5 +318,7 @@ export const customerExperienceData = {
     { issue: "AC Cooling", count: 7, users: 5 },
   ]
 };
+
+    
 
     

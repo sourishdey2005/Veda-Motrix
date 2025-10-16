@@ -31,7 +31,7 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
   useEffect(() => {
     setHealthData(vehicle.healthHistory || []);
   }, [vehicle.healthHistory]);
-  
+
   const toggleComponent = (component: ComponentKey) => {
     setActiveComponents(prev => 
       prev.includes(component) 
@@ -144,3 +144,5 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
     </Card>
   );
 }
+
+    

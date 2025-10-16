@@ -1,9 +1,10 @@
 
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import type { User, Vehicle, UsageDataPoint, HealthHistoryEntry } from '@/lib/types';
+import type { User, Vehicle, UsageDataPoint, HealthHistoryEntry, PredictedAlert, MaintenanceLog } from '@/lib/types';
 import { users as mockUsers, vehicles as mockVehicles } from '@/lib/data';
 import { subDays, format } from 'date-fns';
 
@@ -61,6 +62,18 @@ const generateHealthHistory = (): HealthHistoryEntry[] => {
       };
   });
 };
+
+const generatePredictedAlerts = (): PredictedAlert[] => [
+    { id: 'PA1', issue: 'Brake Pad Wear', priority: 'High', recommendation: 'Replace front brake pads within 2 weeks.', estimatedTime: '2 hours', estimatedCost: 8000, parts: [{ name: 'Brake Pads', cost: 6000 }], laborCost: 2000 },
+    { id: 'PA2', issue: 'Battery Degradation', priority: 'Medium', recommendation: 'Voltage dropping. Test and potential replacement recommended at next service.', estimatedTime: '1 hour', estimatedCost: 12000, parts: [{ name: 'Battery', cost: 11000 }], laborCost: 1000 },
+    { id: 'PA3', issue: 'Tire Pressure Imbalance', priority: 'Low', recommendation: 'Check and adjust tire pressures. Monitor for slow leaks.', estimatedTime: '15 mins', estimatedCost: 200, parts: [], laborCost: 200 },
+];
+
+const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => [
+    { id: `M${vehicleIndex}1`, date: '2023-03-10', mileage: 12000 + vehicleIndex*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK.' },
+    { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters.' },
+    { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up.' },
+];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -176,14 +189,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         { name: 'Suspension', health: 92, anomalyProbability: 0.08 },
         { name: 'Sensors', health: 97, anomalyProbability: 0.03 },
       ],
-      predictedAlerts: [
-        { id: 'PA1', issue: 'Brake Pad Wear', priority: 'High', recommendation: 'Replace front brake pads within 2 weeks.', estimatedTime: '2 hours', estimatedCost: 8000, parts: [{ name: 'Brake Pads', cost: 6000 }], laborCost: 2000 },
-        { id: 'PA2', issue: 'Battery Degradation', priority: 'Medium', recommendation: 'Voltage dropping. Test and potential replacement recommended at next service.', estimatedTime: '1 hour', estimatedCost: 12000, parts: [{ name: 'Battery', cost: 11000 }], laborCost: 1000 },
-      ],
+      predictedAlerts: generatePredictedAlerts(),
       sensorData: {
         engine_temp: 90, oil_level: 0.9, vibration: 5, tire_pressure: 32, battery_voltage: 12.6, fuel_level: 1,
       },
-      maintenanceHistory: [],
+      maintenanceHistory: generateMaintenanceHistory(vehicles.length),
       usageHistory: generateUsageHistory(),
       healthHistory: generateHealthHistory(),
     };
@@ -205,3 +215,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+    

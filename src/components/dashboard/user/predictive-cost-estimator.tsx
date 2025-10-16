@@ -14,6 +14,12 @@ export function PredictiveCostEstimator({ vehicle }: { vehicle: Vehicle }) {
   const [selectedAlertId, setSelectedAlertId] = useState<string | undefined>(vehicleAlerts[0]?.id);
   const [includeOptional, setIncludeOptional] = useState(true);
 
+  useEffect(() => {
+    if (!selectedAlertId && vehicleAlerts.length > 0) {
+      setSelectedAlertId(vehicleAlerts[0].id);
+    }
+  }, [vehicleAlerts, selectedAlertId]);
+
   const selectedAlert = vehicleAlerts.find(a => a.id === selectedAlertId);
 
   const chartData = selectedAlert ? [
@@ -107,3 +113,5 @@ export function PredictiveCostEstimator({ vehicle }: { vehicle: Vehicle }) {
     </Card>
   );
 }
+
+    
