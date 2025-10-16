@@ -1,6 +1,8 @@
 
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend } from './types';
+
+
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format, addDays } from 'date-fns';
@@ -52,7 +54,9 @@ const generateTechnicianPerformance = (): TechnicianPerformance => ({
         { issueType: 'General Service', time: 2 + Math.random() * 1 },
         { issueType: 'Engine Repair', time: 6 + Math.random() * 4 },
         { issueType: 'Brake Work', time: 3 + Math.random() * 1.5 },
-    ]
+    ],
+    satisfaction: 90 + Math.random() * 10,
+    experience: 2 + Math.random() * 8, // years
 });
 
 export const technicians: Technician[] = [
@@ -237,7 +241,8 @@ export const liveQueueData: LiveQueueVehicle[] = [
     { id: 'V1001', model: 'Hero Splendor', stage: 'Ready for Pickup' },
 ];
 
-const components = ['Engine', 'Transmission', 'Suspension', 'Brakes', 'AC System'];
+const rcaComponents = ['ECU', 'Injector', 'ABS Sensor', 'Wiring'];
+const rcaSuppliers = ['Bosch', 'Delphi', 'Continental', 'Minda'];
 
 export const analyticsData = {
   kpis: {
@@ -246,7 +251,7 @@ export const analyticsData = {
     fleetUtilization: 92.3,
     preventiveSavings: 1250000,
   },
-  predictiveBreakdown: components.flatMap(component => 
+  predictiveBreakdown: rcaComponents.flatMap(component => 
     indianMakes.map(model => ({
       component,
       model,
@@ -283,9 +288,6 @@ export const analyticsData = {
     'Injector': 30 + Math.random() * 15,
   }))
 };
-
-const rcaSuppliers = ['Bosch India', 'Minda Corp', 'Bharat Forge', 'Lumax', 'Uno Minda'];
-const rcaComponents = ['ECU', 'Fuel Injector', 'ABS Module', 'Wiring Harness', 'Infotainment Unit'];
 
 export const rcaCapaAnalyticsData = {
   rcaClusters: [
@@ -422,4 +424,18 @@ export const partConsumptionTrends: PartConsumptionTrend[] = [
     { part: 'Oil Filters', change: 20 },
     { part: 'Brake Pads', change: 15 },
     { part: 'Air Filters', change: -5 },
+];
+
+export const rootCauseData: RootCauseData[] = [
+    { faultType: 'Engine', recurrence: 0.1, frequency: 15 },
+    { faultType: 'Brake', recurrence: 0.35, frequency: 30 },
+    { faultType: 'Electrical', recurrence: 0.2, frequency: 25 },
+    { faultType: 'Suspension', recurrence: 0.15, frequency: 20 },
+];
+
+export const technicianCorrelationMatrix: CorrelationMatrix[] = [
+    { metric: 'Skill', skill: 1.0, experience: 0.6, serviceTime: -0.82, satisfaction: 0.7 },
+    { metric: 'Experience', skill: 0.6, experience: 1.0, serviceTime: -0.5, satisfaction: 0.4 },
+    { metric: 'Service Time', skill: -0.82, experience: -0.5, serviceTime: 1.0, satisfaction: -0.65 },
+    { metric: 'Satisfaction', skill: 0.7, experience: 0.4, serviceTime: -0.65, satisfaction: 1.0 },
 ];

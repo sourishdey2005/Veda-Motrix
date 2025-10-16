@@ -5,6 +5,7 @@
 
 
 
+
 export type User = {
   id: string;
   name: string;
@@ -137,6 +138,8 @@ export type TechnicianPerformance = {
         issueType: string;
         time: number; // in hours
     }[];
+    satisfaction: number;
+    experience: number;
 };
 
 export type Technician = {
@@ -212,4 +215,18 @@ export type InventoryPart = {
 export type PartConsumptionTrend = {
     part: string;
     change: number;
+};
+
+export type RootCauseData = {
+    faultType: 'Engine' | 'Brake' | 'Electrical' | 'Suspension';
+    recurrence: number;
+    frequency: number;
+};
+
+export type CorrelationMatrix = {
+    metric: 'Skill' | 'Experience' | 'Service Time' | 'Satisfaction';
+    skill: number;
+    experience: number;
+    serviceTime: number;
+    satisfaction: number;
 };
