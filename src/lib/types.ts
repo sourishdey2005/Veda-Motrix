@@ -1,12 +1,4 @@
 
-
-
-
-
-
-
-
-
 export type User = {
   id: string;
   name: string;
@@ -249,4 +241,16 @@ export type RepairCostData = {
 export type PartLifecycleData = {
   mileage: number;
   failureProbability: number;
+};
+
+export type SankeyNode = { name: string };
+export type SankeyLink = { source: number; target: number; value: number };
+export type SankeyData = {
+  nodes: SankeyNode[];
+  links: SankeyLink[];
+};
+
+export type AnomalyTimelineDataPoint = {
+  time: string;
+  score: number;
 };

@@ -1,9 +1,4 @@
-
-
-
-
-
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format, addDays } from 'date-fns';
@@ -462,4 +457,32 @@ export const repairCostData: RepairCostData[] = [
 export const partLifecycleData: PartLifecycleData[] = Array.from({ length: 10 }).map((_, i) => ({
   mileage: (i + 1) * 10000,
   failureProbability: (1 / (1 + Math.exp(-(i - 5) * 0.8))) * 100, // Sigmoid curve
+}));
+
+export const sankeyChartData: SankeyData = {
+    nodes: [
+        { name: "Brake Pad" }, { name: "Engine" },
+        { name: "Braking System" }, { name: "Powertrain" },
+        { name: "Wear & Tear" }, { name: "Overheating" },
+        { name: "Replacement" }, { name: "Diagnostic Check" },
+        { name: "Sanjay Kumar" }, { name: "Rajesh Sharma" }
+    ],
+    links: [
+        { source: 0, target: 2, value: 40 },
+        { source: 1, target: 3, value: 25 },
+        { source: 2, target: 4, value: 30 },
+        { source: 2, target: 5, value: 10 },
+        { source: 3, target: 5, value: 25 },
+        { source: 4, target: 6, value: 30 },
+        { source: 5, target: 7, value: 35 },
+        { source: 6, target: 8, value: 20 },
+        { source: 6, target: 9, value: 10 },
+        { source: 7, target: 8, value: 15 },
+        { source: 7, target: 9, value: 20 }
+    ]
+};
+
+export const anomalyTimelineData: AnomalyTimelineDataPoint[] = Array.from({length: 24}).map((_, i) => ({
+    time: `${String(i).padStart(2, '0')}:00`,
+    score: i > 8 && i < 18 ? Math.random() * 0.3 : (i === 2 || i === 22) ? Math.random() * 0.5 + 0.4 : Math.random() * 0.1,
 }));
