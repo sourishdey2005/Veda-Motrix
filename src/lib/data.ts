@@ -1,5 +1,5 @@
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format } from 'date-fns';
@@ -37,6 +37,15 @@ export const serviceCenters: ServiceCenter[] = [
   { id: 'SC3', name: 'VedaMotrix Connaught Place', city: 'Delhi', lat: 28.632, lng: 77.219, capacity: 10, availableSlots: ['09:00', '11:00', '14:00', '17:00'], rating: 4.7, avgCompletionTime: 2.8 },
   { id: 'SC4', name: 'VedaMotrix T. Nagar', city: 'Chennai', lat: 13.04, lng: 80.23, capacity: 8, availableSlots: ['10:30', '14:30'], rating: 4.5, avgCompletionTime: 3.5 },
   { id: 'SC5', name: 'VedaMotrix Park Street', city: 'Kolkata', lat: 22.55, lng: 88.35, capacity: 9, availableSlots: ['09:00', '12:00', '15:00'], rating: 4.6, avgCompletionTime: 3.2 },
+];
+
+export const technicians: Technician[] = [
+    { id: 'T1', name: 'Sanjay Kumar', specialty: 'Engine', serviceCenterId: 'SC1' },
+    { id: 'T2', name: 'Rajesh Sharma', specialty: 'Electronics', serviceCenterId: 'SC1' },
+    { id: 'T3', name: 'Vijay Singh', specialty: 'General', serviceCenterId: 'SC1' },
+    { id: 'T4', name: 'Anil Mehta', specialty: 'Suspension', serviceCenterId: 'SC2' },
+    { id: 'T5', name: 'Prakash Rao', specialty: 'General', serviceCenterId: 'SC2' },
+    { id: 'T6', name: 'Deepak Verma', specialty: 'Engine', serviceCenterId: 'SC3' },
 ];
 
 const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => {
@@ -176,9 +185,12 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
 export const allVehicles = vehicles;
 
 export const appointments: Appointment[] = [
-  { id: 'A1', vehicleId: 'V1001', serviceCenterId: 'SC1', date: '2024-08-01', time: '09:30', status: 'Completed', notes: 'Diagnosed high engine temperature.' },
-  { id: 'A2', vehicleId: 'V1002', serviceCenterId: 'SC2', date: '2024-08-02', time: '10:00', status: 'In Progress', notes: 'Investigating low oil pressure warning.' },
-  { id: 'A3', vehicleId: 'V1003', serviceCenterId: 'SC3', date: '2024-08-03', time: '14:00', status: 'Booked', notes: 'Customer reports high vibration during braking.' },
+  { id: 'A1', vehicleId: 'V1001', serviceCenterId: 'SC1', date: '2024-08-01', time: '09:30', status: 'Completed', notes: 'Diagnosed high engine temperature.', technicianId: 'T1', estimatedTime: 3, stageProgress: 100 },
+  { id: 'A2', vehicleId: 'V1002', serviceCenterId: 'SC1', date: '2024-08-02', time: '10:00', status: 'In Service', notes: 'Investigating low oil pressure warning.', technicianId: 'T2', estimatedTime: 5, stageProgress: 60 },
+  { id: 'A3', vehicleId: 'V1003', serviceCenterId: 'SC1', date: '2024-08-03', time: '14:00', status: 'Pending', notes: 'Customer reports high vibration during braking.', technicianId: 'T1', estimatedTime: 2, stageProgress: 0 },
+  { id: 'A4', vehicleId: 'V1004', serviceCenterId: 'SC1', date: '2024-08-04', time: '11:00', status: 'Pending', notes: 'Annual service and check-up.', technicianId: 'T3', estimatedTime: 4, stageProgress: 0 },
+  { id: 'A5', vehicleId: 'V1005', serviceCenterId: 'SC1', date: '2024-08-05', time: '15:00', status: 'In Service', notes: 'Replace battery as per predictive alert.', technicianId: 'T2', estimatedTime: 1, stageProgress: 80 },
+  { id: 'A6', vehicleId: 'V1006', serviceCenterId: 'SC1', date: '2024-08-06', time: '10:30', status: 'Awaiting Parts', notes: 'ABS module failure. Part ordered.', technicianId: 'T2', estimatedTime: 6, stageProgress: 40 },
 ];
 
 export const uebaEvents: UebaEvent[] = [
@@ -199,6 +211,7 @@ export const notifications: Notification[] = [
   { id: 'N1', title: 'Critical Alert: V1003', description: 'Engine vibration has exceeded critical threshold. Immediate inspection recommended.', timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString() },
   { id: 'N2', title: 'Agent Anomaly Detected', description: 'Scheduling Agent attempted unauthorized access. Action was blocked.', timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString() },
   { id: 'N3', title: 'New Feedback Received', description: 'A 5-star review was submitted for service at Mumbai SC.', timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString() },
+  { id: 'N4', title: 'Parts Shortage Warning', description: 'Low stock for "Brake Pads - XUV700". Consider reordering.', timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString() },
 ];
 
 const components = ['Engine', 'Transmission', 'Suspension', 'Brakes', 'AC System'];

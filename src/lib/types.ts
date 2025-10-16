@@ -1,5 +1,6 @@
 
 
+
 export type User = {
   id: string;
   name: string;
@@ -107,7 +108,7 @@ export type Vehicle = {
   usageHistory: UsageDataPoint[];
   healthHistory: HealthHistoryEntry[];
   predictiveInsights: PredictiveInsight[];
-  environmentalData: EnvironmentalData;
+  environmentalData?: EnvironmentalData;
 };
 
 export type ServiceCenter = {
@@ -122,14 +123,26 @@ export type ServiceCenter = {
   avgCompletionTime: number;
 };
 
+export type Technician = {
+    id: string;
+    name: string;
+    specialty: string;
+    serviceCenterId: string;
+}
+
+export type AppointmentStatus = 'Pending' | 'In Service' | 'Awaiting Parts' | 'Completed';
+
 export type Appointment = {
   id: string;
   vehicleId: string;
   serviceCenterId: string;
   date: string;
   time: string;
-  status: 'Booked' | 'In Progress' | 'Completed' | 'Cancelled';
+  status: AppointmentStatus;
   notes: string;
+  technicianId?: string;
+  estimatedTime: number; // hours
+  stageProgress?: number; // 0-100
 };
 
 export type UebaEvent = {
