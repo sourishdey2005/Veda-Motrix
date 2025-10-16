@@ -9,7 +9,6 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import type { User } from '@/lib/types';
-import { users } from '@/lib/data';
 
 const credentials = {
   manager: {
@@ -21,7 +20,7 @@ const credentials = {
     password: 'SERVICE@123',
   },
   user: {
-    email: 'john.doe@email.com',
+    email: 'rohan.joshi@email.com',
     password: 'password123',
   }
 };
@@ -34,12 +33,9 @@ export function LoginForm({ userType }: { userType: User['role'] }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (userType === 'manager' || userType === 'service-center') {
+    if (credentials[userType]) {
       setEmail(credentials[userType].email);
       setPassword(credentials[userType].password);
-    } else {
-        setEmail(credentials.user.email);
-        setPassword(credentials.user.password);
     }
   }, [userType]);
 
@@ -67,7 +63,7 @@ export function LoginForm({ userType }: { userType: User['role'] }) {
           <Input
             id="email"
             type="email"
-            placeholder="manager@vedamotrix.ai"
+            placeholder="your@email.com"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -87,7 +83,7 @@ export function LoginForm({ userType }: { userType: User['role'] }) {
             onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading || isHardcoded}
             readOnly={isHardcoded}
-            placeholder={userType === 'manager' ? 'VEDA@123' : ''}
+            placeholder='Your password'
           />
         </div>
         <Button type="submit" className="w-full" disabled={isLoading}>

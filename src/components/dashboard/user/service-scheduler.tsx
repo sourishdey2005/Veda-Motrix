@@ -30,7 +30,7 @@ export function ServiceScheduler() {
 
     toast({
       title: "Appointment Booked!",
-      description: `Your service is confirmed for ${date.toLocaleDateString()} at ${timeSlot}.`,
+      description: `Your service is confirmed for ${date.toLocaleDateString('en-IN')} at ${timeSlot}.`,
     });
     // Reset state after booking
     setDate(new Date());

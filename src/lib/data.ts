@@ -15,9 +15,9 @@ const avatar2 = PlaceHolderImages.find(img => img.id === 'avatar-2')?.imageUrl |
 const avatar3 = PlaceHolderImages.find(img => img.id === 'avatar-3')?.imageUrl || '';
 
 export const users: User[] = [
-  { id: '1', name: 'Alex Manager', email: 'manager@vedamotrix.ai', passwordHash: simpleHash('VEDA@123'), role: 'manager', avatarUrl: avatar1 },
-  { id: '2', name: 'Sarah Service', email: 'service@vedamotrix.ai', passwordHash: simpleHash('SERVICE@123'), role: 'service-center', avatarUrl: avatar2 },
-  { id: '3', name: 'John Doe', email: 'john.doe@email.com', passwordHash: simpleHash('password123'), role: 'user', avatarUrl: avatar3 },
+  { id: '1', name: 'Priya Sharma', email: 'manager@vedamotrix.ai', passwordHash: simpleHash('VEDA@123'), role: 'manager', avatarUrl: avatar1 },
+  { id: '2', name: 'Amit Singh', email: 'service@vedamotrix.ai', passwordHash: simpleHash('SERVICE@123'), role: 'service-center', avatarUrl: avatar2 },
+  { id: '3', name: 'Rohan Joshi', email: 'rohan.joshi@email.com', passwordHash: simpleHash('password123'), role: 'user', avatarUrl: avatar3 },
 ];
 
 const vehicleImg1 = PlaceHolderImages.find(img => img.id === 'vehicle-1');
@@ -29,9 +29,9 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   const selectedImg = i % 3 === 0 ? vehicleImg1 : i % 2 === 0 ? vehicleImg2 : vehicleImg3;
   return {
     id: `V${1001 + i}`,
-    ownerId: '3', // All owned by John Doe for simplicity
-    make: ['Volkswagon', 'Tesla', 'BMW', 'Audi', 'Mercedes', 'Ford', 'Honda', 'Toyota', 'Nissan', 'Hyundai'][i],
-    model: ['Virtus', 'Model Y', 'M3', 'A4', 'C-Class', 'Mustang', 'Civic', 'Camry', 'Altima', 'Sonata'][i],
+    ownerId: '3', // All owned by Rohan Joshi for simplicity
+    make: ['Maruti Suzuki', 'Tata', 'Mahindra', 'Hyundai', 'Kia', 'Toyota', 'Honda', 'Skoda', 'Volkswagen', 'MG'][i],
+    model: ['Swift', 'Nexon', 'XUV700', 'Creta', 'Seltos', 'Innova', 'City', 'Kushaq', 'Virtus', 'Hector'][i],
     year: 2020 + (i % 4),
     vin: `VIN${Math.random().toString(36).substring(2, 15).toUpperCase()}`,
     imageUrl: selectedImg?.imageUrl || '',
@@ -46,28 +46,28 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
       fuel_level: Math.random(),
     },
     maintenanceHistory: [
-      { id: `M${i}1`, date: '2023-01-15', mileage: 15000 + i*1000, service: 'Oil Change', notes: 'Routine check-up.' },
-      { id: `M${i}2`, date: '2023-07-20', mileage: 25000 + i*1000, service: 'Tire Rotation', notes: 'Checked brake pads.' },
+      { id: `M${i}1`, date: '2023-03-10', mileage: 12000 + i*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK.' },
+      { id: `M${i}2`, date: '2023-09-15', mileage: 21000 + i*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters.' },
     ],
   };
 });
 
 export const serviceCenters: ServiceCenter[] = [
-  { id: 'SC1', name: 'VedaMotrix Downtown', city: 'New York', capacity: 10, availableSlots: ['09:00', '11:00', '14:00'] },
-  { id: 'SC2', name: 'VedaMotrix Westside', city: 'Los Angeles', capacity: 8, availableSlots: ['10:00', '13:00', '15:00'] },
-  { id: 'SC3', name: 'VedaMotrix North', city: 'Chicago', capacity: 12, availableSlots: ['08:00', '10:00', '12:00', '16:00'] },
+  { id: 'SC1', name: 'VedaMotrix Andheri', city: 'Mumbai', capacity: 15, availableSlots: ['09:30', '11:30', '14:30'] },
+  { id: 'SC2', name: 'VedaMotrix Koramangala', city: 'Bengaluru', capacity: 12, availableSlots: ['10:00', '13:00', '16:00'] },
+  { id: 'SC3', name: 'VedaMotrix Connaught Place', city: 'Delhi', capacity: 10, availableSlots: ['09:00', '11:00', '14:00', '17:00'] },
 ];
 
 export const appointments: Appointment[] = [
-  { id: 'A1', vehicleId: 'V1001', serviceCenterId: 'SC1', date: '2024-07-28', time: '09:00', status: 'Completed', notes: 'Diagnosed high engine temperature.' },
-  { id: 'A2', vehicleId: 'V1002', serviceCenterId: 'SC2', date: '2024-07-29', time: '10:00', status: 'In Progress', notes: 'Investigating low oil pressure warning.' },
-  { id: 'A3', vehicleId: 'V1003', serviceCenterId: 'SC1', date: '2024-07-30', time: '14:00', status: 'Booked', notes: 'Customer reports high vibration.' },
+  { id: 'A1', vehicleId: 'V1001', serviceCenterId: 'SC1', date: '2024-08-01', time: '09:30', status: 'Completed', notes: 'Diagnosed high engine temperature.' },
+  { id: 'A2', vehicleId: 'V1002', serviceCenterId: 'SC2', date: '2024-08-02', time: '10:00', status: 'In Progress', notes: 'Investigating low oil pressure warning.' },
+  { id: 'A3', vehicleId: 'V1003', serviceCenterId: 'SC3', date: '2024-08-03', time: '14:00', status: 'Booked', notes: 'Customer reports high vibration during braking.' },
 ];
 
 export const capaRcaEntries: CapaRcaEntry[] = [
-  { id: 'C1', component: 'Fuel Injector', issuePattern: 'Clogging reported in Model Y under 20,000 miles.', suggestion: 'Review injector supplier quality control.', status: 'Pending' },
-  { id: 'C2', component: 'Transmission Gasket', issuePattern: 'Premature wear leading to leaks in M3s.', suggestion: 'Investigate alternative gasket materials.', status: 'Approved' },
-  { id: 'C3', component: 'Brake Caliper', issuePattern: 'Sticking issue causing uneven pad wear.', suggestion: 'Redesign caliper piston seals for better heat resistance.', status: 'Pending' },
+  { id: 'C1', component: 'Clutch Assembly', issuePattern: 'Premature wear reported in Tata Nexon under 30,000 kms in city driving.', suggestion: 'Investigate clutch plate material for higher durability.', status: 'Pending' },
+  { id: 'C2', component: 'AC Compressor', issuePattern: 'Failure in Hyundai Creta models in regions with high ambient temperature.', suggestion: 'Evaluate higher-rated AC compressor units for hot climates.', status: 'Approved' },
+  { id: 'C3', component: 'Suspension Bushings', issuePattern: 'Frequent wear and tear in Mahindra XUV700 on rough roads.', suggestion: 'Test polyurethane bushings as a potential replacement for standard rubber.', status: 'Pending' },
 ];
 
 export const uebaEvents: UebaEvent[] = [
@@ -79,7 +79,7 @@ export const uebaEvents: UebaEvent[] = [
 ];
 
 export const customerFeedbackData: CustomerFeedback[] = [
-    { id: 'F1', userId: '3', vehicleId: 'V1001', rating: 5, comment: 'The service was excellent, and the staff were very professional. My car runs like new!', date: '2024-07-29' },
-    { id: 'F2', userId: '3', vehicleId: 'V1004', rating: 3, comment: 'The repair took longer than expected, but the issue seems to be fixed. Communication could have been better.', date: '2024-07-25' },
-    { id: 'F3', userId: '3', vehicleId: 'V1007', rating: 4, comment: 'Good service, fair price. The waiting area was clean and comfortable.', date: '2024-07-22' },
+    { id: 'F1', userId: '3', vehicleId: 'V1001', rating: 5, comment: 'Excellent service at the Mumbai center. The staff was very courteous and explained everything clearly.', date: '2024-08-02' },
+    { id: 'F2', userId: '3', vehicleId: 'V1004', rating: 3, comment: 'The service in Delhi took a bit longer than I was told. The car is fine now, but the wait was too long.', date: '2024-07-28' },
+    { id: 'F3', userId: '3', vehicleId: 'V1007', rating: 4, comment: 'Good experience in Bengaluru. The lounge was clean and they fixed the issue promptly. Price was reasonable.', date: '2024-07-25' },
 ];

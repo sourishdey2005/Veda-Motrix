@@ -21,7 +21,7 @@ export function ManufacturingInsightsView() {
   const [entries, setEntries] = useState<CapaRcaEntry[]>(initialEntries);
   const [loading, setLoading] = useState(false);
   const [serviceData, setServiceData] = useState(
-    'Recent service reports indicate a trend of premature wear on transmission gaskets for M3 models, leading to leaks. Also, multiple reports of fuel injector clogging in Model Y under 20k miles.'
+    'Recent service reports indicate a trend of premature wear on clutch assemblies for Tata Nexon models, leading to slippage. Also, multiple reports of AC compressor failure in Hyundai Creta under 40k km.'
   );
 
   const handleGenerate = async () => {
@@ -32,7 +32,7 @@ export function ManufacturingInsightsView() {
       id: `C${entries.length + 1}`,
       component: "AI Generated",
       issuePattern: "Based on provided service data.",
-      suggestion: "Consider using a more durable gasket material for high-torque applications and investigate fuel additives to reduce injector deposits.",
+      suggestion: "Consider using a more durable clutch material for high-torque applications and investigate alternative AC compressor suppliers.",
       status: 'Pending'
     };
     setEntries(prev => [newEntry, ...prev]);

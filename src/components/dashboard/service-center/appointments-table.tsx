@@ -45,7 +45,7 @@ export function AppointmentsTable() {
               return (
                 <TableRow key={appointment.id}>
                   <TableCell className="font-medium">{vehicle ? `${vehicle.make} ${vehicle.model}` : 'N/A'}</TableCell>
-                  <TableCell>{appointment.date} at {appointment.time}</TableCell>
+                  <TableCell>{new Date(appointment.date).toLocaleDateString('en-IN')} at {appointment.time}</TableCell>
                   <TableCell>{serviceCenter?.name || 'N/A'}</TableCell>
                   <TableCell className="max-w-xs truncate">{appointment.notes}</TableCell>
                   <TableCell>

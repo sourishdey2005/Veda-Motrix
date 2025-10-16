@@ -16,10 +16,10 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
             {vehicle.maintenanceHistory.map((log, index) => (
                 <div key={log.id} className="relative mb-8 flex items-start">
                     <div className="absolute left-[30px] top-1/2 h-3 w-3 rounded-full bg-primary ring-4 ring-background -translate-x-1/2 -translate-y-1/2"></div>
-                    <div className="w-20 text-sm text-muted-foreground pt-1">{log.date}</div>
+                    <div className="w-24 text-sm text-muted-foreground pt-1">{new Date(log.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
                     <div className="ml-8 flex-1">
                         <h4 className="font-semibold">{log.service}</h4>
-                        <p className="text-sm text-muted-foreground">Mileage: {log.mileage.toLocaleString()}</p>
+                        <p className="text-sm text-muted-foreground">Mileage: {log.mileage.toLocaleString('en-IN')} km</p>
                         <p className="text-sm mt-1">{log.notes}</p>
                     </div>
                 </div>

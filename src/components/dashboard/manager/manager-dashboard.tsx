@@ -89,8 +89,8 @@ export function ManagerDashboard() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
-            <p className="text-xs text-muted-foreground">New suggestions generated this week.</p>
+            <div className="text-2xl font-bold">3</div>
+            <p className="text-xs text-muted-foreground">New suggestions for RCA/CAPA.</p>
           </CardContent>
         </Card>
         <Card>
@@ -104,7 +104,7 @@ export function ManagerDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">10</div>
-            <p className="text-xs text-muted-foreground">Across 10 different models.</p>
+            <p className="text-xs text-muted-foreground">Vehicle models being monitored.</p>
           </CardContent>
         </Card>
       </div>

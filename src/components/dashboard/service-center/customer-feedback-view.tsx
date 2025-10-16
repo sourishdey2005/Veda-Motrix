@@ -69,7 +69,7 @@ export function CustomerFeedbackView() {
                       <StarRating rating={feedback.rating} />
                       <CardTitle className="text-lg">Feedback from User #{feedback.userId}</CardTitle>
                     </div>
-                    <CardDescription>Vehicle: {feedback.vehicleId} on {feedback.date}</CardDescription>
+                    <CardDescription>Vehicle: {feedback.vehicleId} on {new Date(feedback.date).toLocaleDateString('en-IN')}</CardDescription>
                   </div>
                   {analysis && <Badge variant={analysis.sentiment.toLowerCase().includes('positive') ? 'default' : analysis.sentiment.toLowerCase().includes('negative') ? 'destructive' : 'secondary'} className={analysis.sentiment.toLowerCase().includes('positive') ? 'bg-green-600': ''}>{analysis.sentiment}</Badge>}
                 </div>

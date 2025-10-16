@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Pie, PieChart, Cell } from "recharts"
 import type { ChartConfig } from "@/components/ui/chart"
-import { vehicles } from "@/lib/data"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Loader2, AlertTriangle } from "lucide-react"
@@ -27,12 +26,12 @@ const chartConfig: ChartConfig = {
 }
 
 const failureComponentsData = [
-    { name: 'Fuel Injector', value: 400 },
-    { name: 'Transmission Gasket', value: 300 },
-    { name: 'Brake Caliper', value: 300 },
-    { name: 'O2 Sensor', value: 200 },
+    { name: 'Clutch Assembly', value: 400 },
+    { name: 'AC Compressor', value: 300 },
+    { name: 'Suspension Bushing', value: 300 },
+    { name: 'Turbocharger', value: 200 },
     { name: 'Battery', value: 278 },
-    { name: 'Alternator', value: 189 },
+    { name: 'Injector', value: 189 },
 ];
 const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
 
