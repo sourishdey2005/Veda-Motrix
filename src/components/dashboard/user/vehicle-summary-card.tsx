@@ -23,12 +23,15 @@ const getRiskColor = (priority: PredictedAlert['priority']) => {
 }
 
 export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }) {
-    const [healthScore, setHealthScore] = useState(vehicle.healthScore);
+    const [healthScore, setHealthScore] = useState(vehicle.healthScore || 0);
     const [predictedAlert, setPredictedAlert] = useState(vehicle.predictedAlerts?.[0]);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setHealthScore(prev => Math.min(100, Math.max(20, prev + (Math.random() - 0.5) * 5)));
+            setHealthScore(prev => {
+                const currentScore = prev || 75; // Fallback to a neutral score
+                return Math.min(100, Math.max(20, currentScore + (Math.random() - 0.5) * 5))
+            });
             if (vehicle.predictedAlerts && vehicle.predictedAlerts.length > 0) {
               setPredictedAlert(vehicle.predictedAlerts[Math.floor(Math.random() * vehicle.predictedAlerts.length)]);
             }
