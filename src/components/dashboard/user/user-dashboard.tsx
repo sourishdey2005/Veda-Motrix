@@ -6,7 +6,7 @@ import { MaintenanceAlerts } from "./maintenance-alerts"
 import { VehicleHealthRadar } from "./vehicle-health-radar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ServiceScheduler } from "./service-scheduler"
-import { AIChat } from "./ai-chat"
+import { AIChatbot } from "./ai-chatbot"
 import { VehicleUsageAnalytics } from "./vehicle-usage-analytics"
 
 export function UserDashboard() {
@@ -55,9 +55,9 @@ export function UserDashboard() {
 
         <div className="grid grid-cols-1 gap-6 h-full">
             <ServiceScheduler />
-            <AIChat />
         </div>
       </div>
+      <AIChatbot />
     </div>
   )
 }

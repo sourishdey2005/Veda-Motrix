@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Bot, Send, User } from "lucide-react"
@@ -69,12 +68,7 @@ export function AIChat() {
     }
 
     return (
-        <Card className="flex flex-col h-full">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Bot className="text-primary" /> AI Assistant</CardTitle>
-                <CardDescription>Chat with our AI for assistance and recommendations.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow flex flex-col">
+        <div className="flex flex-col h-full p-6 pt-0">
                 <ScrollArea className="flex-grow h-0 pr-4 -mr-4 mb-4" ref={scrollAreaRef}>
                     <div className="space-y-4">
                         {messages.map((msg, index) => (
@@ -108,7 +102,6 @@ export function AIChat() {
                         <Send className="w-4 h-4" />
                     </Button>
                 </form>
-            </CardContent>
-        </Card>
+        </div>
     )
 }
