@@ -27,7 +27,7 @@ export default function ManagerLoginPage() {
             width="1920"
             height="1080"
             data-ai-hint={loginBg.imageHint}
-            className="h-full w-full object-cover dark:brightness-[0.3] dark:grayscale"
+            className="h-full w-full object-cover"
           />
         )}
       </div>
