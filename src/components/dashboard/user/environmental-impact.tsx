@@ -28,6 +28,10 @@ const badgeIcons: { [key: string]: React.ElementType } = {
 export function EnvironmentalImpact({ vehicle }: { vehicle: Vehicle }) {
   const { environmentalData } = vehicle;
 
+  if (!environmentalData) {
+    return null; // or a placeholder
+  }
+
   return (
     <Card>
       <CardHeader>
