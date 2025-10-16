@@ -132,7 +132,7 @@ export function AIChat() {
                 </ScrollArea>
                  <div className="pt-4 pb-2">
                     <p className="text-xs text-muted-foreground mb-2">Or try asking:</p>
-                    <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="flex flex-wrap sm:flex-row gap-2">
                         {suggestedQuestions.map((q, i) => (
                             <Button
                                 key={i}
