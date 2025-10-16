@@ -54,7 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       delete userToStore.passwordHash; // Don't store hash in state or localStorage
       setUser(userToStore);
       localStorage.setItem('veda-user', JSON.stringify(userToStore));
-      router.push('/dashboard');
+      
+      let redirectPath = '/dashboard';
+      if(userToStore.role === 'manager') redirectPath = '/dashboard/manager';
+      if(userToStore.role === 'service-center') redirectPath = '/dashboard/service-center';
+      if(userToStore.role === 'user') redirectPath = '/dashboard/user';
+
+      router.push(redirectPath);
       return true;
     }
     return false;
@@ -79,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
      delete userToStore.passwordHash;
      setUser(userToStore);
      localStorage.setItem('veda-user', JSON.stringify(userToStore));
-     router.push('/dashboard');
+     router.push('/dashboard/user');
      return true;
   }
 
