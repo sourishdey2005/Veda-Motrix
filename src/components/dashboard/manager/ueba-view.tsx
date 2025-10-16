@@ -47,11 +47,9 @@ export function UebaView() {
           </TableHeader>
           <TableBody>
             {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                        <TableCell colSpan={5} className="text-center p-4">Loading events...</TableCell>
-                    </TableRow>
-                ))
+                <TableRow>
+                    <TableCell colSpan={5} className="text-center p-4">Loading events...</TableCell>
+                </TableRow>
             ) : (
                 uebaEvents.map((event) => (
                 <TableRow key={event.id} className={event.isAnomalous ? "bg-destructive/10" : ""}>
