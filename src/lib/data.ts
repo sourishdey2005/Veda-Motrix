@@ -1,4 +1,5 @@
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint } from './types';
+
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format } from 'date-fns';
@@ -54,6 +55,22 @@ const generateUsageHistory = (): UsageDataPoint[] => {
     });
 };
 
+const generateHealthHistory = (): HealthHistoryEntry[] => {
+  const today = new Date();
+  return Array.from({ length: 30 }).map((_, i) => {
+      const date = subDays(today, 29 - i);
+      return {
+          date: format(date, 'yyyy-MM-dd'),
+          engine: 90 - i * 0.2 + Math.random() * 5,
+          brakes: 95 - i * 0.3 + Math.random() * 8,
+          battery: 98 - i * 0.1 + Math.random() * 4,
+          suspension: 88 - i * 0.4 + Math.random() * 10,
+          sensors: 99 - i * 0.05 + Math.random() * 2,
+      };
+  });
+};
+
+
 export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   const healthStatus = i % 3 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
   const healthScore = healthStatus === 'Critical' ? 30 + Math.random() * 20 : healthStatus === 'Warning' ? 60 + Math.random() * 20 : 85 + Math.random() * 15;
@@ -79,9 +96,9 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
       { name: 'Sensors', health: 95 + Math.random() * 5, anomalyProbability: Math.random() * 0.02 },
     ],
     predictedAlerts: [
-        { id: 'PA1', issue: 'Brake Pad Wear', priority: 'High', recommendation: 'Replace front brake pads within 2 weeks.', estimatedTime: '2 hours', estimatedCost: 8000 },
-        { id: 'PA2', issue: 'Battery Degradation', priority: 'Medium', recommendation: 'Voltage dropping. Test and potential replacement recommended at next service.', estimatedTime: '1 hour', estimatedCost: 12000 },
-        { id: 'PA3', issue: 'Tire Pressure Imbalance', priority: 'Low', recommendation: 'Check and adjust tire pressures. Monitor for slow leaks.', estimatedTime: '15 mins', estimatedCost: 200 },
+        { id: 'PA1', issue: 'Brake Pad Wear', priority: 'High', recommendation: 'Replace front brake pads within 2 weeks.', estimatedTime: '2 hours', estimatedCost: 8000, parts: [{ name: 'Brake Pads', cost: 6000 }], laborCost: 2000 },
+        { id: 'PA2', issue: 'Battery Degradation', priority: 'Medium', recommendation: 'Voltage dropping. Test and potential replacement recommended at next service.', estimatedTime: '1 hour', estimatedCost: 12000, parts: [{ name: 'Battery', cost: 11000 }], laborCost: 1000 },
+        { id: 'PA3', issue: 'Tire Pressure Imbalance', priority: 'Low', recommendation: 'Check and adjust tire pressures. Monitor for slow leaks.', estimatedTime: '15 mins', estimatedCost: 200, parts: [], laborCost: 200 },
     ],
     sensorData: {
       engine_temp: 90 + Math.random() * 30 * (healthStatus === 'Critical' ? 1.2 : 1),
@@ -93,17 +110,18 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
     },
     maintenanceHistory: generateMaintenanceHistory(i),
     usageHistory: generateUsageHistory(),
+    healthHistory: generateHealthHistory(),
   };
 });
 
 export const allVehicles = vehicles;
 
 export const serviceCenters: ServiceCenter[] = [
-  { id: 'SC1', name: 'VedaMotrix Andheri', city: 'Mumbai', capacity: 15, availableSlots: ['09:30', '11:30', '14:30'], rating: 4.8, avgCompletionTime: 2.5 },
-  { id: 'SC2', name: 'VedaMotrix Koramangala', city: 'Bengaluru', capacity: 12, availableSlots: ['10:00', '13:00', '16:00'], rating: 4.6, avgCompletionTime: 3.1 },
-  { id: 'SC3', name: 'VedaMotrix Connaught Place', city: 'Delhi', capacity: 10, availableSlots: ['09:00', '11:00', '14:00', '17:00'], rating: 4.7, avgCompletionTime: 2.8 },
-  { id: 'SC4', name: 'VedaMotrix T. Nagar', city: 'Chennai', capacity: 8, availableSlots: ['10:30', '14:30'], rating: 4.5, avgCompletionTime: 3.5 },
-  { id: 'SC5', name: 'VedaMotrix Park Street', city: 'Kolkata', capacity: 9, availableSlots: ['09:00', '12:00', '15:00'], rating: 4.6, avgCompletionTime: 3.2 },
+  { id: 'SC1', name: 'VedaMotrix Andheri', city: 'Mumbai', lat: 19.119, lng: 72.847, capacity: 15, availableSlots: ['09:30', '11:30', '14:30'], rating: 4.8, avgCompletionTime: 2.5 },
+  { id: 'SC2', name: 'VedaMotrix Koramangala', city: 'Bengaluru', lat: 12.935, lng: 77.624, capacity: 12, availableSlots: ['10:00', '13:00', '16:00'], rating: 4.6, avgCompletionTime: 3.1 },
+  { id: 'SC3', name: 'VedaMotrix Connaught Place', city: 'Delhi', lat: 28.632, lng: 77.219, capacity: 10, availableSlots: ['09:00', '11:00', '14:00', '17:00'], rating: 4.7, avgCompletionTime: 2.8 },
+  { id: 'SC4', name: 'VedaMotrix T. Nagar', city: 'Chennai', lat: 13.04, lng: 80.23, capacity: 8, availableSlots: ['10:30', '14:30'], rating: 4.5, avgCompletionTime: 3.5 },
+  { id: 'SC5', name: 'VedaMotrix Park Street', city: 'Kolkata', lat: 22.55, lng: 88.35, capacity: 9, availableSlots: ['09:00', '12:00', '15:00'], rating: 4.6, avgCompletionTime: 3.2 },
 ];
 
 

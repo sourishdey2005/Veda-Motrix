@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useCallback } from "react";
@@ -75,7 +76,7 @@ export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }) {
                 </div>
                  <Link href={`/dashboard/vehicles/${vehicle.id}`} className="w-full">
                     <Button className="w-full">
-                        <Wrench className="mr-2 h-4 w-4" /> Book Service
+                        <Wrench className="mr-2 h-4 w-4" /> View Details & Book Service
                     </Button>
                 </Link>
             </CardContent>

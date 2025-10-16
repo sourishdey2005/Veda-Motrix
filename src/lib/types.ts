@@ -1,3 +1,4 @@
+
 export type User = {
   id: string;
   name: string;
@@ -12,6 +13,15 @@ export type SubsystemHealth = {
   health: number; // 0-100
   anomalyProbability: number; // 0-1
 };
+
+export type HealthHistoryEntry = {
+    date: string;
+    engine: number;
+    brakes: number;
+    battery: number;
+    suspension: number;
+    sensors: number;
+}
 
 export type SensorData = {
   engine_temp: number;
@@ -37,6 +47,8 @@ export type PredictedAlert = {
     recommendation: string;
     estimatedTime: string;
     estimatedCost: number;
+    parts: { name: string; cost: number }[];
+    laborCost: number;
 };
 
 export type UsageDataPoint = {
@@ -65,12 +77,15 @@ export type Vehicle = {
   sensorData: SensorData;
   maintenanceHistory: MaintenanceLog[];
   usageHistory: UsageDataPoint[];
+  healthHistory: HealthHistoryEntry[];
 };
 
 export type ServiceCenter = {
   id: string;
   name:string;
   city: string;
+  lat: number;
+  lng: number;
   capacity: number;
   availableSlots: string[];
   rating: number;

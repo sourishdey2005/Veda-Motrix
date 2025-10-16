@@ -1,8 +1,12 @@
+
 "use client";
 
 import { useAuth } from "@/hooks/use-auth";
 import { VehicleDetailsCard } from "@/components/dashboard/user/vehicle-details-card";
 import { MaintenanceTimeline } from "@/components/dashboard/user/maintenance-timeline";
+import { ComponentHealthTrends } from "@/components/dashboard/user/component-health-trends";
+import { PredictiveCostEstimator } from "@/components/dashboard/user/predictive-cost-estimator";
+import { ServiceCenterLocator } from "@/components/dashboard/user/service-center-locator";
 import { VedaMotrixLogo } from "@/components/icons";
 
 export default function VehicleDetailsPage({ params: { id } }: { params: { id: string } }) {
@@ -25,9 +29,16 @@ export default function VehicleDetailsPage({ params: { id } }: { params: { id: s
   return (
     <div className="space-y-6">
         <VehicleDetailsCard vehicle={vehicle} />
-        <MaintenanceTimeline vehicle={vehicle} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+                <ComponentHealthTrends vehicle={vehicle} />
+                <MaintenanceTimeline vehicle={vehicle} />
+            </div>
+            <div className="space-y-6">
+                <PredictiveCostEstimator vehicle={vehicle} />
+                <ServiceCenterLocator />
+            </div>
+        </div>
     </div>
   )
 }
-
-    
