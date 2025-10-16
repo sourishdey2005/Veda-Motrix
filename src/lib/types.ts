@@ -1,6 +1,7 @@
 
 
 
+
 export type User = {
   id: string;
   name: string;
@@ -324,4 +325,16 @@ export type LoadBalancingSuggestion = {
   reason: string;
   etaImpact: number; // percentage
   status: 'suggested' | 'in-progress' | 'completed';
+};
+
+export type AiCapaSuggestion = 'Approve' | 'Reject (Duplicate)' | 'Merge with CAPA-0811' | 'Forward to Manufacturing';
+
+export type CapaItem = {
+  id: string;
+  title: string;
+  originatingIssue: string;
+  proposedAction: string;
+  aiSuggestion: AiCapaSuggestion;
+  aiJustification: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
 };

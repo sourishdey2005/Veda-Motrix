@@ -1,6 +1,7 @@
 
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion } from './types';
+
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion, CapaItem } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format, addDays } from 'date-fns';
@@ -428,6 +429,45 @@ export const rcaCapaAnalyticsData = {
       impactScore: 10 + Math.random() * 90,
   }))
 };
+
+export const capaData: CapaItem[] = [
+  {
+    id: 'CAPA-0812',
+    title: 'Fuel Line Vibration Failure',
+    originatingIssue: 'Recurring fuel leak reports for Hero Splendor (Lot B-2023)',
+    proposedAction: 'Increase torque specification for fuel line connectors by 5%.',
+    aiSuggestion: 'Approve',
+    aiJustification: 'Action directly addresses the identified root cause of connector loosening from vibration.',
+    status: 'Pending',
+  },
+  {
+    id: 'CAPA-0813',
+    title: 'ECU Software Glitch',
+    originatingIssue: 'Infotainment system freezes on Mahindra XUV700 models.',
+    proposedAction: 'Develop and deploy firmware patch v2.3.1 to address memory leak.',
+    aiSuggestion: 'Merge with CAPA-0811',
+    aiJustification: 'CAPA-0811 already addresses a similar memory management issue in the same ECU. Merging efforts will be more efficient.',
+    status: 'Pending',
+  },
+  {
+    id: 'CAPA-0814',
+    title: 'ABS Sensor Contamination',
+    originatingIssue: 'False ABS activation in dusty conditions.',
+    proposedAction: 'Redesign sensor housing to improve shielding from debris.',
+    aiSuggestion: 'Forward to Manufacturing',
+    aiJustification: 'This requires a hardware design change. Forwarding to the manufacturing and design team for feasibility study.',
+    status: 'Pending',
+  },
+  {
+    id: 'CAPA-0815',
+    title: 'Fuel Line Vibration Failure',
+    originatingIssue: 'Fuel leaks reported for Hero Splendor (Lot C-2023)',
+    proposedAction: 'Add thread-locking compound to fuel line connectors.',
+    aiSuggestion: 'Reject (Duplicate)',
+    aiJustification: 'This is a duplicate of CAPA-0812, which proposes a different solution for the same root cause. Evaluate which solution is superior.',
+    status: 'Pending',
+  }
+];
 
 
 export const executiveAnalyticsData = {

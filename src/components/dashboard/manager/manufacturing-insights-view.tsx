@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -11,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { rcaCapaAnalyticsData } from "@/lib/data"
 import { cn } from "@/lib/utils"
+import { SmartCapaApprovalAssistant } from "./manufacturing/smart-capa-approval-assistant"
 
 const chartConfig: ChartConfig = {
   recurrence: { label: "Recurrence", color: "hsl(var(--chart-5))" },
@@ -18,6 +20,7 @@ const chartConfig: ChartConfig = {
   effectiveness: { label: "Effectiveness", color: "hsl(var(--chart-1))" },
   Hero: { label: "Hero", color: "hsl(var(--chart-1))" },
   Mahindra: { label: "Mahindra", color: "hsl(var(--chart-2))" },
+  count: { label: "Count", color: "hsl(var(--chart-1))" },
 }
 
 const riskColors = {
@@ -90,6 +93,8 @@ export function ManufacturingInsightsView() {
             </CardHeader>
         </Card>
         
+        <SmartCapaApprovalAssistant />
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2">
                 <CardHeader>
