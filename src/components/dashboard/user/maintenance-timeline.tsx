@@ -51,12 +51,7 @@ function StarRating({
 
 
 export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
-  const [openItems, setOpenItems] = React.useState<string[]>([]);
   const [maintenanceHistory, setMaintenanceHistory] = React.useState(vehicle.maintenanceHistory);
-
-  const toggleItem = (id: string) => {
-    setOpenItems(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]);
-  };
   
   const getServiceCenterName = (id: string) => {
     return serviceCenters.find(sc => sc.id === id)?.name || 'Unknown Center';
@@ -90,13 +85,13 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
           </TableHeader>
           <TableBody>
             {maintenanceHistory.map((item) => (
-              <Collapsible asChild key={item.id} open={openItems.includes(item.id)} onOpenChange={() => toggleItem(item.id)}>
-                <>
-                  <TableRow className="cursor-pointer hover:bg-muted/50">
+              <Collapsible key={item.id} asChild>
+                <React.Fragment>
+                  <TableRow>
                     <TableCell>
                       <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="sm" className="w-9 p-0">
-                           <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openItems.includes(item.id) ? 'rotate-180' : ''}`} />
+                        <Button variant="ghost" size="sm" className="w-9 p-0 data-[state=open]:rotate-180">
+                           <ChevronDown className="h-4 w-4 transition-transform duration-200" />
                            <span className="sr-only">Toggle details</span>
                         </Button>
                       </CollapsibleTrigger>
@@ -106,7 +101,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                     <TableCell>{getServiceCenterName(item.serviceCenterId)}</TableCell>
                     <TableCell className="text-right font-mono flex items-center justify-end gap-1"><IndianRupee size={12}/>{(item.cost || 0).toLocaleString('en-IN')}</TableCell>
                     <TableCell className="text-right">
-                        <StarRating rating={item.rating} onRate={(newRating) => handleRate(item.id, newRating)} />
+                        <StarRating rating={item.rating || 0} onRate={(newRating) => handleRate(item.id, newRating)} />
                     </TableCell>
                   </TableRow>
                   <CollapsibleContent asChild>
@@ -121,7 +116,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                           </TableCell>
                       </TableRow>
                   </CollapsibleContent>
-                </>
+                </React.Fragment>
               </Collapsible>
             ))}
           </TableBody>
