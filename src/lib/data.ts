@@ -2,7 +2,8 @@
 
 
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion, CapaItem } from './types';
+
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion, CapaItem, WhatIfScenario } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format, addDays } from 'date-fns';
@@ -513,6 +514,47 @@ export const executiveAnalyticsData = {
   })),
   detectionRate: 85.4,
   sri: 91.3,
+  preventiveActionEffectiveness: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => ({
+    month,
+    failures: 30 - i * 4.5,
+  })),
+  fleetReliability: [
+    { model: 'XUV700', '2023': 12.5, '2024': 10.6 },
+    { model: 'Splendor', '2023': 8.2, '2024': 7.1 },
+    { model: 'Nexon', '2023': 10.1, '2024': 8.9 },
+  ],
+  whatIfScenarios: [
+    {
+      id: 'scenario1',
+      name: 'Increase Service Intervals by 20%',
+      description: 'Simulates the effect of extending the time between scheduled maintenance for all vehicles.',
+      impact: [
+        { metric: 'Cost Savings', value: '+12%', changeDirection: 'positive' },
+        { metric: 'Defect Rate', value: '+8%', changeDirection: 'negative' },
+        { metric: 'Satisfaction', value: '-5%', changeDirection: 'negative' },
+      ],
+    },
+    {
+      id: 'scenario2',
+      name: 'Replace Supplier A with Supplier B',
+      description: 'Models the impact of switching from Supplier A (cheaper) to Supplier B (higher quality) for brake components.',
+      impact: [
+        { metric: 'Cost Savings', value: '-4%', changeDirection: 'negative' },
+        { metric: 'Defect Rate', value: '-15%', changeDirection: 'positive' },
+        { metric: 'Satisfaction', value: '+9%', changeDirection: 'positive' },
+      ],
+    },
+    {
+      id: 'scenario3',
+      name: 'Deploy New ECU Firmware',
+      description: 'Predicts the outcome of rolling out a major firmware update designed to improve engine efficiency.',
+      impact: [
+        { metric: 'Cost Savings', value: '+6%', changeDirection: 'positive' },
+        { metric: 'Defect Rate', value: '-3%', changeDirection: 'positive' },
+        { metric: 'Satisfaction', value: '+4%', changeDirection: 'positive' },
+      ],
+    },
+  ],
 };
 
 export const customerExperienceData = {

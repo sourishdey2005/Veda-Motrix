@@ -339,3 +339,14 @@ export type CapaItem = {
   aiJustification: string;
   status: 'Pending' | 'Approved' | 'Rejected';
 };
+
+export type WhatIfScenario = {
+  id: string;
+  name: string;
+  description: string;
+  impact: {
+    metric: string;
+    value: string;
+    changeDirection: 'positive' | 'negative';
+  }[];
+};

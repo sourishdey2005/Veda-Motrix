@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -15,12 +16,16 @@ import { Button }from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { generateExecutiveSummary } from "@/ai/flows/generate-executive-summary"
 import { useToast } from "@/hooks/use-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const chartConfig: ChartConfig = {
   predictive: { label: "Predictive", color: "hsl(var(--chart-1))" },
   reactive: { label: "Reactive", color: "hsl(var(--chart-5))" },
   beforeAI: { label: "Before AI", color: "hsl(var(--chart-5))" },
   afterAI: { label: "After AI", color: "hsl(var(--chart-1))" },
+  failures: { label: "Failures", color: "hsl(var(--chart-5))" },
+  '2023': { label: "2023", color: "hsl(var(--chart-5))" },
+  '2024': { label: "2024", color: "hsl(var(--chart-1))" },
 }
 
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
@@ -70,6 +75,16 @@ export function ExecutiveAnalyticsView() {
 
     const detectionRate = useSimulatedData(executiveAnalyticsData.detectionRate, r => Math.min(100, r + (Math.random() - 0.4) * 0.1));
     const sri = useSimulatedData(executiveAnalyticsData.sri, s => Math.min(100, s + (Math.random() - 0.5) * 0.2));
+    
+    const actionEffectiveness = useSimulatedData(executiveAnalyticsData.preventiveActionEffectiveness, d => 
+        d.map(item => ({...item, failures: Math.max(0, item.failures - (Math.random() * 0.2))}))
+    );
+    const reliabilityComparison = useSimulatedData(executiveAnalyticsData.fleetReliability, d => 
+        d.map(item => ({...item, '2024': Math.max(0, item['2024'] - (Math.random() * 0.1))}))
+    );
+
+    const [selectedScenario, setSelectedScenario] = useState(executiveAnalyticsData.whatIfScenarios[0]);
+
 
     const handleGenerateReport = async () => {
         setIsGenerating(true);
@@ -242,6 +257,84 @@ export function ExecutiveAnalyticsView() {
                 </CardContent>
             </Card>
         </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Preventive Action Effectiveness</CardTitle>
+                    <CardDescription>“Brake calibration change reduced related failures by 37%.”</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer config={chartConfig} className="h-64">
+                        <LineChart data={actionEffectiveness}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis dataKey="month" />
+                            <YAxis domain={[0, 'dataMax + 5']} />
+                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <Line type="monotone" dataKey="failures" stroke="var(--color-failures)" strokeWidth={2} />
+                        </LineChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Fleet Reliability Comparison</CardTitle>
+                    <CardDescription>“Model X2024 shows 15% fewer failures than 2023 after CAPA.”</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer config={chartConfig} className="h-64">
+                        <BarChart data={reliabilityComparison}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis dataKey="model" />
+                            <YAxis />
+                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <Legend />
+                            <Bar dataKey="2023" fill="var(--color-2023)" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="2024" fill="var(--color-2024)" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+        </div>
+
+        <Card>
+            <CardHeader>
+                <CardTitle>AI-Driven "What-If" Simulation Lab</CardTitle>
+                <CardDescription>Test hypothetical actions and see the predicted impact on key business metrics.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="md:col-span-1 space-y-2">
+                        <h4 className="font-semibold">Select Scenario</h4>
+                        <Select onValueChange={(value) => setSelectedScenario(executiveAnalyticsData.whatIfScenarios.find(s => s.id === value)!)} defaultValue={selectedScenario.id}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a simulation" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {executiveAnalyticsData.whatIfScenarios.map(scenario => (
+                                    <SelectItem key={scenario.id} value={scenario.id}>{scenario.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">{selectedScenario.description}</p>
+                    </div>
+                    <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {selectedScenario.impact.map(impact => (
+                            <div key={impact.metric} className={cn(
+                                "p-4 rounded-lg border text-center",
+                                impact.changeDirection === 'positive' ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'
+                            )}>
+                                <p className="text-sm text-muted-foreground">{impact.metric}</p>
+                                <p className="text-3xl font-bold flex items-center justify-center gap-1">
+                                     {impact.changeDirection === 'positive' ? <TrendingUp className="w-6 h-6 text-green-500" /> : <TrendingDown className="w-6 h-6 text-red-500" />}
+                                    {impact.value}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
              <Card>
