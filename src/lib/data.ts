@@ -1,3 +1,4 @@
+
 import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
@@ -218,9 +219,12 @@ export const uebaEvents: UebaEvent[] = [
 ];
 
 export const customerFeedbackData: CustomerFeedback[] = [
-    { id: 'F1', userId: '3', vehicleId: 'V1001', rating: 5, comment: 'Excellent service at the Mumbai center. The staff was very courteous and explained everything clearly.', date: '2024-08-02' },
-    { id: 'F2', userId: '3', vehicleId: 'V1004', rating: 3, comment: 'The service in Delhi took a bit longer than I was told. The car is fine now, but the wait was too long.', date: '2024-07-28' },
-    { id: 'F3', userId: '3', vehicleId: 'V1007', rating: 4, comment: 'Good experience in Bengaluru. The lounge was clean and they fixed the issue promptly. Price was reasonable.', date: '2024-07-25' },
+    { id: 'F1', userId: '3', vehicleId: 'V1001', rating: 5, comment: 'Exceptional service at the Mumbai Andheri center. My car feels brand new. The AI prediction for the brake pads was spot on and saved me from a bigger issue. Staff was very professional.', date: '2024-08-02' },
+    { id: 'F2', userId: '3', vehicleId: 'V1004', rating: 2, comment: 'The service in Delhi was a nightmare. It took them three days for a standard service, and the final bill was much higher than the initial estimate. The problem I came for is still not fully resolved.', date: '2024-07-28' },
+    { id: 'F3', userId: '3', vehicleId: 'V1007', rating: 4, comment: 'Good experience in Bengaluru. The lounge was clean and comfortable. They fixed the electrical issue promptly. I only wish they had communicated the status more proactively.', date: '2024-07-25' },
+    { id: 'F4', userId: '3', vehicleId: 'V1002', rating: 3, comment: 'Average service. The issue was fixed, but it felt very transactional. No one explained what was done or why. Just a bill at the end. Expected more from a "smart" service center.', date: '2024-07-20' },
+    { id: 'F5', userId: '3', vehicleId: 'V1005', rating: 5, comment: 'I am blown away by the predictive maintenance! I got an alert about my battery, booked an appointment easily, and they replaced it before it could leave me stranded. This is the future!', date: '2024-07-18' },
+    { id: 'F6', userId: '3', vehicleId: 'V1008', rating: 1, comment: 'Terrible. They damaged the interior of my car and are refusing to take responsibility. I had to wait for 2 hours just to talk to a manager. Never coming back to the Pune location.', date: '2024-07-15' }
 ];
 
 export const notifications: Notification[] = [
@@ -554,3 +558,6 @@ export const timeOfDayLoadData: TimeOfDayLoadData[] = Array.from({length: 10}).m
     vehicles: Math.floor(Math.random() * 10) + (i > 1 && i < 6 ? 5 : 0) // peak mid-day
 }));
 
+
+
+    
