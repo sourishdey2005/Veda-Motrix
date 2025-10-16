@@ -51,8 +51,7 @@ END KNOWLEDGE BASE
 
 Conversation History:
 {{#each conversationHistory}}
-{{#if (eq role 'user')}}User: {{content}}{{/if}}
-{{#if (eq role 'model')}}AI: {{content}}{{/if}}
+{{role}}: {{content}}
 {{/each}}
 
 User's current question: {{{question}}}
