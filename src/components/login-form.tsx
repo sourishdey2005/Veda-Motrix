@@ -2,20 +2,46 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import type { User } from '@/lib/types';
+import { users } from '@/lib/data';
 
-export function LoginForm() {
+const credentials = {
+  manager: {
+    email: 'manager@vedamotrix.ai',
+    password: 'VEDA@123',
+  },
+  'service-center': {
+    email: 'service@vedamotrix.ai',
+    password: 'SERVICE@123',
+  },
+  user: {
+    email: 'john.doe@email.com',
+    password: 'password123',
+  }
+};
+
+export function LoginForm({ userType }: { userType: User['role'] }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (userType === 'manager' || userType === 'service-center') {
+      setEmail(credentials[userType].email);
+      setPassword(credentials[userType].password);
+    } else {
+        setEmail(credentials.user.email);
+        setPassword(credentials.user.password);
+    }
+  }, [userType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +57,8 @@ export function LoginForm() {
     setIsLoading(false);
   };
 
+  const isHardcoded = userType === 'manager' || userType === 'service-center';
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid gap-4">
@@ -43,7 +71,8 @@ export function LoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading}
+            disabled={isLoading || isHardcoded}
+            readOnly={isHardcoded}
           />
         </div>
         <div className="grid gap-2">
@@ -56,8 +85,9 @@ export function LoginForm() {
             required 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
-            placeholder="VEDA@123"
+            disabled={isLoading || isHardcoded}
+            readOnly={isHardcoded}
+            placeholder={userType === 'manager' ? 'VEDA@123' : ''}
           />
         </div>
         <Button type="submit" className="w-full" disabled={isLoading}>
@@ -70,6 +100,13 @@ export function LoginForm() {
         <Link href="/signup" className="underline">
           Sign up
         </Link>
+      </div>
+       <div className="mt-4 text-center text-sm space-x-2">
+         <Link href="/login/user" className="underline">User Login</Link>
+         <span>|</span>
+         <Link href="/login/manager" className="underline">Manager Login</Link>
+         <span>|</span>
+         <Link href="/login/service-center" className="underline">Service Center Login</Link>
       </div>
     </form>
   );
