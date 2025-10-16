@@ -9,15 +9,15 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot } from "lucide-react";
+import { BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot, Briefcase } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 const managerNav = [
     { name: "Dashboard", href: "/dashboard/manager", icon: LayoutDashboard },
     { name: "Orchestration", href: "/dashboard/orchestration", icon: Bot },
     { name: "Service Analytics", href: "/dashboard/analytics", icon: BarChart },
+    { name: "Executive Analytics", href: "/dashboard/executive", icon: Briefcase },
     { name: "Manufacturing", href: "/dashboard/manufacturing", icon: Factory },
     { name: "UEBA Security", href: "/dashboard/ueba", icon: ShieldCheck },
 ];
@@ -29,8 +29,6 @@ const serviceCenterNav = [
 
 const userNav = [
     { name: "My Vehicle", href: "/dashboard/user", icon: Car },
-    { name: "Vehicle Health", href: "/dashboard/health", icon: HeartPulse },
-    { name: "Schedule Service", href: "/dashboard/schedule", icon: Wrench },
 ];
 
 
@@ -54,7 +52,7 @@ export function AppSidebar() {
         <SidebarMenu>
             {navItems.map((item) => (
                 <SidebarMenuItem key={item.name}>
-                    <Link href={item.href} passHref>
+                    <Link href={item.href} className="w-full">
                       <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.name}>
                         <div>
                           <item.icon />

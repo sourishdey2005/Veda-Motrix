@@ -180,3 +180,48 @@ export const rcaCapaAnalyticsData = {
       impactScore: 10 + Math.random() * 90,
   }))
 };
+
+
+export const executiveAnalyticsData = {
+  aiRoi: {
+    costSavings: 1500000,
+    timeSavings: 25,
+    breakdownReduction: 18,
+  },
+  regionalPerformance: indianCities.map(city => ({
+    city,
+    efficiency: 75 + Math.random() * 25,
+    uptime: 90 + Math.random() * 10,
+  })),
+  policyCompliance: [
+    { center: "Mumbai SC", score: 95 },
+    { center: "Bengaluru SC", score: 88 },
+    { center: "Delhi SC", score: 92 },
+  ],
+  innovationOpportunities: [
+    { area: "Battery Technology", impact: 8, feasibility: 7, suggestion: "Focus on improving battery chemistry for longer life and faster charging, based on high warranty claims for battery degradation." },
+    { area: "Predictive UI/UX", impact: 6, feasibility: 9, suggestion: "Develop more intuitive in-car alerts for predicted failures. Current alerts have a low user response rate." },
+  ],
+  maintenanceRatio: [
+    { month: "Jan", predictive: 20, reactive: 80 },
+    { month: "Feb", predictive: 25, reactive: 75 },
+    { month: "Mar", predictive: 35, reactive: 65 },
+    { month: "Apr", predictive: 50, reactive: 50 },
+    { month: "May", predictive: 65, reactive: 35 },
+    { month: "Jun", predictive: 70, reactive: 30 },
+  ],
+  warrantyCost: [
+    { month: "Jan", beforeAI: 500000, afterAI: 450000 },
+    { month: "Feb", beforeAI: 520000, afterAI: 430000 },
+    { month: "Mar", beforeAI: 480000, afterAI: 380000 },
+    { month: "Apr", beforeAI: 550000, afterAI: 350000 },
+    { month: "May", beforeAI: 530000, afterAI: 320000 },
+    { month: "Jun", beforeAI: 580000, afterAI: 300000 },
+  ],
+  rulPrediction: indianModels.map((model, i) => ({
+    model: `${rcaMakes[i % 2]} ${model}`,
+    rul: 3.5 + Math.random() * 4,
+  })),
+  detectionRate: 85.4,
+  sri: 91.3,
+};
