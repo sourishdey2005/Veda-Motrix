@@ -70,9 +70,9 @@ const generatePredictedAlerts = (): PredictedAlert[] => [
 ];
 
 const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => [
-    { id: `M${vehicleIndex}1`, date: '2023-03-10', mileage: 12000 + vehicleIndex*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK.' },
-    { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters.' },
-    { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up.' },
+    { id: `M${vehicleIndex}1`, date: '2023-03-10', mileage: 12000 + vehicleIndex*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK.', serviceCenterId: 'SC1', cost: 4500, rating: 5 },
+    { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters.', serviceCenterId: 'SC2', cost: 2500, rating: 4 },
+    { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up.', serviceCenterId: 'SC1', cost: 7800, rating: 4 },
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -215,5 +215,7 @@ export const useAuth = () => {
   }
   return context;
 };
+
+    
 
     
