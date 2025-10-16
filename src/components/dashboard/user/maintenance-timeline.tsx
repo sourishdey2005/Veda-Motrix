@@ -90,8 +90,8 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
           </TableHeader>
           <TableBody>
             {maintenanceHistory.map((item) => (
-              <React.Fragment key={item.id}>
-                <Collapsible asChild open={openItems.includes(item.id)} onOpenChange={() => toggleItem(item.id)}>
+              <Collapsible asChild key={item.id} open={openItems.includes(item.id)} onOpenChange={() => toggleItem(item.id)}>
+                <React.Fragment>
                   <TableRow className="cursor-pointer hover:bg-muted/50">
                     <TableCell>
                       <CollapsibleTrigger asChild>
@@ -105,22 +105,24 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                     <TableCell>{item.service}</TableCell>
                     <TableCell>{getServiceCenterName(item.serviceCenterId)}</TableCell>
                     <TableCell className="text-right font-mono flex items-center justify-end gap-1"><IndianRupee size={12}/>{(item.cost || 0).toLocaleString('en-IN')}</TableCell>
-                    <TableCell className="text-right"><StarRating rating={item.rating} onRate={(newRating) => handleRate(item.id, newRating)} /></TableCell>
+                    <TableCell className="text-right">
+                        <StarRating rating={item.rating} onRate={(newRating) => handleRate(item.id, newRating)} />
+                    </TableCell>
                   </TableRow>
-                </Collapsible>
-                <CollapsibleContent asChild>
-                    <TableRow>
-                        <TableCell colSpan={6} className="p-0">
-                            <div className="p-4 bg-muted/20">
-                               <p className="font-semibold">Service Notes:</p>
-                               <p className="text-sm text-muted-foreground">{item.notes}</p>
-                               <p className="text-xs text-muted-foreground mt-2">Mileage: {item.mileage.toLocaleString('en-IN')} km</p>
-                               <Button variant="outline" size="sm" className="mt-2">Rebook Similar Service</Button>
-                            </div>
-                        </TableCell>
-                    </TableRow>
-                </CollapsibleContent>
-              </React.Fragment>
+                  <CollapsibleContent asChild>
+                      <TableRow>
+                          <TableCell colSpan={6} className="p-0">
+                              <div className="p-4 bg-muted/20">
+                                 <p className="font-semibold">Service Notes:</p>
+                                 <p className="text-sm text-muted-foreground">{item.notes}</p>
+                                 <p className="text-xs text-muted-foreground mt-2">Mileage: {item.mileage.toLocaleString('en-IN')} km</p>
+                                 <Button variant="outline" size="sm" className="mt-2">Rebook Similar Service</Button>
+                              </div>
+                          </TableCell>
+                      </TableRow>
+                  </CollapsibleContent>
+                </React.Fragment>
+              </Collapsible>
             ))}
           </TableBody>
         </Table>
