@@ -9,7 +9,6 @@ import { TechnicianCorrelationMatrix } from "@/components/dashboard/service-cent
 import { ServiceDurationAnalysis } from "@/components/dashboard/service-center/analytics/service-duration-analysis";
 import { RepairCostAnalysis } from "@/components/dashboard/service-center/analytics/repair-cost-analysis";
 import { PartFailureLifecycle } from "@/components/dashboard/service-center/analytics/part-failure-lifecycle";
-import { ComponentFailurePath } from "@/components/dashboard/manager/advanced/component-failure-path";
 import { AnomalyTimeline } from "@/components/dashboard/manager/advanced/anomaly-timeline";
 
 export default function ServiceCenterAnalyticsPage() {
@@ -52,12 +51,11 @@ export default function ServiceCenterAnalyticsPage() {
                 <CardHeader>
                     <CardTitle>Advanced Analytics</CardTitle>
                     <CardDescription>
-                        Insights into failure paths and system anomalies.
+                        Insights into system anomalies.
                     </CardDescription>
                 </CardHeader>
             </Card>
             <div className="space-y-6">
-                <ComponentFailurePath />
                 <AnomalyTimeline />
             </div>
         </div>
