@@ -29,7 +29,7 @@ export function MasterAgentView() {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card className="lg:col-span-4">
         <CardHeader>
-          <CardTitle>Master Agent Orchestration</CardTitle>
+          <CardTitle>Manager Dashboard: Master Agent Orchestration</CardTitle>
           <CardDescription>Visualizing the AI worker agent collaboration flow.</CardDescription>
         </CardHeader>
         <CardContent>

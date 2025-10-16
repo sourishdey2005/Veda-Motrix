@@ -1,7 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/hooks/use-auth"
 import { vehicles } from "@/lib/data"
 import { VehicleHealthCard } from "./vehicle-health-card"
@@ -21,14 +20,24 @@ export function UserDashboard() {
   const vehicle = userVehicles[0];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-        <VehicleHealthCard vehicle={vehicle} />
-        <MaintenanceTimeline vehicle={vehicle} />
-      </div>
-      <div className="lg:col-span-1 space-y-6">
-        <ServiceScheduler />
-        <AIChat />
+    <div className="space-y-6">
+       <Card>
+        <CardHeader>
+          <CardTitle>User Dashboard</CardTitle>
+          <CardDescription>
+            Welcome, {user.name}! Manage your vehicle's health and service appointments.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <VehicleHealthCard vehicle={vehicle} />
+          <MaintenanceTimeline vehicle={vehicle} />
+        </div>
+        <div className="lg:col-span-1 space-y-6">
+          <ServiceScheduler />
+          <AIChat />
+        </div>
       </div>
     </div>
   )
