@@ -1,3 +1,46 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "login-bg",
+      "description": "Abstract background for the login page",
+      "imageUrl": "https://picsum.photos/seed/loginbg/1920/1080",
+      "imageHint": "abstract technology"
+    },
+    {
+      "id": "avatar-1",
+      "description": "User avatar 1",
+      "imageUrl": "https://picsum.photos/seed/avatar1/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-2",
+      "description": "User avatar 2",
+      "imageUrl": "https://picsum.photos/seed/avatar2/100/100",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "avatar-3",
+      "description": "User avatar 3",
+      "imageUrl": "https://picsum.photos/seed/avatar3/100/100",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "vehicle-1",
+      "description": "Sedan vehicle image",
+      "imageUrl": "https://picsum.photos/seed/sedan1/600/400",
+      "imageHint": "modern car"
+    },
+    {
+      "id": "vehicle-2",
+      "description": "SUV vehicle image",
+      "imageUrl": "https://picsum.photos/seed/suv1/600/400",
+      "imageHint": "luxury suv"
+    },
+    {
+      "id": "vehicle-3",
+      "description": "Sports car image",
+      "imageUrl": "https://picsum.photos/seed/sportscar1/600/400",
+      "imageHint": "red sportscar"
+    }
+  ]
 }

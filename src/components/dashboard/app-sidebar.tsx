@@ -1,0 +1,69 @@
+"use client";
+
+import { VedaMotrixLogo } from "@/components/icons";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
+import { BarChart, Car, Cog, Factory, HeartPulse, LayoutDashboard, Shield, Users, Wrench } from "lucide-react";
+import { usePathname } from "next/navigation";
+
+const managerNav = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Master Agent", href: "/dashboard/master", icon: Cog },
+    { name: "UEBA Security", href: "/dashboard/ueba", icon: Shield },
+    { name: "Manufacturing", href: "/dashboard/manufacturing", icon: Factory },
+    { name: "Service Analytics", href: "/dashboard/analytics", icon: BarChart },
+];
+
+const serviceCenterNav = [
+    { name: "Appointments", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Customer Feedback", href: "/dashboard/feedback", icon: Users },
+];
+
+const userNav = [
+    { name: "My Vehicle", href: "/dashboard", icon: Car },
+    { name: "Vehicle Health", href: "/dashboard/health", icon: HeartPulse },
+    { name: "Schedule Service", href: "/dashboard/schedule", icon: Wrench },
+];
+
+
+export function AppSidebar() {
+  const { user } = useAuth();
+  const pathname = usePathname();
+
+  let navItems = userNav;
+  if (user?.role === 'manager') navItems = managerNav;
+  if (user?.role === 'service-center') navItems = serviceCenterNav;
+
+  return (
+    <>
+      <SidebarHeader>
+        <div className="flex items-center gap-2">
+            <VedaMotrixLogo className="w-8 h-8 text-primary" />
+            <span className="text-lg font-semibold font-headline">VEDA-MOTRIX</span>
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu>
+            {navItems.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton
+                        href={item.href}
+                        isActive={pathname === item.href}
+                        tooltip={item.name}
+                    >
+                        <item.icon />
+                        <span>{item.name}</span>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            ))}
+        </SidebarMenu>
+      </SidebarContent>
+    </>
+  );
+}
