@@ -33,6 +33,7 @@ const serviceCenterNav = [
     { name: "Analytics", href: "/dashboard/service-center/analytics", icon: BarChart },
     { name: "Forecasting", href: "/dashboard/service-center/inventory", icon: Warehouse },
     { name: "Customer Feedback", href: "/dashboard/feedback", icon: Users },
+    { name: "Doc Analysis", href: "/dashboard/document-analysis", icon: FileSearch },
 ];
 
 const userNav = [
