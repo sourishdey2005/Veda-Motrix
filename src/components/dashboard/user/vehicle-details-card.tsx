@@ -84,3 +84,5 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
         </Card>
     );
 }
+
+    

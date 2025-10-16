@@ -29,3 +29,5 @@ export default function VehicleDetailsPage({ params: { id } }: { params: { id: s
     </div>
   )
 }
+
+    

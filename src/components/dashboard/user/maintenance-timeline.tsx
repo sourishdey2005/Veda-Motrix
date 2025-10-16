@@ -28,3 +28,5 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
     </Card>
   );
 }
+
+    
