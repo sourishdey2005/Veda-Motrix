@@ -224,7 +224,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const newVehicle: Vehicle = {
       ...data,
       id: `V${vehicles.length + 1001}`,
-      ownerId: '3', // Default owner for now
+      ownerId: user?.id || '3', // Assign to current user or default
       vin: `VIN${Math.random().toString(36).substring(2, 15).toUpperCase()}`,
       imageUrl: `https://picsum.photos/seed/vehicle${vehicles.length + 1}/600/400`,
       imageHint: 'car',
@@ -269,5 +269,7 @@ export const useAuth = () => {
 };
 
   
+
+    
 
     
