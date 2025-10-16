@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import * as React from "react";
@@ -13,12 +14,13 @@ import { serviceCenters } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 
 function StarRating({ rating }: { rating: number }) {
+  const safeRating = rating || 0;
   return (
     <div className="flex items-center">
       {[...Array(5)].map((_, i) => (
         <StarIcon
           key={i}
-          className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+          className={`w-4 h-4 ${i < safeRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
         />
       ))}
     </div>
@@ -71,7 +73,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                     <TableCell className="font-medium">{format(new Date(item.date), "dd MMM yyyy")}</TableCell>
                     <TableCell>{item.service}</TableCell>
                     <TableCell>{getServiceCenterName(item.serviceCenterId)}</TableCell>
-                    <TableCell className="text-right font-mono flex items-center justify-end gap-1"><IndianRupee size={12}/>{item.cost.toLocaleString('en-IN')}</TableCell>
+                    <TableCell className="text-right font-mono flex items-center justify-end gap-1"><IndianRupee size={12}/>{(item.cost || 0).toLocaleString('en-IN')}</TableCell>
                     <TableCell className="text-right"><StarRating rating={item.rating} /></TableCell>
                   </TableRow>
                   <CollapsibleContent asChild>
@@ -95,3 +97,5 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
     </Card>
   );
 }
+
+  

@@ -118,6 +118,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userToStore);
       localStorage.setItem('veda-user', JSON.stringify(userToStore));
       
+      // On login, ensure vehicles in local storage are up-to-date
+      localStorage.setItem('veda-vehicles', JSON.stringify(mockVehicles));
+      setVehicles(mockVehicles);
+
       let redirectPath = '/dashboard';
       if(userToStore.role === 'manager') redirectPath = '/dashboard/manager';
       if(userToStore.role === 'service-center') redirectPath = '/dashboard/service-center';
@@ -218,3 +222,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+  
