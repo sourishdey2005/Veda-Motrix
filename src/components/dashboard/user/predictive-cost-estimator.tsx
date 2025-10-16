@@ -13,7 +13,8 @@ export function PredictiveCostEstimator({ vehicle }: { vehicle: Vehicle }) {
   const [selectedAlertId, setSelectedAlertId] = useState<string | undefined>(vehicle.predictedAlerts?.[0]?.id);
   const [includeOptional, setIncludeOptional] = useState(true);
 
-  const selectedAlert = vehicle.predictedAlerts.find(a => a.id === selectedAlertId);
+  const vehicleAlerts = vehicle.predictedAlerts || [];
+  const selectedAlert = vehicleAlerts.find(a => a.id === selectedAlertId);
 
   const chartData = selectedAlert ? [
     { name: 'Labor', cost: selectedAlert.laborCost },
@@ -35,7 +36,7 @@ export function PredictiveCostEstimator({ vehicle }: { vehicle: Vehicle }) {
             <SelectValue placeholder="Select a predicted service" />
           </SelectTrigger>
           <SelectContent>
-            {vehicle.predictedAlerts.map(alert => (
+            {vehicleAlerts.map(alert => (
               <SelectItem key={alert.id} value={alert.id}>{alert.issue}</SelectItem>
             ))}
           </SelectContent>
@@ -99,7 +100,7 @@ export function PredictiveCostEstimator({ vehicle }: { vehicle: Vehicle }) {
           </div>
         ) : (
           <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">
-            Select a service to see cost estimate.
+            No service estimates available for this vehicle.
           </div>
         )}
       </CardContent>
