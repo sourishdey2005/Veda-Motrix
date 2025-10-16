@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -9,18 +10,41 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronsRight, Star as StarIcon, IndianRupee } from "lucide-react";
 import { format } from "date-fns";
 import { serviceCenters } from "@/lib/data";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
-function StarRating({ rating }: { rating: number }) {
+function StarRating({
+  rating,
+  onRate,
+}: {
+  rating: number;
+  onRate: (rating: number) => void;
+}) {
+  const [hoverRating, setHoverRating] = React.useState(0);
   const safeRating = rating || 0;
+
   return (
-    <div className="flex items-center">
-      {[...Array(5)].map((_, i) => (
-        <StarIcon
-          key={i}
-          className={`w-4 h-4 ${i < safeRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-        />
-      ))}
+    <div
+      className="flex items-center"
+      onMouseLeave={() => setHoverRating(0)}
+    >
+      {[...Array(5)].map((_, i) => {
+        const starValue = i + 1;
+        const isFilled = starValue <= (hoverRating || safeRating);
+
+        return (
+          <StarIcon
+            key={i}
+            className={cn(
+              "w-4 h-4 cursor-pointer",
+              isFilled
+                ? "text-yellow-400 fill-yellow-400"
+                : "text-gray-300"
+            )}
+            onMouseEnter={() => setHoverRating(starValue)}
+            onClick={() => onRate(starValue)}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -28,6 +52,7 @@ function StarRating({ rating }: { rating: number }) {
 
 export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
   const [openItems, setOpenItems] = React.useState<string[]>([]);
+  const [maintenanceHistory, setMaintenanceHistory] = React.useState(vehicle.maintenanceHistory);
 
   const toggleItem = (id: string) => {
     setOpenItems(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]);
@@ -36,6 +61,14 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
   const getServiceCenterName = (id: string) => {
     return serviceCenters.find(sc => sc.id === id)?.name || 'Unknown Center';
   }
+  
+  const handleRate = (itemId: string, newRating: number) => {
+    setMaintenanceHistory(prevHistory => 
+      prevHistory.map(item => 
+        item.id === itemId ? { ...item, rating: newRating } : item
+      )
+    );
+  };
 
   return (
     <Card>
@@ -56,9 +89,9 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vehicle.maintenanceHistory.map((item) => (
-              <Collapsible asChild key={item.id} open={openItems.includes(item.id)} onOpenChange={() => toggleItem(item.id)}>
-                <React.Fragment>
+            {maintenanceHistory.map((item) => (
+              <React.Fragment key={item.id}>
+                <Collapsible asChild open={openItems.includes(item.id)} onOpenChange={() => toggleItem(item.id)}>
                   <TableRow className="cursor-pointer hover:bg-muted/50">
                     <TableCell>
                       <CollapsibleTrigger asChild>
@@ -72,9 +105,10 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                     <TableCell>{item.service}</TableCell>
                     <TableCell>{getServiceCenterName(item.serviceCenterId)}</TableCell>
                     <TableCell className="text-right font-mono flex items-center justify-end gap-1"><IndianRupee size={12}/>{(item.cost || 0).toLocaleString('en-IN')}</TableCell>
-                    <TableCell className="text-right"><StarRating rating={item.rating} /></TableCell>
+                    <TableCell className="text-right"><StarRating rating={item.rating} onRate={(newRating) => handleRate(item.id, newRating)} /></TableCell>
                   </TableRow>
-                  <CollapsibleContent asChild>
+                </Collapsible>
+                <CollapsibleContent asChild>
                     <TableRow>
                         <TableCell colSpan={6} className="p-0">
                             <div className="p-4 bg-muted/20">
@@ -85,9 +119,8 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                             </div>
                         </TableCell>
                     </TableRow>
-                  </CollapsibleContent>
-                </React.Fragment>
-              </Collapsible>
+                </CollapsibleContent>
+              </React.Fragment>
             ))}
           </TableBody>
         </Table>
