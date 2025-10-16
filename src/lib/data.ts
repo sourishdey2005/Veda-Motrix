@@ -219,12 +219,84 @@ export const uebaEvents: UebaEvent[] = [
 ];
 
 export const customerFeedbackData: CustomerFeedback[] = [
-    { id: 'F1', userId: '3', vehicleId: 'V1001', rating: 5, comment: 'Exceptional service at the Mumbai Andheri center. My car feels brand new. The AI prediction for the brake pads was spot on and saved me from a bigger issue. Staff was very professional.', date: '2024-08-02' },
-    { id: 'F2', userId: '3', vehicleId: 'V1004', rating: 2, comment: 'The service in Delhi was a nightmare. It took them three days for a standard service, and the final bill was much higher than the initial estimate. The problem I came for is still not fully resolved.', date: '2024-07-28' },
-    { id: 'F3', userId: '3', vehicleId: 'V1007', rating: 4, comment: 'Good experience in Bengaluru. The lounge was clean and comfortable. They fixed the electrical issue promptly. I only wish they had communicated the status more proactively.', date: '2024-07-25' },
-    { id: 'F4', userId: '3', vehicleId: 'V1002', rating: 3, comment: 'Average service. The issue was fixed, but it felt very transactional. No one explained what was done or why. Just a bill at the end. Expected more from a "smart" service center.', date: '2024-07-20' },
-    { id: 'F5', userId: '3', vehicleId: 'V1005', rating: 5, comment: 'I am blown away by the predictive maintenance! I got an alert about my battery, booked an appointment easily, and they replaced it before it could leave me stranded. This is the future!', date: '2024-07-18' },
-    { id: 'F6', userId: '3', vehicleId: 'V1008', rating: 1, comment: 'Terrible. They damaged the interior of my car and are refusing to take responsibility. I had to wait for 2 hours just to talk to a manager. Never coming back to the Pune location.', date: '2024-07-15' }
+    { 
+        id: 'F1', 
+        userId: '3', 
+        vehicleId: 'V1001', 
+        rating: 5, 
+        comment: 'Exceptional service at the Mumbai Andheri center. My car feels brand new. The AI prediction for the brake pads was spot on and saved me from a bigger issue. Staff was very professional.', 
+        date: '2024-08-02',
+        analysis: {
+            sentiment: 'Very Positive',
+            keyAreas: 'Service Quality, Predictive Accuracy, Staff Professionalism',
+            suggestions: 'Highlight the predictive maintenance success in marketing materials.'
+        }
+    },
+    { 
+        id: 'F2', 
+        userId: '3', 
+        vehicleId: 'V1004', 
+        rating: 2, 
+        comment: 'The service in Delhi was a nightmare. It took them three days for a standard service, and the final bill was much higher than the initial estimate. The problem I came for is still not fully resolved.', 
+        date: '2024-07-28',
+        analysis: {
+            sentiment: 'Very Negative',
+            keyAreas: 'Service Time, Billing Transparency, Issue Resolution',
+            suggestions: 'Investigate the delay and billing discrepancy. Follow up with the customer to resolve the outstanding issue.'
+        }
+    },
+    { 
+        id: 'F3', 
+        userId: '3', 
+        vehicleId: 'V1007', 
+        rating: 4, 
+        comment: 'Good experience in Bengaluru. The lounge was clean and comfortable. They fixed the electrical issue promptly. I only wish they had communicated the status more proactively.', 
+        date: '2024-07-25',
+        analysis: {
+            sentiment: 'Positive',
+            keyAreas: 'Facility Cleanliness, Repair Time, Communication',
+            suggestions: 'Implement an automated SMS/WhatsApp update system for service status.'
+        }
+    },
+    { 
+        id: 'F4', 
+        userId: '3', 
+        vehicleId: 'V1002', 
+        rating: 3, 
+        comment: 'Average service. The issue was fixed, but it felt very transactional. No one explained what was done or why. Just a bill at the end. Expected more from a "smart" service center.', 
+        date: '2024-07-20',
+        analysis: {
+            sentiment: 'Neutral',
+            keyAreas: 'Customer Interaction, Service Explanation',
+            suggestions: 'Train technicians to walk customers through the work done and explain the value of the repairs.'
+        }
+    },
+    { 
+        id: 'F5', 
+        userId: '3', 
+        vehicleId: 'V1005', 
+        rating: 5, 
+        comment: 'I am blown away by the predictive maintenance! I got an alert about my battery, booked an appointment easily, and they replaced it before it could leave me stranded. This is the future!', 
+        date: '2024-07-18',
+        analysis: {
+            sentiment: 'Very Positive',
+            keyAreas: 'Predictive Maintenance, Convenience, User Experience',
+            suggestions: 'Use this as a testimonial. The system worked perfectly.'
+        }
+    },
+    { 
+        id: 'F6', 
+        userId: '3', 
+        vehicleId: 'V1008', 
+        rating: 1, 
+        comment: 'Terrible. They damaged the interior of my car and are refusing to take responsibility. I had to wait for 2 hours just to talk to a manager. Never coming back to the Pune location.', 
+        date: '2024-07-15',
+        analysis: {
+            sentiment: 'Very Negative',
+            keyAreas: 'Service Quality, Customer Support, Issue Resolution',
+            suggestions: 'Urgent management intervention required. Review CCTV footage and contact the customer immediately to resolve the damage claim.'
+        }
+    }
 ];
 
 export const notifications: Notification[] = [

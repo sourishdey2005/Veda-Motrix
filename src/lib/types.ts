@@ -176,6 +176,11 @@ export type CustomerFeedback = {
   rating: number;
   comment: string;
   date: string;
+  analysis?: {
+    sentiment: string;
+    keyAreas: string;
+    suggestions: string;
+  }
 };
 
 export type Notification = {
@@ -307,4 +312,5 @@ export type CustomerLifetimeValueData = {
     clv: number;
     retentionProbability: number;
 };
+
 
