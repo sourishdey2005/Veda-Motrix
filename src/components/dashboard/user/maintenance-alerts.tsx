@@ -27,15 +27,16 @@ const priorityStyles = {
 
 export function MaintenanceAlerts({ vehicle }: { vehicle: Vehicle }) {
 
-    // For simulation, we'll just cycle through the alerts
-    const [alerts, setAlerts] = useState(vehicle.predictedAlerts);
+    const [alerts, setAlerts] = useState(vehicle.predictedAlerts || []);
     
     useEffect(() => {
-      const interval = setInterval(() => {
-        setAlerts(prev => [...prev.slice(1), prev[0]]);
-      }, 5000);
-      return () => clearInterval(interval);
-    }, []);
+      if (alerts.length > 1) {
+        const interval = setInterval(() => {
+          setAlerts(prev => [...prev.slice(1), prev[0]]);
+        }, 5000);
+        return () => clearInterval(interval);
+      }
+    }, [alerts.length]);
 
     return (
         <Card className="flex flex-col">
@@ -46,7 +47,7 @@ export function MaintenanceAlerts({ vehicle }: { vehicle: Vehicle }) {
             <CardContent className="flex-grow">
                  <ScrollArea className="h-64 pr-4 -mr-4">
                     <div className="space-y-4">
-                        {alerts.map((alert) => {
+                        {alerts.length > 0 ? alerts.map((alert) => {
                             const styles = priorityStyles[alert.priority];
                             return (
                                 <div key={alert.id} className={cn("p-3 rounded-lg border", styles.bg, styles.border)}>
@@ -63,7 +64,11 @@ export function MaintenanceAlerts({ vehicle }: { vehicle: Vehicle }) {
                                     </div>
                                 </div>
                             )
-                        })}
+                        }) : (
+                            <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
+                                No predicted alerts for this vehicle.
+                            </div>
+                        )}
                     </div>
                 </ScrollArea>
             </CardContent>
