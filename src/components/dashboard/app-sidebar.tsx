@@ -8,8 +8,10 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarFooter,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot, Briefcase, Smile } from "lucide-react";
+import { BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot, Briefcase, Smile, Settings, User as UserIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -32,6 +34,10 @@ const userNav = [
     { name: "My Vehicle", href: "/dashboard/user", icon: Car },
 ];
 
+const commonNav = [
+    { name: "Profile", href: "/dashboard/profile", icon: UserIcon },
+    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+];
 
 export function AppSidebar() {
   const { user } = useAuth();
@@ -65,6 +71,23 @@ export function AppSidebar() {
             ))}
         </SidebarMenu>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarSeparator />
+        <SidebarMenu>
+           {commonNav.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                    <Link href={item.href} className="w-full">
+                      <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.name}>
+                        <div>
+                          <item.icon />
+                          <span>{item.name}</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </Link>
+                </SidebarMenuItem>
+            ))}
+        </SidebarMenu>
+      </SidebarFooter>
     </>
   );
 }
