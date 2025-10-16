@@ -41,7 +41,7 @@ export function UserDashboard() {
             </CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {primaryVehicle.predictiveInsights.map(insight => (
+            {primaryVehicle.predictiveInsights && primaryVehicle.predictiveInsights.map(insight => (
                 <PredictiveInsightCard key={insight.id} insight={insight} />
             ))}
         </CardContent>
@@ -57,7 +57,7 @@ export function UserDashboard() {
             <EnvironmentalImpact vehicle={primaryVehicle} />
         </div>
 
-        <div className="space-y-6">
+        <div className="lg:col-span-1 space-y-6">
             <ServiceScheduler />
             <VehicleSummaryCard vehicle={primaryVehicle} />
         </div>
