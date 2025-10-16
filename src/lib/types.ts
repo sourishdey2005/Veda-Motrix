@@ -1,4 +1,5 @@
 
+
 export type User = {
   id: string;
   name: string;
@@ -253,4 +254,19 @@ export type SankeyData = {
 export type AnomalyTimelineDataPoint = {
   time: string;
   score: number;
+};
+
+export type RepairComplexityData = {
+  easy: number;
+  complex: number;
+};
+
+export type FirstTimeFixRateData = {
+  month: string;
+  rate: number;
+};
+
+export type AiConfidenceData = {
+  level: 'High' | 'Medium' | 'Low';
+  count: number;
 };

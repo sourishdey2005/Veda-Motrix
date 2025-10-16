@@ -1,4 +1,4 @@
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format, addDays } from 'date-fns';
@@ -486,3 +486,23 @@ export const anomalyTimelineData: AnomalyTimelineDataPoint[] = Array.from({lengt
     time: `${String(i).padStart(2, '0')}:00`,
     score: i > 8 && i < 18 ? Math.random() * 0.3 : (i === 2 || i === 22) ? Math.random() * 0.5 + 0.4 : Math.random() * 0.1,
 }));
+
+export const repairComplexityData: RepairComplexityData = {
+    easy: 75,
+    complex: 25,
+};
+
+export const firstTimeFixRateData: FirstTimeFixRateData[] = [
+    { month: 'Jan', rate: 88 },
+    { month: 'Feb', rate: 91 },
+    { month: 'Mar', rate: 90 },
+    { month: 'Apr', rate: 92 },
+    { month: 'May', rate: 94 },
+    { month: 'Jun', rate: 95 },
+];
+
+export const aiConfidenceData: AiConfidenceData[] = [
+    { level: 'High', count: 25 },
+    { level: 'Medium', count: 60 },
+    { level: 'Low', count: 15 },
+];
