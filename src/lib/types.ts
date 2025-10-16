@@ -7,6 +7,12 @@ export type User = {
   avatarUrl: string;
 };
 
+export type SubsystemHealth = {
+  name: 'Engine' | 'Brakes' | 'Battery' | 'Suspension' | 'Sensors';
+  health: number; // 0-100
+  anomalyProbability: number; // 0-1
+};
+
 export type SensorData = {
   engine_temp: number;
   oil_level: number;
@@ -24,6 +30,15 @@ export type MaintenanceLog = {
   notes: string;
 };
 
+export type PredictedAlert = {
+    id: string;
+    issue: string;
+    priority: 'High' | 'Medium' | 'Low';
+    recommendation: string;
+    estimatedTime: string;
+    estimatedCost: number;
+};
+
 export type Vehicle = {
   id: string;
   ownerId: string;
@@ -34,13 +49,18 @@ export type Vehicle = {
   imageUrl: string;
   imageHint: string;
   healthStatus: 'Good' | 'Warning' | 'Critical';
+  healthScore: number; // 0-100
+  lastService: string;
+  nextServiceDue: string;
+  subsystemHealth: SubsystemHealth[];
+  predictedAlerts: PredictedAlert[];
   sensorData: SensorData;
   maintenanceHistory: MaintenanceLog[];
 };
 
 export type ServiceCenter = {
   id: string;
-  name: string;
+  name:string;
   city: string;
   capacity: number;
   availableSlots: string[];

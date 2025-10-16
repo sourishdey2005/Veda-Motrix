@@ -31,6 +31,7 @@ export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata
 
 export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   const healthStatus = i % 3 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
+  const healthScore = healthStatus === 'Critical' ? 30 + Math.random() * 20 : healthStatus === 'Warning' ? 60 + Math.random() * 20 : 85 + Math.random() * 15;
   const selectedImg = i % 3 === 0 ? vehicleImg1 : i % 2 === 0 ? vehicleImg2 : vehicleImg3;
   return {
     id: `V${1001 + i}`,
@@ -42,6 +43,21 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
     imageUrl: selectedImg?.imageUrl || '',
     imageHint: selectedImg?.imageHint || 'car',
     healthStatus: healthStatus,
+    healthScore: healthScore,
+    lastService: `2024-0${1+i%5}-15`,
+    nextServiceDue: `2024-10-${15+i%10}`,
+    subsystemHealth: [
+      { name: 'Engine', health: 80 + Math.random() * 20, anomalyProbability: Math.random() * 0.1 },
+      { name: 'Brakes', health: 70 + Math.random() * 30, anomalyProbability: Math.random() * 0.2 },
+      { name: 'Battery', health: 90 + Math.random() * 10, anomalyProbability: Math.random() * 0.05 },
+      { name: 'Suspension', health: 60 + Math.random() * 40, anomalyProbability: Math.random() * 0.3 },
+      { name: 'Sensors', health: 95 + Math.random() * 5, anomalyProbability: Math.random() * 0.02 },
+    ],
+    predictedAlerts: [
+        { id: 'PA1', issue: 'Brake Pad Wear', priority: 'High', recommendation: 'Replace front brake pads within 2 weeks.', estimatedTime: '2 hours', estimatedCost: 8000 },
+        { id: 'PA2', issue: 'Battery Degradation', priority: 'Medium', recommendation: 'Voltage dropping. Test and potential replacement recommended at next service.', estimatedTime: '1 hour', estimatedCost: 12000 },
+        { id: 'PA3', issue: 'Tire Pressure Imbalance', priority: 'Low', recommendation: 'Check and adjust tire pressures. Monitor for slow leaks.', estimatedTime: '15 mins', estimatedCost: 200 },
+    ],
     sensorData: {
       engine_temp: 90 + Math.random() * 30 * (healthStatus === 'Critical' ? 1.2 : 1),
       oil_level: 0.5 + Math.random() * 0.5 * (healthStatus === 'Warning' ? 0.8 : 1),

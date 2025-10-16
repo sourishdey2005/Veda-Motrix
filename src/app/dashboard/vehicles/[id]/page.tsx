@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/hooks/use-auth";
-import { VehicleHealthCard } from "@/components/dashboard/user/vehicle-health-card";
+import { VehicleDetailsCard } from "@/components/dashboard/user/vehicle-details-card";
 import { MaintenanceTimeline } from "@/components/dashboard/user/maintenance-timeline";
 import { VedaMotrixLogo } from "@/components/icons";
 
@@ -24,7 +24,7 @@ export default function VehicleDetailsPage({ params: { id } }: { params: { id: s
 
   return (
     <div className="space-y-6">
-        <VehicleHealthCard vehicle={vehicle} />
+        <VehicleDetailsCard vehicle={vehicle} />
         <MaintenanceTimeline vehicle={vehicle} />
     </div>
   )
