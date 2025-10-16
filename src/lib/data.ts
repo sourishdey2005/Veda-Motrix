@@ -1,4 +1,4 @@
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format, addDays } from 'date-fns';
@@ -506,3 +506,24 @@ export const aiConfidenceData: AiConfidenceData[] = [
     { level: 'Medium', count: 60 },
     { level: 'Low', count: 15 },
 ];
+
+export const centerBenchmarkData: CenterBenchmarkData[] = [
+  { metric: 'Satisfaction', center: 92, average: 88 },
+  { metric: 'Turnaround', center: 3.1, average: 3.8 },
+  { metric: 'Cost', center: 95, average: 105 }, // Center is 5% below avg
+  { metric: 'FTF Rate', center: 94, average: 91 },
+  { metric: 'Diagnostics', center: 89, average: 82 },
+];
+
+export const partReliabilityData: PartReliabilityData[] = [
+  { id: 'PR1', partName: 'Alternator', score: 92, failureRate: 0.8, cost: 15000 },
+  { id: 'PR2', partName: 'Fuel Injector', score: 85, failureRate: 1.2, cost: 8000 },
+  { id: 'PR3', partName: 'ABS Sensor', score: 78, failureRate: 2.1, cost: 4000 },
+  { id: 'PR4', partName: 'Turbocharger', score: 65, failureRate: 3.5, cost: 45000 },
+  { id: 'PR5', partName: 'Water Pump', score: 55, failureRate: 4.2, cost: 7000 },
+].sort((a,b) => a.score - b.score);
+
+export const timeOfDayLoadData: TimeOfDayLoadData[] = Array.from({length: 10}).map((_, i) => ({
+    hour: `${(i + 9).toString().padStart(2,'0')}:00`,
+    vehicles: Math.floor(Math.random() * 10) + (i > 1 && i < 6 ? 5 : 0) // peak mid-day
+}));

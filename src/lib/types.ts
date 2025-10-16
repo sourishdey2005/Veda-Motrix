@@ -270,3 +270,22 @@ export type AiConfidenceData = {
   level: 'High' | 'Medium' | 'Low';
   count: number;
 };
+
+export type CenterBenchmarkData = {
+  metric: string;
+  center: number;
+  average: number;
+};
+
+export type PartReliabilityData = {
+  id: string;
+  partName: string;
+  score: number;
+  failureRate: number;
+  cost: number;
+};
+
+export type TimeOfDayLoadData = {
+  hour: string;
+  vehicles: number;
+};
