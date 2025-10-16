@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react";
@@ -32,6 +33,8 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
             });
             setSensorData(prev => {
                 const currentSensorData = prev ?? vehicle.sensorData;
+                // Add a check to prevent error if currentSensorData is still not available
+                if (!currentSensorData) return vehicle.sensorData;
                 return {
                     engine_temp: currentSensorData.engine_temp + (Math.random() - 0.5) * 2,
                     oil_level: Math.min(1, Math.max(0, currentSensorData.oil_level + (Math.random() - 0.5) * 0.05)),
@@ -44,6 +47,23 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
         }, 2000);
         return () => clearInterval(interval);
     }, [vehicle.healthScore, vehicle.sensorData]);
+
+    const displayHealthScore = healthScore ?? vehicle.healthScore ?? 0;
+    const displaySensorData = sensorData ?? vehicle.sensorData;
+
+    if (!displaySensorData) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>{vehicle.make} {vehicle.model}</CardTitle>
+                    <CardDescription>{vehicle.vin}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p>Loading sensor data...</p>
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <Card>
@@ -63,27 +83,27 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-sm">
                     <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted/50">
                         <p className="text-muted-foreground text-xs">Overall Health</p>
-                        <p className={cn("text-3xl font-bold", getHealthColor(healthScore))}>{healthScore.toFixed(0)}%</p>
+                        <p className={cn("text-3xl font-bold", getHealthColor(displayHealthScore))}>{displayHealthScore.toFixed(0)}%</p>
                     </div>
                     <div className="flex flex-col">
                         <p className="font-medium">Engine Temp</p>
-                        <p className="text-2xl font-bold font-mono">{sensorData.engine_temp.toFixed(1)}°C</p>
+                        <p className="text-2xl font-bold font-mono">{displaySensorData.engine_temp.toFixed(1)}°C</p>
                     </div>
                     <div className="flex flex-col">
                         <p className="font-medium">Oil Level</p>
-                        <p className="text-2xl font-bold font-mono">{(sensorData.oil_level * 100).toFixed(0)}%</p>
+                        <p className="text-2xl font-bold font-mono">{(displaySensorData.oil_level * 100).toFixed(0)}%</p>
                     </div>
                     <div className="flex flex-col">
                         <p className="font-medium">Tire Pressure</p>
-                        <p className="text-2xl font-bold font-mono">{sensorData.tire_pressure.toFixed(1)} PSI</p>
+                        <p className="text-2xl font-bold font-mono">{displaySensorData.tire_pressure.toFixed(1)} PSI</p>
                     </div>
                     <div className="flex flex-col">
                         <p className="font-medium">Battery Voltage</p>
-                        <p className="text-2xl font-bold font-mono">{sensorData.battery_voltage.toFixed(2)}V</p>
+                        <p className="text-2xl font-bold font-mono">{displaySensorData.battery_voltage.toFixed(2)}V</p>
                     </div>
                     <div className="flex flex-col">
                         <p className="font-medium">Vibration</p>
-                        <p className="text-2xl font-bold font-mono">{sensorData.vibration.toFixed(2)} m/s²</p>
+                        <p className="text-2xl font-bold font-mono">{displaySensorData.vibration.toFixed(2)} m/s²</p>
                     </div>
                 </div>
             </CardContent>
