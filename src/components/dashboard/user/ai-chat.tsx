@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useRef, useEffect } from 'react';
@@ -9,41 +10,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { qnaData } from '@/lib/chatbot-qna';
+import { answerQuestion } from '@/ai/flows/vehicle-qna';
 
 interface Message {
     role: 'user' | 'model';
     content: string;
 }
-
-// Simple search function to find a matching answer
-const getHardcodedAnswer = (question: string): string => {
-    const lowerCaseQuestion = question.toLowerCase().trim();
-    // Prioritize exact or near-exact matches
-    const exactMatch = qnaData.find(item => item.question.toLowerCase().trim() === lowerCaseQuestion);
-    if (exactMatch) {
-        return exactMatch.answer;
-    }
-
-    // Simple keyword matching as a fallback
-    const keywords = lowerCaseQuestion.split(/\s+/).filter(k => k.length > 2);
-    let bestMatch = { score: 0, answer: "I'm sorry, I don't have information on that topic right now. I can help with vehicle maintenance, service, and general questions." };
-
-    qnaData.forEach(item => {
-        let currentScore = 0;
-        const itemQuestionLower = item.question.toLowerCase();
-        keywords.forEach(keyword => {
-            if (itemQuestionLower.includes(keyword)) {
-                currentScore++;
-            }
-        });
-        if (currentScore > bestMatch.score) {
-            bestMatch = { score: currentScore, answer: item.answer };
-        }
-    });
-
-    return bestMatch.answer;
-}
-
 
 export function AIChat() {
     const [messages, setMessages] = useState<Message[]>([
@@ -85,14 +57,32 @@ export function AIChat() {
         setMessages(prev => [...prev, userMessage]);
         setLoading(true);
 
-        // Simulate thinking time
-        await new Promise(resolve => setTimeout(resolve, 500));
+        try {
+            const conversationHistory = messages.map(msg => ({
+                role: msg.role,
+                content: msg.content,
+            }));
 
-        const answer = getHardcodedAnswer(messageContent);
-        const aiMessage: Message = { role: 'model', content: answer };
-        setMessages(prev => [...prev, aiMessage]);
+            const result = await answerQuestion({
+                question: messageContent,
+                conversationHistory,
+            });
+            
+            const aiMessage: Message = { role: 'model', content: result.answer };
+            setMessages(prev => [...prev, aiMessage]);
 
-        setLoading(false);
+        } catch (error) {
+            console.error("AI Assistant Error:", error);
+            toast({
+                title: "AI Assistant Error",
+                description: "There was a problem connecting to the AI. Please check your connection and try again.",
+                variant: "destructive"
+            });
+            // Remove the user's message if the AI fails to respond
+            setMessages(prev => prev.slice(0, -1));
+        } finally {
+            setLoading(false);
+        }
     }
 
     const handleSendMessage = async (e: React.FormEvent) => {
