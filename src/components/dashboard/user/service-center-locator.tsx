@@ -14,15 +14,6 @@ export function ServiceCenterLocator() {
         <CardDescription>Find and review top-rated service centers in your area.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="relative h-48 w-full rounded-lg overflow-hidden">
-             <Image 
-                src="https://picsum.photos/seed/map/600/400"
-                alt="City map with service centers"
-                layout="fill"
-                objectFit="cover"
-                data-ai-hint="city map"
-             />
-        </div>
         <div className="space-y-2">
           {serviceCenters.slice(0, 3).map(center => (
             <div key={center.id} className="p-3 bg-muted/50 rounded-lg flex justify-between items-center">
