@@ -9,7 +9,8 @@ import { PredictiveCostEstimator } from "@/components/dashboard/user/predictive-
 import { ServiceCenterLocator } from "@/components/dashboard/user/service-center-locator";
 import { VedaMotrixLogo } from "@/components/icons";
 
-export default function VehicleDetailsPage({ params: { id } }: { params: { id: string } }) {
+export default function VehicleDetailsPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const { vehicles, loading } = useAuth();
   
   if (loading) {
