@@ -13,7 +13,7 @@ import {
   SidebarFooter,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot, Briefcase, Smile, Settings, User as UserIcon, Warehouse } from "lucide-react";
+import { BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot, Briefcase, Smile, Settings, User as UserIcon, Warehouse, FileSearch } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -24,6 +24,7 @@ const managerNav = [
     { name: "Executive Analytics", href: "/dashboard/executive", icon: Briefcase },
     { name: "Manufacturing", href: "/dashboard/manufacturing", icon: Factory },
     { name: "Customer Experience", href: "/dashboard/customer-experience", icon: Smile },
+    { name: "Doc Analysis", href: "/dashboard/document-analysis", icon: FileSearch },
     { name: "UEBA Security", href: "/dashboard/ueba", icon: ShieldCheck },
 ];
 

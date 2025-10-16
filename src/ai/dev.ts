@@ -10,3 +10,4 @@ import '@/ai/flows/generate-manufacturing-insights.ts';
 import '@/ai/flows/detect-agent-anomalies.ts';
 import '@/ai/flows/generate-executive-summary.ts';
 import '@/ai/flows/vehicle-qna.ts';
+import '@/ai/flows/analyze-document.ts';
