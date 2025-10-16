@@ -69,11 +69,14 @@ const generatePredictedAlerts = (): PredictedAlert[] => [
     { id: 'PA3', issue: 'Tire Pressure Imbalance', priority: 'Low', recommendation: 'Check and adjust tire pressures. Monitor for slow leaks.', estimatedTime: '15 mins', estimatedCost: 200, parts: [], laborCost: 200 },
 ];
 
-const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => [
-    { id: `M${vehicleIndex}1`, date: '2023-03-10', mileage: 12000 + vehicleIndex*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK.', serviceCenterId: 'SC1', cost: 4500, rating: 5 },
-    { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters.', serviceCenterId: 'SC2', cost: 2500, rating: 4 },
-    { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up.', serviceCenterId: 'SC1', cost: 7800, rating: 4 },
-];
+const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => {
+    const history: MaintenanceLog[] = [
+        { id: `M${vehicleIndex}1`, date: '2023-03-10', mileage: 12000 + vehicleIndex*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK. Replaced oil filter and topped up fluids.', serviceCenterId: 'SC1', cost: 4500, rating: 5 },
+        { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters. Cleaned throttle body.', serviceCenterId: 'SC2', cost: 2500, rating: 4 },
+        { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up. Customer reported slight shudder, but not reproducible.', serviceCenterId: 'SC1', cost: 7800, rating: 4 },
+    ];
+    return history;
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -215,7 +218,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-    
-
-    

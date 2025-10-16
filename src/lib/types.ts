@@ -40,7 +40,7 @@ export type MaintenanceLog = {
   notes: string;
   serviceCenterId: string;
   cost: number;
-  rating: number; // 1-5
+  rating: number;
 };
 
 export type PredictedAlert = {
