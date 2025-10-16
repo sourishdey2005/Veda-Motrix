@@ -11,6 +11,38 @@ import { useEffect, useState } from "react"
 import { uebaEvents as mockUebaEvents } from "@/lib/data";
 import type { UebaEvent } from "@/lib/types";
 
+const sampleAnomalies: Omit<UebaEvent, 'id' | 'timestamp'>[] = [
+  {
+    agentId: 'Scheduling Agent',
+    action: 'Attempted to access billing info',
+    anomalyScore: 0.85,
+    isAnomalous: true,
+    explanation: 'Unauthorized attempt to access sensitive financial data outside of typical agent behavior.',
+  },
+  {
+    agentId: 'Data Analysis Agent',
+    action: 'Deleted historical sensor data for V1004',
+    anomalyScore: 0.95,
+    isAnomalous: true,
+    explanation: 'Data deletion is a highly restricted action. Agent does not have deletion privileges.',
+  },
+  {
+    agentId: 'Customer Engagement Agent',
+    action: 'Exported contact list of all users',
+    anomalyScore: 0.9,
+    isAnomalous: true,
+    explanation: 'Mass data export is anomalous. Agent should only access individual user data when required.',
+  },
+   {
+    agentId: 'Manufacturing Insights Agent',
+    action: 'Accessed R&D server outside of work hours',
+    anomalyScore: 0.75,
+    isAnomalous: true,
+    explanation: 'Access to sensitive R&D data from an unusual time and location.',
+  }
+];
+
+
 export function UebaView() {
   const [uebaEvents, setUebaEvents] = useState<UebaEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,14 +64,12 @@ export function UebaView() {
     // This is a mock analysis since we are using dummy data
     await new Promise(resolve => setTimeout(resolve, 1000));
     
+    const randomAnomaly = sampleAnomalies[Math.floor(Math.random() * sampleAnomalies.length)];
+
     const newEvent: UebaEvent = {
+        ...randomAnomaly,
         id: `UEBA${uebaEvents.length + 1}`,
-        agentId: 'Scheduling Agent',
-        action: 'Attempted to access billing info',
         timestamp: new Date().toISOString(),
-        anomalyScore: 0.85,
-        isAnomalous: true,
-        explanation: 'Unauthorized attempt to access sensitive financial data outside of typical agent behavior.',
       };
 
     setUebaEvents(prev => [newEvent, ...prev]);
