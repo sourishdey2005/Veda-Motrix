@@ -161,9 +161,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userToStore);
       localStorage.setItem('veda-user', JSON.stringify(userToStore));
       
-      // On login, ensure vehicles in local storage are up-to-date
-      localStorage.setItem('veda-vehicles', JSON.stringify(mockVehicles));
-      setVehicles(mockVehicles);
+      // On login, load vehicles from storage, or set default if storage is empty
+      const storedVehicles = localStorage.getItem('veda-vehicles');
+      if (storedVehicles) {
+        setVehicles(JSON.parse(storedVehicles));
+      } else {
+        localStorage.setItem('veda-vehicles', JSON.stringify(mockVehicles));
+        setVehicles(mockVehicles);
+      }
 
       let redirectPath = '/dashboard';
       if(userToStore.role === 'manager') redirectPath = '/dashboard/manager';
@@ -202,7 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('veda-user');
-    localStorage.removeItem('veda-vehicles');
+    // Don't remove vehicles on logout to persist them for the next session
     router.push('/');
   };
 
@@ -269,6 +274,8 @@ export const useAuth = () => {
 };
 
   
+
+    
 
     
 
