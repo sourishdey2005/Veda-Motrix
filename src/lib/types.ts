@@ -44,6 +44,8 @@ export type ServiceCenter = {
   city: string;
   capacity: number;
   availableSlots: string[];
+  rating: number;
+  avgCompletionTime: number;
 };
 
 export type Appointment = {

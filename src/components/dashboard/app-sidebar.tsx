@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot, Briefcase } from "lucide-react";
+import { BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot, Briefcase, Smile } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -19,6 +19,7 @@ const managerNav = [
     { name: "Service Analytics", href: "/dashboard/analytics", icon: BarChart },
     { name: "Executive Analytics", href: "/dashboard/executive", icon: Briefcase },
     { name: "Manufacturing", href: "/dashboard/manufacturing", icon: Factory },
+    { name: "Customer Experience", href: "/dashboard/customer-experience", icon: Smile },
     { name: "UEBA Security", href: "/dashboard/ueba", icon: ShieldCheck },
 ];
 

@@ -27,6 +27,7 @@ const vehicleImg3 = PlaceHolderImages.find(img => img.id === 'vehicle-3');
 
 const indianMakes = ['Hero', 'Mahindra'];
 const indianModels = ['Splendor', 'Xtreme', 'XUV700', 'Scorpio', 'Pleasure+', 'Thar', 'Passion', 'Jawa', 'Karizma', 'Bolero'];
+const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata'];
 
 export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   const healthStatus = i % 3 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
@@ -57,10 +58,13 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
 });
 
 export const serviceCenters: ServiceCenter[] = [
-  { id: 'SC1', name: 'VedaMotrix Andheri', city: 'Mumbai', capacity: 15, availableSlots: ['09:30', '11:30', '14:30'] },
-  { id: 'SC2', name: 'VedaMotrix Koramangala', city: 'Bengaluru', capacity: 12, availableSlots: ['10:00', '13:00', '16:00'] },
-  { id: 'SC3', name: 'VedaMotrix Connaught Place', city: 'Delhi', capacity: 10, availableSlots: ['09:00', '11:00', '14:00', '17:00'] },
+  { id: 'SC1', name: 'VedaMotrix Andheri', city: 'Mumbai', capacity: 15, availableSlots: ['09:30', '11:30', '14:30'], rating: 4.8, avgCompletionTime: 2.5 },
+  { id: 'SC2', name: 'VedaMotrix Koramangala', city: 'Bengaluru', capacity: 12, availableSlots: ['10:00', '13:00', '16:00'], rating: 4.6, avgCompletionTime: 3.1 },
+  { id: 'SC3', name: 'VedaMotrix Connaught Place', city: 'Delhi', capacity: 10, availableSlots: ['09:00', '11:00', '14:00', '17:00'], rating: 4.7, avgCompletionTime: 2.8 },
+  { id: 'SC4', name: 'VedaMotrix T. Nagar', city: 'Chennai', capacity: 8, availableSlots: ['10:30', '14:30'], rating: 4.5, avgCompletionTime: 3.5 },
+  { id: 'SC5', name: 'VedaMotrix Park Street', city: 'Kolkata', capacity: 9, availableSlots: ['09:00', '12:00', '15:00'], rating: 4.6, avgCompletionTime: 3.2 },
 ];
+
 
 export const appointments: Appointment[] = [
   { id: 'A1', vehicleId: 'V1001', serviceCenterId: 'SC1', date: '2024-08-01', time: '09:30', status: 'Completed', notes: 'Diagnosed high engine temperature.' },
@@ -82,7 +86,6 @@ export const customerFeedbackData: CustomerFeedback[] = [
     { id: 'F3', userId: '3', vehicleId: 'V1007', rating: 4, comment: 'Good experience in Bengaluru. The lounge was clean and they fixed the issue promptly. Price was reasonable.', date: '2024-07-25' },
 ];
 
-const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata'];
 const components = ['Engine', 'Transmission', 'Suspension', 'Brakes', 'AC System'];
 
 export const analyticsData = {
@@ -130,7 +133,6 @@ export const analyticsData = {
   }))
 };
 
-const rcaMakes = ['Hero', 'Mahindra'];
 const rcaSuppliers = ['Bosch India', 'Minda Corp', 'Bharat Forge', 'Lumax', 'Uno Minda'];
 const rcaComponents = ['ECU', 'Fuel Injector', 'ABS Module', 'Wiring Harness', 'Infotainment Unit'];
 
@@ -164,7 +166,7 @@ export const rcaCapaAnalyticsData = {
     })),
   })),
   designVulnerability: indianModels.slice(0, 5).map((model, i) => ({
-    model: `${rcaMakes[i % 2]} ${model}`,
+    model: `${indianMakes[i % 2]} ${model}`,
     riskScore: 20 + Math.random() * 70,
   })),
   aiRecommendations: [
@@ -219,9 +221,33 @@ export const executiveAnalyticsData = {
     { month: "Jun", beforeAI: 580000, afterAI: 300000 },
   ],
   rulPrediction: indianModels.map((model, i) => ({
-    model: `${rcaMakes[i % 2]} ${model}`,
+    model: `${indianMakes[i % 2]} ${model}`,
     rul: 3.5 + Math.random() * 4,
   })),
   detectionRate: 85.4,
   sri: 91.3,
+};
+
+export const customerExperienceData = {
+  sentimentScore: 8.2,
+  appointmentDeclineRate: 15,
+  voiceInteractionSuccess: 78,
+  feedbackToActionRatio: 45,
+  retentionProbability: 85,
+  networkUtilization: 88,
+  responseTime: indianCities.map(city => ({
+    city,
+    predictionToAppointment: Math.random() * 3 + 1, // 1-4 days
+    appointmentToRepair: Math.random() * 2 + 0.5, // 0.5-2.5 days
+  })),
+  userEngagement: [
+    { metric: 'Avg. App Opens/Wk', value: 4.5 },
+    { metric: 'Avg. Chat Interactions/Mo', value: 2.1 },
+    { metric: 'Avg. Voice Interactions/Mo', value: 0.8 },
+  ],
+  complaintRecurrence: [
+    { issue: "Brake Noise", count: 12, users: 8 },
+    { issue: "Infotainment Lag", count: 9, users: 7 },
+    { issue: "AC Cooling", count: 7, users: 5 },
+  ]
 };
