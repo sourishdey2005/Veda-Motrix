@@ -7,6 +7,9 @@ import { AppSidebar } from '@/components/dashboard/app-sidebar';
 import { UserNav } from '@/components/dashboard/user-nav';
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import { VedaMotrixLogo } from '@/components/icons';
+import { Bell } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
 
 export default function DashboardLayout({
   children,
@@ -15,6 +18,11 @@ export default function DashboardLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [currentDate, setCurrentDate] = React.useState('');
+
+  React.useEffect(() => {
+    setCurrentDate(format(new Date(), 'eeee, MMMM do, yyyy'));
+  }, []);
 
   React.useEffect(() => {
     if (!loading && !user) {
@@ -36,12 +44,23 @@ export default function DashboardLayout({
         <AppSidebar />
       </Sidebar>
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
+        <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
           <SidebarTrigger className="md:hidden" />
           <div className="flex-1">
-            <h1 className="font-semibold text-lg hidden md:block">VEDA-MOTRIX AI</h1>
+             <h1 className="font-semibold text-lg hidden md:block">VEDA-MOTRIX AI — Predictive Intelligence Hub</h1>
+             <p className="text-xs text-muted-foreground hidden md:block">{currentDate}</p>
           </div>
-          <UserNav />
+          <div className='flex items-center gap-4'>
+            <p className='text-sm text-muted-foreground hidden lg:block'>Namaste, {user.name.split(' ')[0]} 👋</p>
+            <Button variant="ghost" size="icon" className='relative'>
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+              </span>
+            </Button>
+            <UserNav />
+          </div>
         </header>
         <main className="flex-1 p-4 sm:p-6">{children}</main>
       </SidebarInset>

@@ -1,20 +1,122 @@
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { AlertTriangle, Bot, Cpu, Car } from "lucide-react"
+import { AlertTriangle, Bot, Cpu, Car, Eye } from "lucide-react"
 import Link from "next/link"
+import React, { useState, useEffect, useMemo, useCallback } from "react"
+import { vehicles as allVehicles, analyticsData } from "@/lib/data"
+import type { Vehicle } from "@/lib/types"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+
+function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
+    const [data, setData] = useState(initialData);
+    const memoizedUpdater = useCallback(updater, []);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setData(prevData => memoizedUpdater(prevData));
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [memoizedUpdater]);
+    return data;
+}
+
+const getStatusColor = (status: Vehicle['healthStatus']) => {
+    switch (status) {
+        case 'Good': return 'bg-green-500';
+        case 'Warning': return 'bg-yellow-500';
+        case 'Critical': return 'bg-red-500';
+        default: return 'bg-gray-500';
+    }
+}
+
+const healthToPercentage = (status: Vehicle['healthStatus']) => {
+    switch (status) {
+        case 'Good': return 90 + Math.random() * 10;
+        case 'Warning': return 60 + Math.random() * 20;
+        case 'Critical': return 20 + Math.random() * 30;
+        default: return 0;
+    }
+}
+
+const predictedIssues = [
+    { issue: "Battery Wear", risk: "High" },
+    { issue: "Brake Pad Thinning", risk: "Medium" },
+    { issue: "Oil Pressure Drop", risk: "Critical" },
+    { issue: "Coolant Level Low", risk: "Low" },
+    { issue: "Tire Pressure Imbalance", risk: "Medium" },
+]
 
 export function ManagerDashboard() {
+  const [vehicles, setVehicles] = useState(allVehicles.slice(0, 8));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+        setVehicles(currentVehicles => currentVehicles.map(v => {
+            const random = Math.random();
+            let newStatus: Vehicle['healthStatus'] = v.healthStatus;
+            if (random < 0.1) newStatus = 'Good';
+            else if (random < 0.2) newStatus = 'Warning';
+            else if (random < 0.3) newStatus = 'Critical';
+            return {...v, healthStatus: newStatus}
+        }))
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  const globalHealthIndex = useMemo(() => {
+    if (vehicles.length === 0) return 0;
+    const totalHealth = vehicles.reduce((sum, v) => sum + healthToPercentage(v.healthStatus), 0);
+    return totalHealth / vehicles.length;
+  }, [vehicles]);
+
 
   return (
     <div className="space-y-6">
        <Card>
         <CardHeader>
-          <CardTitle>Manager Dashboard</CardTitle>
+          <CardTitle>Fleet Health Overview</CardTitle>
           <CardDescription>
-            Welcome, Manager. Get a high-level overview of the VEDA-MOTRIX AI system.
+            Real-time status and predictive alerts for the entire monitored fleet.
           </CardDescription>
         </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="md:col-span-1 flex flex-col items-center justify-center gap-2 p-4 rounded-lg bg-muted/50">
+                 <div className="relative h-32 w-32">
+                    <svg className="h-full w-full" viewBox="0 0 36 36">
+                        <path className="text-muted" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
+                        <path className="text-primary transition-all duration-500" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray={`${globalHealthIndex.toFixed(0)}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-4xl font-bold">{globalHealthIndex.toFixed(0)}%</span>
+                    </div>
+                </div>
+                <p className="font-semibold">Global Health Index</p>
+            </div>
+            <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {vehicles.map((vehicle, index) => {
+                    const issue = predictedIssues[index % predictedIssues.length];
+                    return (
+                        <Card key={vehicle.id} className="flex flex-col">
+                            <CardHeader className="pb-2">
+                                <div className="flex justify-between items-center">
+                                    <CardTitle className="text-sm font-medium">{vehicle.make} {vehicle.model}</CardTitle>
+                                    <div className={cn("w-3 h-3 rounded-full", getStatusColor(vehicle.healthStatus))}></div>
+                                </div>
+                                <CardDescription className="text-xs">{vehicle.vin}</CardDescription>
+                            </CardHeader>
+                            <CardContent className="flex-grow flex flex-col justify-end">
+                                <Badge variant={issue.risk === 'High' || issue.risk === 'Critical' ? 'destructive' : 'secondary'} className="mb-2 w-full justify-center text-xs">{issue.risk} Risk: {issue.issue}</Badge>
+                                <Button variant="outline" size="sm" className="w-full">
+                                    <Eye className="mr-2 h-3 w-3"/>
+                                    View Details
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )
+                })}
+            </div>
+        </CardContent>
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -25,7 +127,7 @@ export function ManagerDashboard() {
             </CardHeader>
             <CardContent>
             <div className="text-2xl font-bold text-green-500">Optimal</div>
-            <p className="text-xs text-muted-foreground">All systems are running smoothly.</p>
+            <p className="text-xs text-muted-foreground">All agent systems are running.</p>
             </CardContent>
         </Card>
         <Card>
@@ -62,7 +164,7 @@ export function ManagerDashboard() {
               </Link>
             </CardTitle>
             <Car className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
+          </header>
           <CardContent>
             <div className="text-2xl font-bold">10</div>
             <p className="text-xs text-muted-foreground">Vehicle models being monitored.</p>
