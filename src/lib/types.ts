@@ -71,6 +71,7 @@ export type UebaEvent = {
   timestamp: string;
   anomalyScore: number;
   isAnomalous: boolean;
+  explanation?: string;
 };
 
 export type CustomerFeedback = {
