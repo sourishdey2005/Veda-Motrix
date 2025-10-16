@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -6,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { inventoryData, partConsumptionTrends } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
@@ -19,7 +18,7 @@ const chartConfig = {
 
 export function InventoryManagement() {
   const [parts, setParts] = useState(inventoryData);
-  const [open, setOpen] = useState(false);
+  const [selectedPart, setSelectedPart] = useState<typeof parts[0] | null>(null);
 
   const getStockStatus = (part: typeof parts[0]) => {
     if (part.inStock < part.reorderLevel) return "low";
@@ -63,9 +62,9 @@ export function InventoryManagement() {
                     </TableCell>
                     <TableCell className="font-mono">{part.avgUsePerWeek}</TableCell>
                     <TableCell className="text-right">
-                       <Dialog open={open && open} onOpenChange={setOpen}>
+                       <Dialog>
                             <DialogTrigger asChild>
-                                <Button variant="outline" size="sm" disabled={status !== 'low'}>
+                                <Button variant="outline" size="sm" onClick={() => setSelectedPart(part)}>
                                     Request Restock
                                 </Button>
                             </DialogTrigger>
@@ -73,9 +72,14 @@ export function InventoryManagement() {
                                 <DialogHeader>
                                     <DialogTitle>Restock Request Sent</DialogTitle>
                                     <DialogDescription>
-                                        A restock request for {part.name} has been sent to procurement.
+                                        A restock request for {selectedPart?.name} has been sent to procurement.
                                     </DialogDescription>
                                 </DialogHeader>
+                                 <DialogClose asChild>
+                                    <Button type="button" variant="secondary">
+                                      Close
+                                    </Button>
+                                  </DialogClose>
                             </DialogContent>
                         </Dialog>
                     </TableCell>
