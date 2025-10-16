@@ -2,7 +2,8 @@
 
 
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix } from './types';
+
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format, addDays } from 'date-fns';
@@ -439,3 +440,26 @@ export const technicianCorrelationMatrix: CorrelationMatrix[] = [
     { metric: 'Service Time', skill: -0.82, experience: -0.5, serviceTime: 1.0, satisfaction: -0.65 },
     { metric: 'Satisfaction', skill: 0.7, experience: 0.4, serviceTime: -0.65, satisfaction: 1.0 },
 ];
+
+export const serviceDurationData: ServiceDurationData[] = [
+  { id: 'SD1', task: 'Oil Change', predicted: 1.0, actual: 0.9, technician: 'Vijay' },
+  { id: 'SD2', task: 'Brake Check', predicted: 2.5, actual: 3.1, technician: 'Sanjay' },
+  { id: 'SD3', task: 'ECU Flash', predicted: 1.5, actual: 1.6, technician: 'Rajesh' },
+  { id: 'SD4', task: 'Suspension', predicted: 4.0, actual: 4.8, technician: 'Anil' },
+  { id: 'SD5', task: 'Filter Swap', predicted: 0.5, actual: 0.4, technician: 'Prakash' },
+  { id: 'SD6', task: 'Engine Diag', predicted: 3.0, actual: 2.8, technician: 'Sanjay' },
+];
+
+export const repairCostData: RepairCostData[] = [
+  { month: 'Jan', actualCost: 12500, standardCost: 12000 },
+  { month: 'Feb', actualCost: 14000, standardCost: 13000 },
+  { month: 'Mar', actualCost: 13200, standardCost: 13500 },
+  { month: 'Apr', actualCost: 15000, standardCost: 14000 },
+  { month: 'May', actualCost: 14500, standardCost: 14200 },
+  { month: 'Jun', actualCost: 16000, standardCost: 15000 },
+];
+
+export const partLifecycleData: PartLifecycleData[] = Array.from({ length: 10 }).map((_, i) => ({
+  mileage: (i + 1) * 10000,
+  failureProbability: (1 / (1 + Math.exp(-(i - 5) * 0.8))) * 100, // Sigmoid curve
+}));

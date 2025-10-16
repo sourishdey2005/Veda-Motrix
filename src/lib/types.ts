@@ -6,6 +6,7 @@
 
 
 
+
 export type User = {
   id: string;
   name: string;
@@ -229,4 +230,23 @@ export type CorrelationMatrix = {
     experience: number;
     serviceTime: number;
     satisfaction: number;
+};
+
+export type ServiceDurationData = {
+  id: string;
+  task: string;
+  predicted: number;
+  actual: number;
+  technician: string;
+};
+
+export type RepairCostData = {
+  month: string;
+  actualCost: number;
+  standardCost: number;
+};
+
+export type PartLifecycleData = {
+  mileage: number;
+  failureProbability: number;
 };
