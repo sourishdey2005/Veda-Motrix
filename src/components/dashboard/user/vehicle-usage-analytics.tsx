@@ -14,12 +14,15 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function VehicleUsageAnalytics({ vehicle }: { vehicle: Vehicle }) {
-  const [usageData, setUsageData] = useState<UsageDataPoint[]>([]);
+  const [usageData, setUsageData] = useState<UsageDataPoint[]>(vehicle.usageHistory || []);
 
   useEffect(() => {
-    // Initialize with static data and then simulate updates
+    // This effect ensures the component updates if the vehicle prop changes.
     setUsageData(vehicle.usageHistory || []);
-
+  }, [vehicle.usageHistory]);
+  
+  useEffect(() => {
+    // This effect simulates real-time data changes.
     const interval = setInterval(() => {
       setUsageData(prevData => {
         if (prevData.length === 0) return [];
@@ -35,7 +38,7 @@ export function VehicleUsageAnalytics({ vehicle }: { vehicle: Vehicle }) {
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [vehicle.usageHistory]);
+  }, []);
 
   const anomalies = usageData.filter(d => d.anomaly);
 
@@ -59,7 +62,7 @@ export function VehicleUsageAnalytics({ vehicle }: { vehicle: Vehicle }) {
                 />
                 <YAxis dataKey="distance" unit=" km" />
                 <ChartTooltip
-                    cursor={false}
+                    cursor={true}
                     content={
                         <ChartTooltipContent
                             formatter={(value, name, props) => (
@@ -68,7 +71,7 @@ export function VehicleUsageAnalytics({ vehicle }: { vehicle: Vehicle }) {
                                     <p>Avg Speed: {props.payload.avgSpeed.toFixed(1)} km/h</p>
                                     <p>Consumption: {props.payload.consumption.toFixed(1)} L/100km</p>
                                     {props.payload.anomaly && (
-                                        <p className="text-red-500 mt-1">Anomaly: {props.payload.anomaly.replace('_', ' ')}</p>
+                                        <p className="text-red-500 mt-1 flex items-center gap-1"><AlertTriangle className="w-4 h-4" /> Anomaly: {props.payload.anomaly.replace('_', ' ')}</p>
                                     )}
                                 </div>
                             )}
@@ -76,24 +79,28 @@ export function VehicleUsageAnalytics({ vehicle }: { vehicle: Vehicle }) {
                         />
                     }
                 />
+                <defs>
+                    <linearGradient id="fillDistance" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-distance)" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="var(--color-distance)" stopOpacity={0.1} />
+                    </linearGradient>
+                </defs>
                 <Area
                     dataKey="distance"
                     type="natural"
-                    fill="var(--color-distance)"
-                    fillOpacity={0.4}
+                    fill="url(#fillDistance)"
                     stroke="var(--color-distance)"
+                    stackId="a"
                 />
                 {anomalies.map(anomaly => (
                    <ReferenceDot
                         key={anomaly.date}
                         x={anomaly.date}
                         y={anomaly.distance}
-                        r={5}
+                        r={8}
                         fill="hsl(var(--destructive))"
-                        stroke="none"
-                    >
-                         <AlertTriangle className="w-4 h-4 text-white" />
-                    </ReferenceDot>
+                        stroke="transparent"
+                    />
                 ))}
             </AreaChart>
             </ChartContainer>
