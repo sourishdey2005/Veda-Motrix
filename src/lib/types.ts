@@ -3,6 +3,7 @@
 
 
 
+
 export type User = {
   id: string;
   name: string;
@@ -190,4 +191,23 @@ export type LiveQueueVehicle = {
   id: string;
   model: string;
   stage: 'In Service' | 'Diagnosis' | 'Ready for Pickup';
+};
+
+export type WorkloadForecastData = {
+    date: string;
+    predictedJobs: number;
+};
+
+export type InventoryPart = {
+    id: string;
+    name: string;
+    inStock: number;
+    avgUsePerWeek: number;
+    reorderLevel: number;
+    predictedShortageDate: string;
+};
+
+export type PartConsumptionTrend = {
+    part: string;
+    change: number;
 };

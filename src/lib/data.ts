@@ -1,8 +1,9 @@
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle } from './types';
+
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
-import { subDays, format } from 'date-fns';
+import { subDays, format, addDays } from 'date-fns';
 
 // A simple hashing function for demonstration. Do not use in production.
 const simpleHash = (s: string) => {
@@ -401,3 +402,24 @@ export const customerExperienceData = {
     { issue: "AC Cooling", count: 7, users: 5 },
   ]
 };
+
+
+export const workloadForecast: WorkloadForecastData[] = Array.from({ length: 7 }).map((_, i) => ({
+    date: format(addDays(new Date(), i), 'yyyy-MM-dd'),
+    predictedJobs: 10 + Math.floor(Math.random() * 15) + (i === 4 ? 10 : 0), // Spike on Friday
+}));
+
+
+export const inventoryData: InventoryPart[] = [
+    { id: 'P1', name: 'Brake Pads (XUV700)', inStock: 50, avgUsePerWeek: 15, reorderLevel: 20, predictedShortageDate: '2024-09-15' },
+    { id: 'P2', name: 'Oil Filter (Splendor)', inStock: 120, avgUsePerWeek: 40, reorderLevel: 50, predictedShortageDate: '2024-09-10' },
+    { id: 'P3', name: 'Battery (Nexon EV)', inStock: 8, avgUsePerWeek: 2, reorderLevel: 10, predictedShortageDate: '2024-08-25' },
+    { id: 'P4', name: 'Air Filter (Swift)', inStock: 75, avgUsePerWeek: 25, reorderLevel: 30, predictedShortageDate: '2024-09-20' },
+    { id: 'P5', name: 'Spark Plug (Set)', inStock: 200, avgUsePerWeek: 50, reorderLevel: 75, predictedShortageDate: '2024-09-30' },
+];
+
+export const partConsumptionTrends: PartConsumptionTrend[] = [
+    { part: 'Oil Filters', change: 20 },
+    { part: 'Brake Pads', change: 15 },
+    { part: 'Air Filters', change: -5 },
+];

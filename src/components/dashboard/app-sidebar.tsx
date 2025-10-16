@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { VedaMotrixLogo } from "@/components/icons";
@@ -12,7 +13,7 @@ import {
   SidebarFooter,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot, Briefcase, Smile, Settings, User as UserIcon } from "lucide-react";
+import { BarChart, Car, Factory, HeartPulse, LayoutDashboard, ShieldCheck, Users, Wrench, Bot, Briefcase, Smile, Settings, User as UserIcon, Warehouse } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -29,6 +30,7 @@ const managerNav = [
 const serviceCenterNav = [
     { name: "Dashboard", href: "/dashboard/service-center", icon: LayoutDashboard },
     { name: "Analytics", href: "/dashboard/service-center/analytics", icon: BarChart },
+    { name: "Forecasting", href: "/dashboard/service-center/inventory", icon: Warehouse },
     { name: "Customer Feedback", href: "/dashboard/feedback", icon: Users },
 ];
 
