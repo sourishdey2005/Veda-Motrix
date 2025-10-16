@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Vehicle } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -10,7 +10,7 @@ import type { ChartConfig } from "@/components/ui/chart";
 import { format, parseISO } from "date-fns";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
 const chartConfig = {
@@ -26,8 +26,11 @@ type ComponentKey = keyof typeof chartConfig;
 export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
   const [showOnlyCritical, setShowOnlyCritical] = useState(false);
   const [activeComponents, setActiveComponents] = useState<ComponentKey[]>(['engine', 'brakes', 'battery', 'suspension', 'sensors']);
+  const [healthData, setHealthData] = useState(vehicle.healthHistory || []);
 
-  const healthData = vehicle.healthHistory || [];
+  useEffect(() => {
+    setHealthData(vehicle.healthHistory || []);
+  }, [vehicle.healthHistory]);
   
   const toggleComponent = (component: ComponentKey) => {
     setActiveComponents(prev => 
