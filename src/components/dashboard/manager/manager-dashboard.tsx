@@ -1,21 +1,14 @@
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Activity, AlertTriangle, ArrowRight, Bot, CheckCircle, Cpu, ShieldCheck, Factory, Users, Wrench, BarChart, Car, HeartPulse } from "lucide-react"
-import React from "react"
-import { cn } from "@/lib/utils"
+import { AlertTriangle, Bot, Cpu, Car } from "lucide-react"
 import Link from "next/link"
-
-const agents = [
-  { name: 'Data Analysis Agent', icon: Activity, href: "/dashboard/analytics" },
-  { name: 'Diagnosis Agent', icon: HeartPulse, href: "/dashboard/analytics" },
-]
-
+import { MasterAgentView } from "./master-agent-view"
 
 export function ManagerDashboard() {
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
        <Card>
         <CardHeader>
           <CardTitle>Manager Dashboard</CardTitle>
@@ -25,7 +18,7 @@ export function ManagerDashboard() {
         </CardHeader>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">System Health</CardTitle>
@@ -54,7 +47,7 @@ export function ManagerDashboard() {
             <Bot className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2</div>
+            <div className="text-2xl font-bold">8</div>
             <p className="text-xs text-muted-foreground">Agents currently operational.</p>
           </CardContent>
         </Card>
@@ -62,7 +55,7 @@ export function ManagerDashboard() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               <Link href="/dashboard/analytics" className="hover:underline">
-                Service Analytics
+                Monitored Fleet
               </Link>
             </CardTitle>
             <Car className="h-4 w-4 text-muted-foreground" />
@@ -73,6 +66,8 @@ export function ManagerDashboard() {
           </CardContent>
         </Card>
       </div>
+      
+      <MasterAgentView />
     </div>
   )
 }
