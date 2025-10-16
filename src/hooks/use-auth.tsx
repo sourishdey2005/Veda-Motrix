@@ -1,10 +1,11 @@
 
 
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import type { User, Vehicle, UsageDataPoint, HealthHistoryEntry, PredictedAlert, MaintenanceLog } from '@/lib/types';
+import type { User, Vehicle, UsageDataPoint, HealthHistoryEntry, PredictedAlert, MaintenanceLog, PredictiveInsight, EnvironmentalData } from '@/lib/types';
 import { users as mockUsers, vehicles as mockVehicles } from '@/lib/data';
 import { subDays, format } from 'date-fns';
 
@@ -16,7 +17,7 @@ interface AuthContextType {
   logout: () => void;
   loading: boolean;
   updateUser: (data: Partial<User>) => void;
-  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory' | 'healthHistory'>) => void;
+  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory' | 'healthHistory' | 'predictiveInsights' | 'environmentalData'>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,7 +43,7 @@ const generateUsageHistory = (): UsageDataPoint[] => {
             date: format(date, 'yyyy-MM-dd'),
             distance: 20 + Math.random() * 80,
             avgSpeed: 30 + Math.random() * 40,
-            consumption: 15 + Math.random() * 10,
+            consumption: 5 + Math.random() * 5, // L/100km
             anomaly: anomaly,
         };
     });
@@ -77,6 +78,50 @@ const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => {
     ];
     return history;
 };
+
+const generatePredictiveInsights = (): PredictiveInsight[] => [
+  {
+    id: 'PI1',
+    title: 'Brake Pad Wear',
+    shortDescription: 'Brake pads likely to wear out in the next 500 km.',
+    detailedExplanation: 'Our AI has detected a pattern of increased brake pedal travel and minor vibrations consistent with thinning brake pads. This is a critical safety component.',
+    recommendedAction: 'Schedule a brake inspection and replacement now to ensure safety.',
+    urgency: 'High',
+  },
+  {
+    id: 'PI2',
+    title: 'Battery Health',
+    shortDescription: 'Battery voltage fluctuations detected.',
+    detailedExplanation: 'The battery is showing inconsistent voltage readings, especially during engine start-up. This could lead to a no-start situation, particularly in colder weather.',
+    recommendedAction: 'Recommend a battery check-up at your next service appointment.',
+    urgency: 'Medium',
+  },
+  {
+    id: 'PI3',
+    title: 'Fuel Efficiency',
+    shortDescription: 'Fuel consumption is 15% higher than average.',
+    detailedExplanation: 'Your recent driving patterns show a higher-than-normal fuel consumption rate. This could be due to factors like tire pressure, a dirty air filter, or driving style.',
+    recommendedAction: 'Check tire pressure and consider a general tune-up to improve mileage.',
+    urgency: 'Low',
+  }
+];
+
+const generateEnvironmentalData = (): EnvironmentalData => ({
+  fuelEfficiencyTrend: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => ({
+    month,
+    efficiency: 14 + Math.random() * 4 - i * 0.3, // km/L
+  })),
+  carbonFootprint: {
+    current: 135, // g/km
+    reduction: 12, // g/km
+  },
+  ecoBadges: [
+    { id: 'B1', name: 'Eco Driver', description: 'Maintained optimal fuel efficiency for a month.', icon: 'leaf', earned: true },
+    { id: 'B2', name: 'Smooth Operator', description: 'Consistently low harsh acceleration/braking events.', icon: 'feather', earned: true },
+    { id: 'B3', name: 'Green Commuter', description: 'Completed 500km with above-average efficiency.', icon: 'award', earned: false },
+    { id: 'B4', name: 'Carbon Saver', description: 'Saved 50kg of CO2 through proactive maintenance.', icon: 'shield', earned: false },
+  ]
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -177,7 +222,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory' | 'healthHistory'>) => {
+  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory' | 'healthHistory' | 'predictiveInsights' | 'environmentalData'>) => {
     const newVehicle: Vehicle = {
       ...data,
       id: `V${vehicles.length + 1001}`,
@@ -203,6 +248,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       maintenanceHistory: generateMaintenanceHistory(vehicles.length),
       usageHistory: generateUsageHistory(),
       healthHistory: generateHealthHistory(),
+      predictiveInsights: generatePredictiveInsights(),
+      environmentalData: generateEnvironmentalData(),
     };
     const newVehicles = [...vehicles, newVehicle];
     setVehicles(newVehicles);

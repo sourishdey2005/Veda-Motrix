@@ -1,4 +1,5 @@
 
+
 export type User = {
   id: string;
   name: string;
@@ -58,8 +59,32 @@ export type UsageDataPoint = {
     date: string;
     distance: number;
     avgSpeed: number;
-    consumption: number;
+    consumption: number; // L/100km
     anomaly?: 'high_vibration' | 'overheating';
+};
+
+export type PredictiveInsight = {
+  id: string;
+  title: string;
+  shortDescription: string;
+  detailedExplanation: string;
+  recommendedAction: string;
+  urgency: 'High' | 'Medium' | 'Low';
+};
+
+export type EnvironmentalData = {
+  fuelEfficiencyTrend: { month: string; efficiency: number }[];
+  carbonFootprint: {
+    current: number; // in kg CO2
+    reduction: number; // in kg CO2
+  };
+  ecoBadges: {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    earned: boolean;
+  }[];
 };
 
 export type Vehicle = {
@@ -81,6 +106,8 @@ export type Vehicle = {
   maintenanceHistory: MaintenanceLog[];
   usageHistory: UsageDataPoint[];
   healthHistory: HealthHistoryEntry[];
+  predictiveInsights: PredictiveInsight[];
+  environmentalData: EnvironmentalData;
 };
 
 export type ServiceCenter = {

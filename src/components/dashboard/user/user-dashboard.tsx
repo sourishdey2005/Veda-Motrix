@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ServiceScheduler } from "./service-scheduler"
 import { AIChatbot } from "./ai-chatbot"
 import { VehicleUsageAnalytics } from "./vehicle-usage-analytics"
+import { PredictiveInsightCard } from "./predictive-insight-card"
+import { EnvironmentalImpact } from "./environmental-impact"
 
 export function UserDashboard() {
   const { user, vehicles } = useAuth();
@@ -34,29 +36,32 @@ export function UserDashboard() {
         <CardHeader>
             <CardTitle>Hello, {user.name.split(' ')[0]} 👋</CardTitle>
             <CardDescription>
-                You have {userVehicles.length} vehicle{userVehicles.length > 1 ? 's' : ''} in your fleet.
+                Here are the latest insights for your vehicles.
             </CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             {userVehicles.map(vehicle => (
-                <VehicleSummaryCard key={vehicle.id} vehicle={vehicle} />
-             ))}
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {primaryVehicle.predictiveInsights.map(insight => (
+                <PredictiveInsightCard key={insight.id} insight={insight} />
+            ))}
         </CardContent>
       </Card>
-
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <VehicleHealthRadar vehicle={primaryVehicle} />
-            <MaintenanceAlerts vehicle={primaryVehicle} />
-             <div className="md:col-span-2">
-                <VehicleUsageAnalytics vehicle={primaryVehicle} />
-            </div>
+        <div className="lg:col-span-2 space-y-6">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <VehicleHealthRadar vehicle={primaryVehicle} />
+                <MaintenanceAlerts vehicle={primaryVehicle} />
+             </div>
+             <VehicleUsageAnalytics vehicle={primaryVehicle} />
+             <EnvironmentalImpact vehicle={primaryVehicle} />
         </div>
 
-        <div className="grid grid-cols-1 gap-6 h-full">
+        <div className="space-y-6">
             <ServiceScheduler />
+            <VehicleSummaryCard vehicle={primaryVehicle} />
         </div>
       </div>
+
       <AIChatbot />
     </div>
   )

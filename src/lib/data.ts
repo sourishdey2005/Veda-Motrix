@@ -1,5 +1,5 @@
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format } from 'date-fns';
@@ -60,7 +60,7 @@ const generateUsageHistory = (): UsageDataPoint[] => {
             date: format(date, 'yyyy-MM-dd'),
             distance: 20 + Math.random() * 80,
             avgSpeed: 30 + Math.random() * 40,
-            consumption: 15 + Math.random() * 10,
+            consumption: 5 + Math.random() * 5, // L/100km
             anomaly: anomaly,
         };
     });
@@ -86,6 +86,50 @@ const generatePredictedAlerts = (): PredictedAlert[] => [
     { id: 'PA2', issue: 'Battery Degradation', priority: 'Medium', recommendation: 'Voltage dropping. Test and potential replacement recommended at next service.', estimatedTime: '1 hour', estimatedCost: 12000, parts: [{ name: 'Battery', cost: 11000 }], laborCost: 1000 },
     { id: 'PA3', issue: 'Tire Pressure Imbalance', priority: 'Low', recommendation: 'Check and adjust tire pressures. Monitor for slow leaks.', estimatedTime: '15 mins', estimatedCost: 200, parts: [], laborCost: 200 },
 ];
+
+const generatePredictiveInsights = (): PredictiveInsight[] => [
+  {
+    id: 'PI1',
+    title: 'Brake Pad Wear',
+    shortDescription: 'Brake pads likely to wear out in the next 500 km.',
+    detailedExplanation: 'Our AI has detected a pattern of increased brake pedal travel and minor vibrations consistent with thinning brake pads. This is a critical safety component.',
+    recommendedAction: 'Schedule a brake inspection and replacement now to ensure safety.',
+    urgency: 'High',
+  },
+  {
+    id: 'PI2',
+    title: 'Battery Health',
+    shortDescription: 'Battery voltage fluctuations detected.',
+    detailedExplanation: 'The battery is showing inconsistent voltage readings, especially during engine start-up. This could lead to a no-start situation, particularly in colder weather.',
+    recommendedAction: 'Recommend a battery check-up at your next service appointment.',
+    urgency: 'Medium',
+  },
+  {
+    id: 'PI3',
+    title: 'Fuel Efficiency',
+    shortDescription: 'Fuel consumption is 15% higher than average.',
+    detailedExplanation: 'Your recent driving patterns show a higher-than-normal fuel consumption rate. This could be due to factors like tire pressure, a dirty air filter, or driving style.',
+    recommendedAction: 'Check tire pressure and consider a general tune-up to improve mileage.',
+    urgency: 'Low',
+  }
+];
+
+const generateEnvironmentalData = (): EnvironmentalData => ({
+  fuelEfficiencyTrend: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => ({
+    month,
+    efficiency: 14 + Math.random() * 4 - i * 0.3, // km/L
+  })),
+  carbonFootprint: {
+    current: 135, // g/km
+    reduction: 12, // g/km
+  },
+  ecoBadges: [
+    { id: 'B1', name: 'Eco Driver', description: 'Maintained optimal fuel efficiency for a month.', icon: 'leaf', earned: true },
+    { id: 'B2', name: 'Smooth Operator', description: 'Consistently low harsh acceleration/braking events.', icon: 'feather', earned: true },
+    { id: 'B3', name: 'Green Commuter', description: 'Completed 500km with above-average efficiency.', icon: 'award', earned: false },
+    { id: 'B4', name: 'Carbon Saver', description: 'Saved 50kg of CO2 through proactive maintenance.', icon: 'shield', earned: false },
+  ]
+});
 
 
 export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
@@ -124,6 +168,8 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
     maintenanceHistory: generateMaintenanceHistory(i),
     usageHistory: generateUsageHistory(),
     healthHistory: generateHealthHistory(),
+    predictiveInsights: generatePredictiveInsights(),
+    environmentalData: generateEnvironmentalData(),
   };
 });
 
