@@ -20,6 +20,9 @@ const chartConfig: ChartConfig = {
   mahindra: { label: "Mahindra", color: "hsl(var(--chart-2))" },
   maruti: { label: "Maruti", color: "hsl(var(--chart-3))" },
   count: { label: "Count", color: "hsl(var(--chart-1))" },
+  Clutch: { label: "Clutch", color: "hsl(var(--chart-1))" },
+  "Brake Pad": { label: "Brake Pad", color: "hsl(var(--chart-2))" },
+  Injector: { label: "Injector", color: "hsl(var(--chart-3))" },
 }
 
 const severityColors = {
@@ -255,19 +258,21 @@ export function AnalyticsDashboard() {
                     <CardDescription>Bubble plot showing failure frequency as vehicles age. Size indicates fleet volume.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                            <CartesianGrid />
-                            <XAxis type="number" dataKey="age" name="Vehicle Age (years)" unit="yrs" />
-                            <YAxis type="number" dataKey="failureRate" name="Failure Rate (%)" unit="%" />
-                            <ZAxis type="number" dataKey="vehicleCount" range={[100, 1000]} name="Vehicle Count" />
-                            <ChartTooltip cursor={{ strokeDasharray: '3 3' }} content={<ChartTooltipContent />} />
-                            <Legend />
-                            <Scatter name="Tata" data={ageVsFailure.filter(d => d.make === 'Tata')} fill="var(--color-tata)" />
-                            <Scatter name="Mahindra" data={ageVsFailure.filter(d => d.make === 'Mahindra')} fill="var(--color-mahindra)" />
-                            <Scatter name="Maruti" data={ageVsFailure.filter(d => d.make === 'Maruti')} fill="var(--color-maruti)" />
-                        </ScatterChart>
-                    </ResponsiveContainer>
+                    <ChartContainer config={chartConfig} className="h-96">
+                        <ResponsiveContainer width="100%" height={300}>
+                            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                                <CartesianGrid />
+                                <XAxis type="number" dataKey="age" name="Vehicle Age (years)" unit="yrs" />
+                                <YAxis type="number" dataKey="failureRate" name="Failure Rate (%)" unit="%" />
+                                <ZAxis type="number" dataKey="vehicleCount" range={[100, 1000]} name="Vehicle Count" />
+                                <ChartTooltip cursor={{ strokeDasharray: '3 3' }} content={<ChartTooltipContent />} />
+                                <Legend />
+                                <Scatter name="Tata" data={ageVsFailure.filter(d => d.make === 'Tata')} fill="var(--color-tata)" />
+                                <Scatter name="Mahindra" data={ageVsFailure.filter(d => d.make === 'Mahindra')} fill="var(--color-mahindra)" />
+                                <Scatter name="Maruti" data={ageVsFailure.filter(d => d.make === 'Maruti')} fill="var(--color-maruti)" />
+                            </ScatterChart>
+                        </ResponsiveContainer>
+                    </ChartContainer>
                 </CardContent>
             </Card>
             
@@ -294,7 +299,7 @@ export function AnalyticsDashboard() {
             <Card>
                 <CardHeader>
                     <CardTitle>Parts Replacement Trend Analysis</CardTitle>
-                    <CardDescription>Top 10 replaced components by month.</CardDescription>
+                    <CardDescription>Top 3 replaced components by month.</CardDescription>
                 </CardHeader>
                 <CardContent>
                      <ChartContainer config={chartConfig} className="h-64">
@@ -309,6 +314,7 @@ export function AnalyticsDashboard() {
                         />
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
+                        <Legend />
                         <Line type="monotone" dataKey="Clutch" stroke="var(--color-tata)" strokeWidth={2} dot={false} />
                         <Line type="monotone" dataKey="Brake Pad" stroke="var(--color-mahindra)" strokeWidth={2} dot={false} />
                         <Line type="monotone" dataKey="Injector" stroke="var(--color-maruti)" strokeWidth={2} dot={false} />
