@@ -152,16 +152,16 @@ export function InventoryManagement() {
              <ChartContainer config={chartConfig} className="h-48">
                 <BarChart data={partConsumptionTrends} layout="vertical" margin={{left: 30, right: 30}}>
                     <YAxis dataKey="part" type="category" tickLine={false} axisLine={false} tickMargin={5} width={80} />
-                    <XAxis type="number" hide />
+                    <XAxis type="number" hide domain={[-20, 25]}/>
                     <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                     <Bar dataKey="change" radius={4}>
                          <LabelList
                             dataKey="change"
-                            position="right"
+                            position="insideRight"
                             offset={8}
                             className="fill-foreground text-sm"
                             formatter={(value: number) => `${value > 0 ? '+' : ''}${value}%`}
-                        />
+                         />
                         {partConsumptionTrends.map((entry) => (
                             <Cell key={`cell-${entry.part}`} fill={entry.change > 0 ? 'hsl(var(--destructive))' : 'hsl(var(--chart-2))'} />
                         ))}
