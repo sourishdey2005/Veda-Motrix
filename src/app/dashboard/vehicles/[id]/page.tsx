@@ -5,7 +5,7 @@ import { VehicleHealthCard } from "@/components/dashboard/user/vehicle-health-ca
 import { MaintenanceTimeline } from "@/components/dashboard/user/maintenance-timeline";
 import { VedaMotrixLogo } from "@/components/icons";
 
-export default function VehicleDetailsPage({ params }: { params: { id: string } }) {
+export default function VehicleDetailsPage({ params: { id } }: { params: { id: string } }) {
   const { vehicles, loading } = useAuth();
   
   if (loading) {
@@ -16,7 +16,7 @@ export default function VehicleDetailsPage({ params }: { params: { id: string } 
     );
   }
 
-  const vehicle = vehicles.find(v => v.id === params.id);
+  const vehicle = vehicles.find(v => v.id === id);
 
   if (!vehicle) {
     return <p>Vehicle not found.</p>;
