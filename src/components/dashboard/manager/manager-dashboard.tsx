@@ -1,14 +1,24 @@
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { AlertTriangle, Bot, Cpu, Car, Eye } from "lucide-react"
+import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
-import { vehicles as allVehicles } from "@/lib/data"
+import { allVehicles } from "@/lib/data"
 import type { Vehicle } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useAuth } from "@/hooks/use-auth"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { AddVehicleForm } from "./add-vehicle-form"
 
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
     const [data, setData] = useState(initialData);
@@ -49,11 +59,20 @@ const predictedIssues = [
 ]
 
 export function ManagerDashboard() {
-  const [vehicles, setVehicles] = useState(allVehicles.slice(0, 8));
+  const { vehicles, addVehicle } = useAuth();
+  const [open, setOpen] = useState(false);
+
+  const displayedVehicles = useMemo(() => vehicles.slice(0, 8), [vehicles]);
+
+  const [simulatedVehicles, setSimulatedVehicles] = useState(displayedVehicles);
 
   useEffect(() => {
+    setSimulatedVehicles(displayedVehicles);
+  }, [displayedVehicles]);
+  
+  useEffect(() => {
     const interval = setInterval(() => {
-        setVehicles(currentVehicles => currentVehicles.map(v => {
+        setSimulatedVehicles(currentVehicles => currentVehicles.map(v => {
             const random = Math.random();
             let newStatus: Vehicle['healthStatus'] = v.healthStatus;
             if (random < 0.1) newStatus = 'Good';
@@ -66,20 +85,39 @@ export function ManagerDashboard() {
   }, []);
   
   const globalHealthIndex = useMemo(() => {
-    if (vehicles.length === 0) return 0;
-    const totalHealth = vehicles.reduce((sum, v) => sum + healthToPercentage(v.healthStatus), 0);
-    return totalHealth / vehicles.length;
-  }, [vehicles]);
+    if (simulatedVehicles.length === 0) return 0;
+    const totalHealth = simulatedVehicles.reduce((sum, v) => sum + healthToPercentage(v.healthStatus), 0);
+    return totalHealth / simulatedVehicles.length;
+  }, [simulatedVehicles]);
 
 
   return (
     <div className="space-y-6">
        <Card>
-        <CardHeader>
-          <CardTitle>Fleet Health Overview</CardTitle>
-          <CardDescription>
-            Real-time status and predictive alerts for the entire monitored fleet.
-          </CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Fleet Health Overview</CardTitle>
+            <CardDescription>
+              Real-time status and predictive alerts for the entire monitored fleet.
+            </CardDescription>
+          </div>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+               <Button>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add New Vehicle
+               </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Vehicle</DialogTitle>
+                <DialogDescription>
+                  Enter the details for the new vehicle to monitor.
+                </DialogDescription>
+              </DialogHeader>
+              <AddVehicleForm onVehicleAdded={() => setOpen(false)} />
+            </DialogContent>
+          </Dialog>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="md:col-span-1 flex flex-col items-center justify-center gap-2 p-4 rounded-lg bg-muted/50">
@@ -95,7 +133,7 @@ export function ManagerDashboard() {
                 <p className="font-semibold">Global Health Index</p>
             </div>
             <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {vehicles.map((vehicle, index) => {
+                {simulatedVehicles.map((vehicle, index) => {
                     const issue = predictedIssues[index % predictedIssues.length];
                     return (
                         <Card key={vehicle.id} className="flex flex-col">
@@ -108,10 +146,14 @@ export function ManagerDashboard() {
                             </CardHeader>
                             <CardContent className="flex-grow flex flex-col justify-end">
                                 <Badge variant={issue.risk === 'High' || issue.risk === 'Critical' ? 'destructive' : 'secondary'} className="mb-2 w-full justify-center text-xs">{issue.risk} Risk: {issue.issue}</Badge>
-                                <Button variant="outline" size="sm" className="w-full">
-                                    <Eye className="mr-2 h-3 w-3"/>
-                                    View Details
-                                </Button>
+                                <Link href={`/dashboard/vehicles/${vehicle.id}`} legacyBehavior>
+                                    <a className="w-full">
+                                        <Button variant="outline" size="sm" className="w-full">
+                                            <Eye className="mr-2 h-3 w-3"/>
+                                            View Details
+                                        </Button>
+                                    </a>
+                                </Link>
                             </CardContent>
                         </Card>
                     )
@@ -167,7 +209,7 @@ export function ManagerDashboard() {
             <Car className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">10</div>
+            <div className="text-2xl font-bold">{vehicles.length}</div>
             <p className="text-xs text-muted-foreground">Vehicle models being monitored.</p>
           </CardContent>
         </Card>

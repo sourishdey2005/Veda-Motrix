@@ -25,9 +25,9 @@ const vehicleImg1 = PlaceHolderImages.find(img => img.id === 'vehicle-1');
 const vehicleImg2 = PlaceHolderImages.find(img => img.id === 'vehicle-2');
 const vehicleImg3 = PlaceHolderImages.find(img => img.id === 'vehicle-3');
 
-const indianMakes = ['Hero', 'Mahindra'];
-const indianModels = ['Splendor', 'Xtreme', 'XUV700', 'Scorpio', 'Pleasure+', 'Thar', 'Passion', 'Jawa', 'Karizma', 'Bolero'];
-const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata'];
+export const indianMakes = ['Hero', 'Mahindra', 'Tata', 'Maruti Suzuki'];
+export const indianModels = ['Splendor', 'Xtreme', 'XUV700', 'Scorpio', 'Pleasure+', 'Thar', 'Passion', 'Jawa', 'Karizma', 'Bolero', 'Nexon', 'Harrier', 'Swift', 'Baleno'];
+export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad'];
 
 export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   const healthStatus = i % 3 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
@@ -35,8 +35,8 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   return {
     id: `V${1001 + i}`,
     ownerId: '3', // All owned by Rohan Joshi for simplicity
-    make: indianMakes[i % 2],
-    model: indianModels[i],
+    make: indianMakes[i % indianMakes.length],
+    model: indianModels[i % indianModels.length],
     year: 2020 + (i % 4),
     vin: `VIN${Math.random().toString(36).substring(2, 15).toUpperCase()}`,
     imageUrl: selectedImg?.imageUrl || '',
@@ -56,6 +56,8 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
     ],
   };
 });
+
+export const allVehicles = vehicles;
 
 export const serviceCenters: ServiceCenter[] = [
   { id: 'SC1', name: 'VedaMotrix Andheri', city: 'Mumbai', capacity: 15, availableSlots: ['09:30', '11:30', '14:30'], rating: 4.8, avgCompletionTime: 2.5 },
@@ -227,7 +229,7 @@ export const executiveAnalyticsData = {
     { month: "Jun", beforeAI: 580000, afterAI: 300000 },
   ],
   rulPrediction: indianModels.map((model, i) => ({
-    model: `${indianMakes[i % 2]} ${model}`,
+    model: `${indianMakes[i % indianMakes.length]} ${model}`,
     rul: 3.5 + Math.random() * 4,
   })),
   detectionRate: 85.4,

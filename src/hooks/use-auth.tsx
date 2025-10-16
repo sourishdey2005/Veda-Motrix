@@ -2,16 +2,18 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import type { User } from '@/lib/types';
-import { users as mockUsers } from '@/lib/data';
+import type { User, Vehicle } from '@/lib/types';
+import { users as mockUsers, vehicles as mockVehicles } from '@/lib/data';
 
 interface AuthContextType {
   user: User | null;
+  vehicles: Vehicle[];
   login: (email: string, pass: string) => Promise<boolean>;
   signup: (name: string, email: string, pass: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   updateUser: (data: Partial<User>) => void;
+  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'sensorData' | 'maintenanceHistory'>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,6 +29,7 @@ const simpleHash = (s: string) => {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -37,9 +40,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
+      const storedVehicles = localStorage.getItem('veda-vehicles');
+      if (storedVehicles) {
+        setVehicles(JSON.parse(storedVehicles));
+      } else {
+        localStorage.setItem('veda-vehicles', JSON.stringify(mockVehicles));
+      }
+
     } catch (error) {
-      console.error("Failed to parse user from localStorage", error);
+      console.error("Failed to parse from localStorage", error);
       localStorage.removeItem('veda-user');
+      localStorage.removeItem('veda-vehicles');
     } finally {
       setLoading(false);
     }
@@ -93,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('veda-user');
+    localStorage.removeItem('veda-vehicles');
     router.push('/');
   };
 
@@ -110,8 +122,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'sensorData' | 'maintenanceHistory'>) => {
+    const newVehicle: Vehicle = {
+      ...data,
+      id: `V${vehicles.length + 1001}`,
+      ownerId: '3', // Default owner for now
+      vin: `VIN${Math.random().toString(36).substring(2, 15).toUpperCase()}`,
+      imageUrl: `https://picsum.photos/seed/vehicle${vehicles.length + 1}/600/400`,
+      imageHint: 'car',
+      healthStatus: 'Good',
+      sensorData: {
+        engine_temp: 90, oil_level: 0.9, vibration: 5, tire_pressure: 32, battery_voltage: 12.6, fuel_level: 1,
+      },
+      maintenanceHistory: [],
+    };
+    const newVehicles = [...vehicles, newVehicle];
+    setVehicles(newVehicles);
+    localStorage.setItem('veda-vehicles', JSON.stringify(newVehicles));
+  };
 
-  const value = { user, login, signup, logout, loading, updateUser };
+
+  const value = { user, vehicles, login, signup, logout, loading, updateUser, addVehicle };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
