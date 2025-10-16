@@ -73,7 +73,7 @@ export function TechnicianPerformance() {
         </CardHeader>
         <CardContent>
              <ChartContainer config={chartConfig} className="h-64">
-                <LineChart data={selectedTech.performance.avgTurnaround} margin={{ left: -20, right: 20 }}>
+                <LineChart data={selectedTech.performance.avgTurnaround} margin={{ left: 0, right: 30 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey="issueType" tickLine={false} axisLine={false} tickMargin={8} fontSize={10} />
                     <YAxis dataKey="time" unit="hr" />
