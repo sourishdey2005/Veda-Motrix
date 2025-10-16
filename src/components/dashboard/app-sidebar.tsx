@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { BarChart, Car, Cog, Factory, HeartPulse, LayoutDashboard, Shield, Users, Wrench } from "lucide-react";
+import { BarChart, Car, HeartPulse, LayoutDashboard, Users, Wrench } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const managerNav = [
