@@ -1,6 +1,8 @@
 
 
 
+
+
 export type User = {
   id: string;
   name: string;
@@ -123,11 +125,24 @@ export type ServiceCenter = {
   avgCompletionTime: number;
 };
 
+export type TechnicianPerformance = {
+    vehiclesServicedToday: number;
+    skillProficiency: {
+        skill: 'Engine' | 'Brakes' | 'Electrical' | 'Diagnostics';
+        score: number; // 0-100
+    }[];
+    avgTurnaround: {
+        issueType: string;
+        time: number; // in hours
+    }[];
+};
+
 export type Technician = {
     id: string;
     name: string;
     specialty: string;
     serviceCenterId: string;
+    performance: TechnicianPerformance;
 }
 
 export type AppointmentStatus = 'Pending' | 'In Service' | 'Awaiting Parts' | 'Completed';
@@ -169,4 +184,10 @@ export type Notification = {
   title: string;
   description: string;
   timestamp: string;
+};
+
+export type LiveQueueVehicle = {
+  id: string;
+  model: string;
+  stage: 'In Service' | 'Diagnosis' | 'Ready for Pickup';
 };

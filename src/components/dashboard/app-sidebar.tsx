@@ -28,6 +28,7 @@ const managerNav = [
 
 const serviceCenterNav = [
     { name: "Dashboard", href: "/dashboard/service-center", icon: LayoutDashboard },
+    { name: "Analytics", href: "/dashboard/service-center/analytics", icon: BarChart },
     { name: "Customer Feedback", href: "/dashboard/feedback", icon: Users },
 ];
 

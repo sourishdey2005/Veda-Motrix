@@ -1,5 +1,5 @@
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format } from 'date-fns';
@@ -39,13 +39,28 @@ export const serviceCenters: ServiceCenter[] = [
   { id: 'SC5', name: 'VedaMotrix Park Street', city: 'Kolkata', lat: 22.55, lng: 88.35, capacity: 9, availableSlots: ['09:00', '12:00', '15:00'], rating: 4.6, avgCompletionTime: 3.2 },
 ];
 
+const generateTechnicianPerformance = (): TechnicianPerformance => ({
+    vehiclesServicedToday: 3 + Math.floor(Math.random() * 4),
+    skillProficiency: [
+        { skill: 'Engine', score: 70 + Math.random() * 30 },
+        { skill: 'Brakes', score: 65 + Math.random() * 35 },
+        { skill: 'Electrical', score: 80 + Math.random() * 20 },
+        { skill: 'Diagnostics', score: 85 + Math.random() * 15 },
+    ],
+    avgTurnaround: [
+        { issueType: 'General Service', time: 2 + Math.random() * 1 },
+        { issueType: 'Engine Repair', time: 6 + Math.random() * 4 },
+        { issueType: 'Brake Work', time: 3 + Math.random() * 1.5 },
+    ]
+});
+
 export const technicians: Technician[] = [
-    { id: 'T1', name: 'Sanjay Kumar', specialty: 'Engine', serviceCenterId: 'SC1' },
-    { id: 'T2', name: 'Rajesh Sharma', specialty: 'Electronics', serviceCenterId: 'SC1' },
-    { id: 'T3', name: 'Vijay Singh', specialty: 'General', serviceCenterId: 'SC1' },
-    { id: 'T4', name: 'Anil Mehta', specialty: 'Suspension', serviceCenterId: 'SC2' },
-    { id: 'T5', name: 'Prakash Rao', specialty: 'General', serviceCenterId: 'SC2' },
-    { id: 'T6', name: 'Deepak Verma', specialty: 'Engine', serviceCenterId: 'SC3' },
+    { id: 'T1', name: 'Sanjay Kumar', specialty: 'Engine', serviceCenterId: 'SC1', performance: generateTechnicianPerformance() },
+    { id: 'T2', name: 'Rajesh Sharma', specialty: 'Electronics', serviceCenterId: 'SC1', performance: generateTechnicianPerformance() },
+    { id: 'T3', name: 'Vijay Singh', specialty: 'General', serviceCenterId: 'SC1', performance: generateTechnicianPerformance() },
+    { id: 'T4', name: 'Anil Mehta', specialty: 'Suspension', serviceCenterId: 'SC2', performance: generateTechnicianPerformance() },
+    { id: 'T5', name: 'Prakash Rao', specialty: 'General', serviceCenterId: 'SC2', performance: generateTechnicianPerformance() },
+    { id: 'T6', name: 'Deepak Verma', specialty: 'Engine', serviceCenterId: 'SC3', performance: generateTechnicianPerformance() },
 ];
 
 const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => {
@@ -212,6 +227,13 @@ export const notifications: Notification[] = [
   { id: 'N2', title: 'Agent Anomaly Detected', description: 'Scheduling Agent attempted unauthorized access. Action was blocked.', timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString() },
   { id: 'N3', title: 'New Feedback Received', description: 'A 5-star review was submitted for service at Mumbai SC.', timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString() },
   { id: 'N4', title: 'Parts Shortage Warning', description: 'Low stock for "Brake Pads - XUV700". Consider reordering.', timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString() },
+];
+
+export const liveQueueData: LiveQueueVehicle[] = [
+    { id: 'V1002', model: 'Hero Xtreme', stage: 'Diagnosis' },
+    { id: 'V1005', model: 'Mahindra Thar', stage: 'In Service' },
+    { id: 'V1008', model: 'Tata Nexon', stage: 'In Service' },
+    { id: 'V1001', model: 'Hero Splendor', stage: 'Ready for Pickup' },
 ];
 
 const components = ['Engine', 'Transmission', 'Suspension', 'Brakes', 'AC System'];
