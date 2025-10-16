@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -11,6 +12,9 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { customerExperienceData, serviceCenters } from "@/lib/data"
 import { Progress } from "@/components/ui/progress"
+import { ServiceDelayAnalysis } from "./customer-experience/service-delay-analysis"
+import { DiagnosisAccuracy } from "./customer-experience/diagnosis-accuracy"
+import { CustomerLifetimeValue } from "./customer-experience/customer-lifetime-value"
 
 const chartConfig: ChartConfig = {
     predictionToAppointment: { label: "Prediction to Appointment", color: "hsl(var(--chart-1))" },
@@ -221,6 +225,21 @@ export function CustomerExperienceView() {
                 </CardContent>
             </Card>
         </div>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle>Advanced Customer &amp; Service Analytics</CardTitle>
+                <CardDescription>
+                    Deeper insights into operational efficiency and customer value.
+                </CardDescription>
+            </CardHeader>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ServiceDelayAnalysis />
+            <DiagnosisAccuracy />
+        </div>
+        <CustomerLifetimeValue />
 
     </div>
   )

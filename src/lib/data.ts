@@ -1,4 +1,4 @@
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format, addDays } from 'date-fns';
@@ -398,7 +398,33 @@ export const customerExperienceData = {
     { issue: "Brake Noise", count: 12, users: 8 },
     { issue: "Infotainment Lag", count: 9, users: 7 },
     { issue: "AC Cooling", count: 7, users: 5 },
-  ]
+  ],
+  serviceDelayReasons: [
+    { reason: 'Parts Delay', count: 45 },
+    { reason: 'Technician Shortage', count: 25 },
+    { reason: 'Customer Hold', count: 15 },
+    { reason: 'Diagnostic Complexity', count: 10 },
+    { reason: 'Workspace Unavailability', count: 5 },
+  ] as ServiceDelayReason[],
+  diagnosisAccuracy: {
+    overall: 87.5,
+    matrix: [
+      { aiPrediction: 'Brakes', technicianDiagnosis: 'Brakes', count: 80 },
+      { aiPrediction: 'Brakes', technicianDiagnosis: 'Suspension', count: 5 },
+      { aiPrediction: 'Engine', technicianDiagnosis: 'Engine', count: 65 },
+      { aiPrediction: 'Engine', technicianDiagnosis: 'Electrical', count: 8 },
+      { aiPrediction: 'Electrical', technicianDiagnosis: 'Electrical', count: 92 },
+      { aiPrediction: 'Electrical', technicianDiagnosis: 'Engine', count: 3 },
+      { aiPrediction: 'Suspension', technicianDiagnosis: 'Suspension', count: 75 },
+      { aiPrediction: 'Suspension', technicianDiagnosis: 'Brakes', count: 2 },
+    ] as DiagnosisAccuracyData[],
+  },
+  customerLifetimeValue: [
+    { customerId: 'C1', name: 'Fleet Co.', clv: 500000, retentionProbability: 0.95 },
+    { customerId: 'C2', name: 'Logistics Inc.', clv: 420000, retentionProbability: 0.92 },
+    { customerId: 'C3', name: 'Mr. Joshi', clv: 150000, retentionProbability: 0.88 },
+    { customerId: 'C4', name: 'Mrs. Gupta', clv: 120000, retentionProbability: 0.85 },
+  ] as CustomerLifetimeValueData[],
 };
 
 
@@ -527,3 +553,4 @@ export const timeOfDayLoadData: TimeOfDayLoadData[] = Array.from({length: 10}).m
     hour: `${(i + 9).toString().padStart(2,'0')}:00`,
     vehicles: Math.floor(Math.random() * 10) + (i > 1 && i < 6 ? 5 : 0) // peak mid-day
 }));
+

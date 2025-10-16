@@ -289,3 +289,22 @@ export type TimeOfDayLoadData = {
   hour: string;
   vehicles: number;
 };
+
+export type ServiceDelayReason = {
+    reason: string;
+    count: number;
+};
+
+export type DiagnosisAccuracyData = {
+    aiPrediction: string;
+    technicianDiagnosis: string;
+    count: number;
+};
+
+export type CustomerLifetimeValueData = {
+    customerId: string;
+    name: string;
+    clv: number;
+    retentionProbability: number;
+};
+
