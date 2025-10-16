@@ -160,7 +160,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         { name: 'Suspension', health: 92, anomalyProbability: 0.08 },
         { name: 'Sensors', health: 97, anomalyProbability: 0.03 },
       ],
-      predictedAlerts: [], // New vehicles have no predicted alerts initially
+      predictedAlerts: [
+        { id: 'PA1', issue: 'Brake Pad Wear', priority: 'High', recommendation: 'Replace front brake pads within 2 weeks.', estimatedTime: '2 hours', estimatedCost: 8000, parts: [{ name: 'Brake Pads', cost: 6000 }], laborCost: 2000 },
+        { id: 'PA2', issue: 'Battery Degradation', priority: 'Medium', recommendation: 'Voltage dropping. Test and potential replacement recommended at next service.', estimatedTime: '1 hour', estimatedCost: 12000, parts: [{ name: 'Battery', cost: 11000 }], laborCost: 1000 },
+      ],
       sensorData: {
         engine_temp: 90, oil_level: 0.9, vibration: 5, tire_pressure: 32, battery_voltage: 12.6, fuel_level: 1,
       },
