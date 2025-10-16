@@ -86,7 +86,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
           <TableBody>
             {maintenanceHistory.map((item) => (
               <Collapsible key={item.id} asChild>
-                 <React.Fragment>
+                <>
                   <TableRow>
                     <TableCell>
                       <CollapsibleTrigger asChild>
@@ -116,7 +116,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                           </TableCell>
                       </TableRow>
                   </CollapsibleContent>
-                </React.Fragment>
+                </>
               </Collapsible>
             ))}
           </TableBody>
