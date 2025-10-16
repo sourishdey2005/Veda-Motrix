@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/chart";
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
-  LineChart, Line, CartesianGrid, Legend
+  LineChart, Line, CartesianGrid, Legend, XAxis, YAxis
 } from 'recharts';
 import type { ChartConfig } from "@/components/ui/chart";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
