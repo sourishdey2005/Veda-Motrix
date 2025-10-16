@@ -29,8 +29,10 @@ export function EnvironmentalImpact({ vehicle }: { vehicle: Vehicle }) {
   const { environmentalData } = vehicle;
 
   if (!environmentalData) {
-    return null; // or a placeholder
+    return null;
   }
+
+  const efficiencyFormatter = (value: number) => value.toFixed(1);
 
   return (
     <Card>
@@ -38,22 +40,22 @@ export function EnvironmentalImpact({ vehicle }: { vehicle: Vehicle }) {
         <CardTitle>Environmental & Usage Impact</CardTitle>
         <CardDescription>How your driving habits and our maintenance affect your footprint.</CardDescription>
       </CardHeader>
-      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CardContent className="space-y-6">
         <div>
           <h4 className="font-semibold mb-2">Fuel Efficiency Trend (km/L)</h4>
           <ChartContainer config={chartConfig} className="h-64">
             <BarChart data={environmentalData.fuelEfficiencyTrend}>
               <CartesianGrid vertical={false} />
               <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
-              <YAxis domain={['dataMin - 2', 'dataMax + 2']} />
+              <YAxis domain={['dataMin - 2', 'dataMax + 2']} tickFormatter={efficiencyFormatter} />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Bar dataKey="efficiency" fill="var(--color-efficiency)" radius={4}>
-                 <LabelList position="top" offset={5} className="fill-foreground text-xs" />
+                 <LabelList position="top" offset={5} className="fill-foreground text-xs" formatter={efficiencyFormatter} />
               </Bar>
             </BarChart>
           </ChartContainer>
         </div>
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <h4 className="font-semibold">Carbon Footprint</h4>
                 <div className="flex items-baseline gap-2 mt-1">
