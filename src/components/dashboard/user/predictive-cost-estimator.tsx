@@ -10,10 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 
 export function PredictiveCostEstimator({ vehicle }: { vehicle: Vehicle }) {
-  const [selectedAlertId, setSelectedAlertId] = useState<string | undefined>(vehicle.predictedAlerts?.[0]?.id);
+  const vehicleAlerts = vehicle.predictedAlerts || [];
+  const [selectedAlertId, setSelectedAlertId] = useState<string | undefined>(vehicleAlerts[0]?.id);
   const [includeOptional, setIncludeOptional] = useState(true);
 
-  const vehicleAlerts = vehicle.predictedAlerts || [];
   const selectedAlert = vehicleAlerts.find(a => a.id === selectedAlertId);
 
   const chartData = selectedAlert ? [
@@ -31,7 +31,7 @@ export function PredictiveCostEstimator({ vehicle }: { vehicle: Vehicle }) {
         <CardDescription>Estimated cost for upcoming maintenance.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Select value={selectedAlertId} onValueChange={setSelectedAlertId}>
+        <Select value={selectedAlertId} onValueChange={setSelectedAlertId} disabled={vehicleAlerts.length === 0}>
           <SelectTrigger>
             <SelectValue placeholder="Select a predicted service" />
           </SelectTrigger>
