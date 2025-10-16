@@ -9,6 +9,7 @@ import { answerQuestion } from '@/ai/flows/vehicle-qna';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { qnaData } from '@/lib/chatbot-qna';
 
 interface Message {
     role: 'user' | 'model';
@@ -21,10 +22,12 @@ export function AIChat() {
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
 
     useEffect(() => {
+        // Scroll to bottom when messages or loading state changes
         if (scrollAreaRef.current) {
             scrollAreaRef.current.scrollTo({
                 top: scrollAreaRef.current.scrollHeight,
@@ -33,14 +36,25 @@ export function AIChat() {
         }
     }, [messages, loading]);
 
-    const handleSendMessage = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!input.trim() || loading) return;
+    useEffect(() => {
+        // Function to get 3 random questions
+        const getNewSuggestions = () => {
+             const shuffled = [...qnaData].sort(() => 0.5 - Math.random());
+             setSuggestedQuestions(shuffled.slice(0, 3).map(q => q.question));
+        };
+        
+        getNewSuggestions(); // Initial suggestions
+        const interval = setInterval(getNewSuggestions, 7000); // Change suggestions every 7 seconds
 
-        const userMessage: Message = { role: 'user', content: input };
+        return () => clearInterval(interval);
+    }, []);
+
+    const sendMessage = async (messageContent: string) => {
+        if (!messageContent.trim() || loading) return;
+
+        const userMessage: Message = { role: 'user', content: messageContent };
         const newMessages = [...messages, userMessage];
         setMessages(newMessages);
-        setInput('');
         setLoading(true);
 
         try {
@@ -50,7 +64,7 @@ export function AIChat() {
             }));
 
             const response = await answerQuestion({
-                question: input,
+                question: messageContent,
                 conversationHistory
             });
 
@@ -67,9 +81,19 @@ export function AIChat() {
         }
     }
 
+    const handleSendMessage = async (e: React.FormEvent) => {
+        e.preventDefault();
+        sendMessage(input);
+        setInput('');
+    }
+
+    const handleSuggestionClick = (question: string) => {
+        sendMessage(question);
+    }
+
     return (
         <div className="flex flex-col h-full p-6 pt-0">
-                <ScrollArea className="flex-grow h-0 pr-4 -mr-4 mb-4" ref={scrollAreaRef}>
+                <ScrollArea className="flex-grow h-0 pr-4 -mr-4" ref={scrollAreaRef}>
                     <div className="space-y-4">
                         {messages.map((msg, index) => (
                             <div key={index} className={cn('flex items-start gap-3', msg.role === 'user' ? 'justify-end' : '')}>
@@ -90,6 +114,23 @@ export function AIChat() {
                         )}
                     </div>
                 </ScrollArea>
+                 <div className="pt-4 pb-2">
+                    <p className="text-xs text-muted-foreground mb-2">Or try asking:</p>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        {suggestedQuestions.map((q, i) => (
+                            <Button
+                                key={i}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs h-auto py-1.5 flex-1 text-left justify-start"
+                                onClick={() => handleSuggestionClick(q)}
+                                disabled={loading}
+                            >
+                                {q}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2 pt-4 border-t">
                     <Input 
                         placeholder="Type your question..." 

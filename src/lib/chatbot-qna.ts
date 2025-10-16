@@ -44,6 +44,9 @@ export const qnaData = [
     { question: "How does the 'Service Center Locator' work?", answer: "It shows authorized service centers near your location, along with their user ratings, helping you choose the best option for your service needs." },
     { question: "What is 'RUL'?", answer: "RUL stands for Remaining Useful Life. It is an AI-powered prediction of how long a component or the vehicle itself is expected to last before requiring major repairs or replacement." },
     { question: "What is 'CAPA'?", answer: "CAPA stands for Corrective and Preventive Action. It's a process used in manufacturing to address and eliminate the root causes of failures." },
+    { question: "What are eco-driving badges?", answer: "Eco-driving badges are awards you earn for demonstrating environmentally friendly driving habits, such as maintaining optimal fuel efficiency or having low harsh acceleration events." },
+    { question: "Tell me about the Environmental Impact card.", answer: "The Environmental Impact card shows your vehicle's fuel efficiency trend, its carbon footprint, and any eco-driving badges you've earned. It helps you understand and improve your environmental footprint." },
+    { question: "What is a 'Predictive Insight' card?", answer: "Predictive Insight cards appear on your dashboard to provide proactive warnings and recommendations based on AI analysis, such as 'Brake Pad Wear' or 'Battery Health'. They help you address issues before they become critical." },
 
     // Manufacturing & Executive Dashboards (for managers)
     { question: "What is the 'RCA Similarity Cluster Map'?", answer: "This map on the Manufacturing dashboard groups recurring Root Cause Analysis (RCA) issues by similarity, helping to identify systemic manufacturing or design flaws." },
