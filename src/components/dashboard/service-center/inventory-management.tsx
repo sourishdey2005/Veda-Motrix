@@ -5,12 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
-import { inventoryData, partConsumptionTrends } from "@/lib/data";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { inventoryData, partConsumptionTrends, type InventoryPart } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, LabelList } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 const chartConfig = {
   change: { label: "% Change", color: "hsl(var(--chart-2))" },
@@ -18,7 +21,10 @@ const chartConfig = {
 
 export function InventoryManagement() {
   const [parts, setParts] = useState(inventoryData);
-  const [selectedPart, setSelectedPart] = useState<typeof parts[0] | null>(null);
+  const [selectedPart, setSelectedPart] = useState<InventoryPart | null>(null);
+  const [restockQuantity, setRestockQuantity] = useState<number>(50);
+  const [isRequesting, setIsRequesting] = useState(false);
+  const { toast } = useToast();
 
   const getStockStatus = (part: typeof parts[0]) => {
     if (part.inStock < part.reorderLevel) return "low";
@@ -31,6 +37,29 @@ export function InventoryManagement() {
     moderate: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
     healthy: "bg-green-500/10 text-green-400 border-green-500/20",
   };
+  
+  const handleOpenDialog = (part: InventoryPart) => {
+    setSelectedPart(part);
+    setRestockQuantity(Math.max(50, part.reorderLevel * 2 - part.inStock));
+  }
+  
+  const handleRequestSubmit = () => {
+    if (!selectedPart || !restockQuantity || restockQuantity <= 0) {
+      toast({ title: "Invalid Quantity", description: "Please enter a valid quantity to restock.", variant: "destructive" });
+      return;
+    }
+    
+    setIsRequesting(true);
+    // Simulate API call
+    setTimeout(() => {
+       toast({
+        title: "Restock Request Sent",
+        description: `Request for ${restockQuantity} units of ${selectedPart.name} has been sent.`,
+      });
+      setIsRequesting(false);
+      setSelectedPart(null); // This will close the dialog via the `open` prop
+    }, 1000);
+  }
 
   return (
     <div className="space-y-6">
@@ -62,26 +91,9 @@ export function InventoryManagement() {
                     </TableCell>
                     <TableCell className="font-mono">{part.avgUsePerWeek}</TableCell>
                     <TableCell className="text-right">
-                       <Dialog>
-                            <DialogTrigger asChild>
-                                <Button variant="outline" size="sm" onClick={() => setSelectedPart(part)}>
-                                    Request Restock
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Restock Request Sent</DialogTitle>
-                                    <DialogDescription>
-                                        A restock request for {selectedPart?.name} has been sent to procurement.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                 <DialogClose asChild>
-                                    <Button type="button" variant="secondary">
-                                      Close
-                                    </Button>
-                                  </DialogClose>
-                            </DialogContent>
-                        </Dialog>
+                       <Button variant="outline" size="sm" onClick={() => handleOpenDialog(part)}>
+                            Request Restock
+                       </Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -90,6 +102,42 @@ export function InventoryManagement() {
           </Table>
         </CardContent>
       </Card>
+      <Dialog open={!!selectedPart} onOpenChange={(isOpen) => !isOpen && setSelectedPart(null)}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Request Restock for {selectedPart?.name}</DialogTitle>
+                <DialogDescription>
+                    Specify the quantity you want to order. Current stock: {selectedPart?.inStock}.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="quantity" className="text-right">
+                        Quantity
+                    </Label>
+                    <Input
+                        id="quantity"
+                        type="number"
+                        value={restockQuantity}
+                        onChange={(e) => setRestockQuantity(Number(e.target.value))}
+                        className="col-span-3"
+                        min="1"
+                    />
+                </div>
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button type="button" variant="secondary" disabled={isRequesting}>
+                        Cancel
+                    </Button>
+                </DialogClose>
+                <Button onClick={handleRequestSubmit} disabled={isRequesting}>
+                    {isRequesting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Submit Request
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
       <Card>
         <CardHeader>
             <CardTitle>Part Consumption Trends</CardTitle>
