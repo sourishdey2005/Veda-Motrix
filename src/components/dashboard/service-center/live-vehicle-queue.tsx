@@ -66,7 +66,7 @@ export function LiveVehicleQueue() {
             <CardDescription>Real-time visualization of vehicles in the service bay.</CardDescription>
         </CardHeader>
         <CardContent>
-            <div className="relative w-full h-24 bg-muted rounded-lg overflow-hidden">
+            <div className="relative w-full h-32 bg-muted rounded-lg overflow-hidden">
             <div className="absolute top-1/2 left-0 w-full h-1 bg-border -translate-y-1/2" />
             <div className="absolute top-1/2 left-0 w-full flex justify-between -translate-y-1/2">
                 {Object.keys(stageConfig).map(stage => (
@@ -82,7 +82,7 @@ export function LiveVehicleQueue() {
                 const leftPosition = `${config.progress}%`;
 
                 // Stagger vehicles vertically to avoid overlap
-                const verticalOffset = (index % 2 === 0 ? -1 : 1) * (Math.floor(index / 2) * 0.7 + 1);
+                const verticalOffset = (index % 2 === 0 ? -1.5 : 1) * (Math.floor(index / 2) * 1.5 + 1.2);
 
                 return (
                 <div
