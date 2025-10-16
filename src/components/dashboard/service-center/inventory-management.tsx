@@ -8,15 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { inventoryData, partConsumptionTrends, type InventoryPart } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { TrendingUp, TrendingDown, Loader2 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, LabelList } from "recharts";
+import { Loader2 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, LabelList, Cell } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 const chartConfig = {
-  change: { label: "% Change", color: "hsl(var(--chart-2))" },
+  change: { label: "% Change" },
 };
 
 export function InventoryManagement() {
@@ -150,10 +150,10 @@ export function InventoryManagement() {
         </CardHeader>
         <CardContent>
              <ChartContainer config={chartConfig} className="h-48">
-                <BarChart data={partConsumptionTrends} layout="vertical" margin={{left: 30}}>
+                <BarChart data={partConsumptionTrends} layout="vertical" margin={{left: 30, right: 30}}>
                     <YAxis dataKey="part" type="category" tickLine={false} axisLine={false} tickMargin={5} width={80} />
                     <XAxis type="number" hide />
-                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                     <Bar dataKey="change" radius={4}>
                          <LabelList
                             dataKey="change"
@@ -162,6 +162,9 @@ export function InventoryManagement() {
                             className="fill-foreground text-sm"
                             formatter={(value: number) => `${value > 0 ? '+' : ''}${value}%`}
                         />
+                        {partConsumptionTrends.map((entry) => (
+                            <Cell key={`cell-${entry.part}`} fill={entry.change > 0 ? 'hsl(var(--destructive))' : 'hsl(var(--chart-2))'} />
+                        ))}
                     </Bar>
                 </BarChart>
              </ChartContainer>
