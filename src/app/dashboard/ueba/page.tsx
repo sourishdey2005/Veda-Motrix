@@ -1,3 +1,4 @@
+
 "use client";
 
 import { UebaView } from "@/components/dashboard/manager/ueba-view";
