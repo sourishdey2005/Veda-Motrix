@@ -2,7 +2,7 @@
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Activity, AlertTriangle, ArrowRight, Bot, CheckCircle, Cpu, ShieldCheck, Factory, Users, Wrench, BarChart, Car, HeartPulse } from "lucide-react"
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
@@ -34,8 +34,12 @@ export function ManagerDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="lg:col-span-4">
             <CardHeader>
-                <CardTitle>Master Agent Orchestration</CardTitle>
-                <CardDescription>An overview of the AI worker agent collaboration flow.</CardDescription>
+                <CardTitle>
+                  <Link href="/dashboard/master" className="hover:underline">
+                    Master Agent Orchestration
+                  </Link>
+                </CardTitle>
+                <CardDescription>An overview of the AI worker agent collaboration flow. Click to see the full view.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="relative flex flex-wrap items-center justify-center gap-4 p-4 rounded-lg bg-muted/50 min-h-[120px]">
@@ -76,24 +80,32 @@ export function ManagerDashboard() {
             </CardContent>
         </Card>
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Manufacturing Insights</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <Link href="/dashboard/manufacturing" className="hover:underline">
+                Manufacturing Insights
+              </Link>
+            </CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
+          </CardHeader>
+          <CardContent>
             <div className="text-2xl font-bold">5</div>
             <p className="text-xs text-muted-foreground">New suggestions generated this week.</p>
-            </CardContent>
+          </CardContent>
         </Card>
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Vehicles Monitored</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <Link href="/dashboard/analytics" className="hover:underline">
+                Service Analytics
+              </Link>
+            </CardTitle>
             <Car className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
+          </CardHeader>
+          <CardContent>
             <div className="text-2xl font-bold">10</div>
             <p className="text-xs text-muted-foreground">Across 10 different models.</p>
-            </CardContent>
+          </CardContent>
         </Card>
       </div>
     </div>
