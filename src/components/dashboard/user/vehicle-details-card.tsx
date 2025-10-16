@@ -26,18 +26,24 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setHealthScore(prev => Math.min(100, Math.max(20, prev + (Math.random() - 0.5) * 5)));
-            setSensorData(prev => ({
-                engine_temp: prev.engine_temp + (Math.random() - 0.5) * 2,
-                oil_level: Math.min(1, Math.max(0, prev.oil_level + (Math.random() - 0.5) * 0.05)),
-                vibration: prev.vibration + (Math.random() - 0.5) * 1,
-                tire_pressure: prev.tire_pressure + (Math.random() - 0.5) * 0.2,
-                battery_voltage: prev.battery_voltage + (Math.random() - 0.5) * 0.1,
-                fuel_level: Math.min(1, Math.max(0, prev.fuel_level + (Math.random() - 0.5) * 0.02)),
-            }))
+            setHealthScore(prev => {
+                const currentScore = prev ?? vehicle.healthScore ?? 75;
+                return Math.min(100, Math.max(20, currentScore + (Math.random() - 0.5) * 5));
+            });
+            setSensorData(prev => {
+                const currentSensorData = prev ?? vehicle.sensorData;
+                return {
+                    engine_temp: currentSensorData.engine_temp + (Math.random() - 0.5) * 2,
+                    oil_level: Math.min(1, Math.max(0, currentSensorData.oil_level + (Math.random() - 0.5) * 0.05)),
+                    vibration: currentSensorData.vibration + (Math.random() - 0.5) * 1,
+                    tire_pressure: currentSensorData.tire_pressure + (Math.random() - 0.5) * 0.2,
+                    battery_voltage: currentSensorData.battery_voltage + (Math.random() - 0.5) * 0.1,
+                    fuel_level: Math.min(1, Math.max(0, currentSensorData.fuel_level + (Math.random() - 0.5) * 0.02)),
+                }
+            })
         }, 2000);
         return () => clearInterval(interval);
-    }, []);
+    }, [vehicle.healthScore, vehicle.sensorData]);
 
     return (
         <Card>
@@ -84,5 +90,3 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
         </Card>
     );
 }
-
-    
