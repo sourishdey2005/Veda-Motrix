@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import type { Vehicle, SensorData } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
 import { Progress } from "@/components/ui/progress"
 import React, { useState, useEffect } from "react"
 import { Thermometer, Droplets, Waves, Gauge, Battery, Fuel } from "lucide-react"
@@ -58,16 +57,7 @@ export function VehicleHealthCard({ vehicle }: { vehicle: Vehicle }) {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="p-6 text-sm grid md:grid-cols-2 gap-6">
-        <div className="relative aspect-video">
-            <Image 
-                src={vehicle.imageUrl}
-                alt={`${vehicle.make} ${vehicle.model}`}
-                fill
-                data-ai-hint={vehicle.imageHint}
-                className="rounded-lg object-cover"
-            />
-        </div>
+      <CardContent className="p-6 text-sm">
         <div className="grid gap-4">
             <h3 className="font-semibold">Live Sensor Data</h3>
             {Object.entries(currentSensorData).map(([key, value]) => {
