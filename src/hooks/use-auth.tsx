@@ -13,7 +13,7 @@ interface AuthContextType {
   logout: () => void;
   loading: boolean;
   updateUser: (data: Partial<User>) => void;
-  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'sensorData' | 'maintenanceHistory'>) => void;
+  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory'>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'sensorData' | 'maintenanceHistory'>) => {
+  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory'>) => {
     const newVehicle: Vehicle = {
       ...data,
       id: `V${vehicles.length + 1001}`,
@@ -131,6 +131,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       imageUrl: `https://picsum.photos/seed/vehicle${vehicles.length + 1}/600/400`,
       imageHint: 'car',
       healthStatus: 'Good',
+      healthScore: 95,
+      lastService: new Date().toISOString().split('T')[0],
+      nextServiceDue: new Date(Date.now() + 1000 * 60 * 60 * 24 * 180).toISOString().split('T')[0],
+      subsystemHealth: [
+        { name: 'Engine', health: 98, anomalyProbability: 0.02 },
+        { name: 'Brakes', health: 95, anomalyProbability: 0.05 },
+        { name: 'Battery', health: 99, anomalyProbability: 0.01 },
+        { name: 'Suspension', health: 92, anomalyProbability: 0.08 },
+        { name: 'Sensors', health: 97, anomalyProbability: 0.03 },
+      ],
+      predictedAlerts: [], // New vehicles have no predicted alerts initially
       sensorData: {
         engine_temp: 90, oil_level: 0.9, vibration: 5, tire_pressure: 32, battery_voltage: 12.6, fuel_level: 1,
       },

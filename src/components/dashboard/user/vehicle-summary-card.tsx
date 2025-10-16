@@ -24,12 +24,14 @@ const getRiskColor = (priority: PredictedAlert['priority']) => {
 
 export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }) {
     const [healthScore, setHealthScore] = useState(vehicle.healthScore);
-    const [predictedAlert, setPredictedAlert] = useState(vehicle.predictedAlerts[0]);
+    const [predictedAlert, setPredictedAlert] = useState(vehicle.predictedAlerts?.[0]);
 
     useEffect(() => {
         const interval = setInterval(() => {
             setHealthScore(prev => Math.min(100, Math.max(20, prev + (Math.random() - 0.5) * 5)));
-            setPredictedAlert(vehicle.predictedAlerts[Math.floor(Math.random() * vehicle.predictedAlerts.length)]);
+            if (vehicle.predictedAlerts && vehicle.predictedAlerts.length > 0) {
+              setPredictedAlert(vehicle.predictedAlerts[Math.floor(Math.random() * vehicle.predictedAlerts.length)]);
+            }
         }, 3000 + Math.random() * 1000);
         return () => clearInterval(interval);
     }, [vehicle.predictedAlerts]);
@@ -55,10 +57,12 @@ export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }) {
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-between space-y-4">
                 <div>
-                    <Badge variant="outline" className={cn("w-full justify-center py-1 relative", getRiskColor(predictedAlert.priority))}>
-                        {predictedAlert.issue} - {predictedAlert.priority} Risk
-                        {predictedAlert.priority === 'High' && <span className="absolute top-1 right-1 flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>}
-                    </Badge>
+                    {predictedAlert && (
+                      <Badge variant="outline" className={cn("w-full justify-center py-1 relative", getRiskColor(predictedAlert.priority))}>
+                          {predictedAlert.issue} - {predictedAlert.priority} Risk
+                          {predictedAlert.priority === 'High' && <span className="absolute top-1 right-1 flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>}
+                      </Badge>
+                    )}
                      <div className="flex justify-between text-xs text-muted-foreground mt-2">
                         <div className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Last: {format(new Date(vehicle.lastService), "dd MMM yyyy")}</div>
                         <div className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Next: {format(new Date(vehicle.nextServiceDue), "dd MMM yyyy")}</div>
