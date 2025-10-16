@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -7,9 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { VedaMotrixLogo } from "@/components/icons";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProfilePage() {
-  const { user, loading } = useAuth();
+  const { user, loading, updateUser } = useAuth();
+  const [name, setName] = useState(user?.name || '');
+  const { toast } = useToast();
 
   if (loading || !user) {
     return (
@@ -20,6 +24,16 @@ export default function ProfilePage() {
   }
 
   const userInitials = user.name.split(' ').map(n => n[0]).join('');
+
+  const handleSave = () => {
+    if (name && name !== user.name) {
+      updateUser({ name });
+      toast({
+        title: "Profile Updated",
+        description: "Your name has been successfully updated.",
+      })
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -34,20 +48,20 @@ export default function ProfilePage() {
                     <AvatarImage src={user.avatarUrl} alt={`@${user.name}`} />
                     <AvatarFallback className="text-3xl">{userInitials}</AvatarFallback>
                 </Avatar>
-                <Button variant="outline">Change Avatar</Button>
+                <Button variant="outline" disabled>Change Avatar</Button>
             </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" defaultValue={user.name} />
+              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" defaultValue={user.email} disabled />
             </div>
           </div>
-           <Button disabled>Save Changes</Button>
+           <Button onClick={handleSave} disabled={name === user.name}>Save Changes</Button>
         </CardContent>
       </Card>
     </div>

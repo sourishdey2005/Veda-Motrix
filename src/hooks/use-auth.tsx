@@ -11,6 +11,7 @@ interface AuthContextType {
   signup: (name: string, email: string, pass: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
+  updateUser: (data: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -95,7 +96,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/');
   };
 
-  const value = { user, login, signup, logout, loading };
+  const updateUser = (data: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...data };
+      setUser(updatedUser);
+      localStorage.setItem('veda-user', JSON.stringify(updatedUser));
+      
+      // Also update the mock user data
+      const userIndex = mockUsers.findIndex(u => u.id === user.id);
+      if (userIndex !== -1) {
+        mockUsers[userIndex] = { ...mockUsers[userIndex], ...data };
+      }
+    }
+  };
+
+
+  const value = { user, login, signup, logout, loading, updateUser };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
