@@ -6,13 +6,15 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList, Legend, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts"
 import type { ChartConfig } from "@/components/ui/chart"
 import { useState, useEffect, useMemo, useCallback } from "react"
-import { Activity, Award, BarChartBig, Bot, CheckCircle, ChevronRight, CircuitBoard, DollarSign, Factory, FileText, Settings, ShieldCheck, TrendingDown, TrendingUp, Zap } from "lucide-react"
+import { Activity, Award, BarChartBig, Bot, CheckCircle, ChevronRight, CircuitBoard, DollarSign, Factory, FileText, Loader2, Settings, ShieldCheck, TrendingDown, TrendingUp, Zap } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { executiveAnalyticsData } from "@/lib/data"
 import { cn } from "@/lib/utils"
 import { Button }from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
+import { generateExecutiveSummary } from "@/ai/flows/generate-executive-summary"
+import { useToast } from "@/hooks/use-toast"
 
 const chartConfig: ChartConfig = {
   predictive: { label: "Predictive", color: "hsl(var(--chart-1))" },
@@ -24,7 +26,6 @@ const chartConfig: ChartConfig = {
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
     const [data, setData] = useState(initialData);
 
-    // Using useCallback to memoize the updater function
     const memoizedUpdater = useCallback(updater, []);
 
     useEffect(() => {
@@ -38,6 +39,8 @@ function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
 }
 
 export function ExecutiveAnalyticsView() {
+    const [isGenerating, setIsGenerating] = useState(false);
+    const { toast } = useToast();
     
     const aiRoi = useSimulatedData(executiveAnalyticsData.aiRoi, d => ({
         costSavings: d.costSavings + Math.random() * 10000,
@@ -68,6 +71,35 @@ export function ExecutiveAnalyticsView() {
     const detectionRate = useSimulatedData(executiveAnalyticsData.detectionRate, r => Math.min(100, r + (Math.random() - 0.4) * 0.1));
     const sri = useSimulatedData(executiveAnalyticsData.sri, s => Math.min(100, s + (Math.random() - 0.5) * 0.2));
 
+    const handleGenerateReport = async () => {
+        setIsGenerating(true);
+        try {
+            const fullReportData = {
+                aiRoi,
+                regionalPerformance,
+                maintenanceRatio,
+                warrantyCost,
+                sri,
+                detectionRate,
+            };
+            const result = await generateExecutiveSummary({ reportData: JSON.stringify(fullReportData, null, 2) });
+            toast({
+                title: "Executive Summary Generated",
+                description: <pre className="text-xs whitespace-pre-wrap">{result.summary}</pre>,
+                duration: 9000,
+            })
+
+        } catch (error) {
+            toast({
+                title: "Error Generating Report",
+                description: "The AI failed to generate the summary. Please try again.",
+                variant: "destructive",
+            })
+        } finally {
+            setIsGenerating(false);
+        }
+    }
+
 
   return (
     <div className="space-y-6">
@@ -77,8 +109,8 @@ export function ExecutiveAnalyticsView() {
                     <CardTitle>Strategic & Executive Analytics</CardTitle>
                     <CardDescription>Manager-level business insights that demonstrate system ROI and operational health.</CardDescription>
                 </div>
-                 <Button>
-                    <FileText className="mr-2 h-4 w-4" />
+                 <Button onClick={handleGenerateReport} disabled={isGenerating}>
+                    {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
                     Generate Executive Report
                 </Button>
             </CardHeader>

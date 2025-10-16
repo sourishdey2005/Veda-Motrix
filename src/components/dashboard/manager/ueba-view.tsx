@@ -13,7 +13,7 @@ import type { UebaEvent } from "@/lib/types";
 export function UebaView() {
   const [uebaEvents, setUebaEvents] = useState<UebaEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [simulating, setSimulating] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   useEffect(() => {
     const loadEvents = () => {
@@ -26,9 +26,9 @@ export function UebaView() {
     loadEvents();
   }, []);
 
-  const handleSimulate = async () => {
-    setSimulating(true);
-    // This is a mock simulation since we are using dummy data
+  const handleAnalyzeAction = async () => {
+    setIsAnalyzing(true);
+    // This is a mock analysis since we are using dummy data
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const newEvent: UebaEvent = {
@@ -42,7 +42,7 @@ export function UebaView() {
       };
 
     setUebaEvents(prev => [newEvent, ...prev]);
-    setSimulating(false);
+    setIsAnalyzing(false);
   }
 
   const anomaliesCount = uebaEvents.filter(e => e.isAnomalous).length;
@@ -72,16 +72,16 @@ export function UebaView() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Simulation</CardTitle>
+            <CardTitle className="text-sm font-medium">Live Analysis</CardTitle>
           </CardHeader>
           <CardContent>
-             <Button onClick={handleSimulate} disabled={simulating} className="w-full">
-              {simulating ? (
+             <Button onClick={handleAnalyzeAction} disabled={isAnalyzing} className="w-full">
+              {isAnalyzing ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Bot className="mr-2 h-4 w-4" />
               )}
-              Simulate & Analyze Action
+              Analyze Test Action
             </Button>
             <p className="text-xs text-muted-foreground mt-2">Trigger a random agent action for analysis.</p>
           </CardContent>

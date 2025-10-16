@@ -3,36 +3,36 @@
 /**
  * @fileOverview Simulates conversations with vehicle owners about potential issues and recommended maintenance.
  *
- * - simulateCustomerEngagement - A function that simulates a conversation with a vehicle owner.
- * - SimulateCustomerEngagementInput - The input type for the simulateCustomerEngagement function.
- * - SimulateCustomerEngagementOutput - The return type for the simulateCustomerEngagement function.
+ * - handleCustomerEnquiry - A function that simulates a conversation with a vehicle owner.
+ * - HandleCustomerEnquiryInput - The input type for the handleCustomerEnquiry function.
+ * - HandleCustomerEnquiryOutput - The return type for the handleCustomerEnquiry function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const SimulateCustomerEngagementInputSchema = z.object({
+const HandleCustomerEnquiryInputSchema = z.object({
   vehicleIssue: z.string().describe('Description of the vehicle issue.'),
   recommendedMaintenance: z.string().describe('Recommended maintenance actions.'),
   userName: z.string().describe('Name of the vehicle owner.'),
 });
-export type SimulateCustomerEngagementInput = z.infer<typeof SimulateCustomerEngagementInputSchema>;
+export type HandleCustomerEnquiryInput = z.infer<typeof HandleCustomerEnquiryInputSchema>;
 
-const SimulateCustomerEngagementOutputSchema = z.object({
+const HandleCustomerEnquiryOutputSchema = z.object({
   conversationSummary: z.string().describe('A summary of the simulated conversation.'),
 });
-export type SimulateCustomerEngagementOutput = z.infer<typeof SimulateCustomerEngagementOutputSchema>;
+export type HandleCustomerEnquiryOutput = z.infer<typeof HandleCustomerEnquiryOutputSchema>;
 
-export async function simulateCustomerEngagement(
-  input: SimulateCustomerEngagementInput
-): Promise<SimulateCustomerEngagementOutput> {
-  return simulateCustomerEngagementFlow(input);
+export async function handleCustomerEnquiry(
+  input: HandleCustomerEnquiryInput
+): Promise<HandleCustomerEnquiryOutput> {
+  return handleCustomerEnquiryFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'simulateCustomerEngagementPrompt',
-  input: {schema: SimulateCustomerEngagementInputSchema},
-  output: {schema: SimulateCustomerEngagementOutputSchema},
+  name: 'handleCustomerEnquiryPrompt',
+  input: {schema: HandleCustomerEnquiryInputSchema},
+  output: {schema: HandleCustomerEnquiryOutputSchema},
   prompt: `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.
 
   Vehicle Owner's Name: {{{userName}}}
@@ -52,11 +52,11 @@ const prompt = ai.definePrompt({
   `,
 });
 
-const simulateCustomerEngagementFlow = ai.defineFlow(
+const handleCustomerEnquiryFlow = ai.defineFlow(
   {
-    name: 'simulateCustomerEngagementFlow',
-    inputSchema: SimulateCustomerEngagementInputSchema,
-    outputSchema: SimulateCustomerEngagementOutputSchema,
+    name: 'handleCustomerEnquiryFlow',
+    inputSchema: HandleCustomerEnquiryInputSchema,
+    outputSchema: HandleCustomerEnquiryOutputSchema,
   },
   async input => {
     const {output} = await prompt(input);

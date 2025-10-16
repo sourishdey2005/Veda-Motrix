@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Bot, Send, User } from "lucide-react"
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { simulateCustomerEngagement } from '@/ai/flows/simulate-customer-engagement';
+import { handleCustomerEnquiry } from '@/ai/flows/handle-customer-enquiry';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface Message {
@@ -32,14 +32,14 @@ export function AIChat() {
 
         try {
             // In a real app, you'd have more context. Here we use the user's input as the issue.
-            const response = await simulateCustomerEngagement({
+            const response = await handleCustomerEnquiry({
                 userName: "John Doe",
                 vehicleIssue: input,
                 recommendedMaintenance: "Based on your query, a full diagnostic check is recommended."
             });
 
             // The flow returns a conversation summary. We'll parse it for the AI's response.
-            // This is a simplified simulation.
+            // This is a simplified approach.
             const conversationLines = response.conversationSummary.split('\n').filter(line => line.startsWith('Agent:'));
             const aiText = conversationLines.length > 1 ? conversationLines[1].replace('Agent: ', '') : "I can help with that. Would you like to schedule an appointment?";
 
