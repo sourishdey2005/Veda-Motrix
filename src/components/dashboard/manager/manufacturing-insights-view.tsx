@@ -1,22 +1,80 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { capaRcaEntries } from "@/lib/data"
 import { Button } from "@/components/ui/button"
-import { Check, ThumbsDown, ThumbsUp, X } from "lucide-react"
+import { Loader2, ThumbsDown, ThumbsUp, Wand2 } from "lucide-react"
+import { useState } from "react"
+import { generateManufacturingInsights } from "@/ai/flows/generate-manufacturing-insights"
+import { capaRcaEntries as initialEntries, vehicles } from "@/lib/data"
+import { Textarea } from "@/components/ui/textarea"
+
+type CapaRcaEntry = {
+  id: string;
+  component: string;
+  issuePattern: string;
+  suggestion: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+};
 
 export function ManufacturingInsightsView() {
+  const [entries, setEntries] = useState<CapaRcaEntry[]>(initialEntries);
+  const [loading, setLoading] = useState(false);
+  const [serviceData, setServiceData] = useState(
+    'Recent service reports indicate a trend of premature wear on transmission gaskets for M3 models, leading to leaks. Also, multiple reports of fuel injector clogging in Model Y under 20k miles.'
+  );
+
+  const handleGenerate = async () => {
+    setLoading(true);
+    try {
+      const result = await generateManufacturingInsights({ serviceData });
+      const newEntry: CapaRcaEntry = {
+        id: `C${entries.length + 1}`,
+        component: "AI Generated",
+        issuePattern: "Based on provided service data.",
+        suggestion: result.improvementSuggestions,
+        status: 'Pending'
+      };
+      setEntries(prev => [newEntry, ...prev]);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleStatusChange = (id: string, status: 'Approved' | 'Rejected') => {
+    setEntries(entries.map(entry => entry.id === id ? { ...entry, status } : entry));
+  };
+
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>RCA/CAPA Manufacturing Insights</CardTitle>
         <CardDescription>
-          Improvement suggestions generated from service data analysis.
+          Generate and review AI-powered improvement suggestions from service data.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <div>
+          <Textarea
+            value={serviceData}
+            onChange={(e) => setServiceData(e.target.value)}
+            placeholder="Enter service data here..."
+            rows={4}
+            className="mb-2"
+          />
+          <Button onClick={handleGenerate} disabled={loading}>
+            {loading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Wand2 className="mr-2 h-4 w-4" />
+            )}
+            Generate Suggestions
+          </Button>
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -28,7 +86,7 @@ export function ManufacturingInsightsView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {capaRcaEntries.map((entry) => (
+            {entries.map((entry) => (
               <TableRow key={entry.id}>
                 <TableCell className="font-medium">{entry.component}</TableCell>
                 <TableCell>{entry.issuePattern}</TableCell>
@@ -43,10 +101,10 @@ export function ManufacturingInsightsView() {
                 <TableCell className="text-right">
                     {entry.status === 'Pending' && (
                         <div className="flex gap-2 justify-end">
-                            <Button variant="outline" size="icon" className="h-8 w-8 text-green-500 hover:text-green-500">
+                            <Button variant="outline" size="icon" className="h-8 w-8 text-green-500 hover:text-green-500" onClick={() => handleStatusChange(entry.id, 'Approved')}>
                                 <ThumbsUp className="h-4 w-4" />
                             </Button>
-                            <Button variant="outline" size="icon" className="h-8 w-8 text-red-500 hover:text-red-500">
+                            <Button variant="outline" size="icon" className="h-8 w-8 text-red-500 hover:text-red-500" onClick={() => handleStatusChange(entry.id, 'Rejected')}>
                                 <ThumbsDown className="h-4 w-4" />
                             </Button>
                         </div>
