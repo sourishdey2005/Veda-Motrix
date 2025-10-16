@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronsRight, Star as StarIcon, IndianRupee } from "lucide-react";
+import { ChevronDown, Star as StarIcon, IndianRupee } from "lucide-react";
 import { format } from "date-fns";
 import { serviceCenters } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -85,8 +85,8 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
           </TableHeader>
           <TableBody>
             {maintenanceHistory.map((item) => (
-              <Collapsible asChild key={item.id}>
-                <>
+              <Collapsible key={item.id} asChild>
+                 <React.Fragment>
                   <TableRow>
                     <TableCell>
                       <CollapsibleTrigger asChild>
@@ -116,7 +116,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                           </TableCell>
                       </TableRow>
                   </CollapsibleContent>
-                </>
+                </React.Fragment>
               </Collapsible>
             ))}
           </TableBody>
