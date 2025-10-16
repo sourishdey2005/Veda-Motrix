@@ -35,7 +35,7 @@ function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
             setData(prevData => updater(prevData));
         }, 3000);
         return () => clearInterval(interval);
-    }, [updater, initialData]);
+    }, [updater]);
 
     return data;
 }
@@ -205,8 +205,8 @@ export function ManufacturingInsightsView() {
                                     <TableCell className="font-medium">{supplier.supplier}</TableCell>
                                     {supplier.issues.map(issue => (
                                         <TableCell key={issue.name} className="text-center">
-                                            <div className="w-full h-8 flex items-center justify-center rounded" style={{ backgroundColor: `hsl(var(--primary), ${issue.count / 30})` }}>
-                                               {issue.count > 0 && <span className="text-primary-foreground font-mono text-xs mix-blend-difference">{issue.count}</span>}
+                                            <div className="w-full h-8 flex items-center justify-center rounded" style={{ backgroundColor: `hsl(var(--primary) / ${issue.count / 30})` }}>
+                                               {issue.count > 0 && <span className="font-mono text-xs text-white" style={{ textShadow: '0 0 2px black' }}>{issue.count}</span>}
                                             </div>
                                         </TableCell>
                                     ))}
