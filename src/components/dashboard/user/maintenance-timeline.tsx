@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import * as React from "react";
@@ -60,7 +58,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
           <TableBody>
             {vehicle.maintenanceHistory.map((item) => (
               <Collapsible asChild key={item.id} open={openItems.includes(item.id)} onOpenChange={() => toggleItem(item.id)}>
-                <tbody>
+                <React.Fragment>
                   <TableRow className="cursor-pointer hover:bg-muted/50">
                     <TableCell>
                       <CollapsibleTrigger asChild>
@@ -88,7 +86,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                         </TableCell>
                     </TableRow>
                   </CollapsibleContent>
-                </tbody>
+                </React.Fragment>
               </Collapsible>
             ))}
           </TableBody>
