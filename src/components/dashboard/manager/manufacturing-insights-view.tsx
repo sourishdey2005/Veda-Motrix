@@ -6,8 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Loader2, ThumbsDown, ThumbsUp, Wand2 } from "lucide-react"
 import { useState } from "react"
-import { generateManufacturingInsights } from "@/ai/flows/generate-manufacturing-insights"
-import { capaRcaEntries as initialEntries, vehicles } from "@/lib/data"
+import { capaRcaEntries as initialEntries } from "@/lib/data"
 import { Textarea } from "@/components/ui/textarea"
 
 type CapaRcaEntry = {
@@ -27,21 +26,17 @@ export function ManufacturingInsightsView() {
 
   const handleGenerate = async () => {
     setLoading(true);
-    try {
-      const result = await generateManufacturingInsights({ serviceData });
-      const newEntry: CapaRcaEntry = {
-        id: `C${entries.length + 1}`,
-        component: "AI Generated",
-        issuePattern: "Based on provided service data.",
-        suggestion: result.improvementSuggestions,
-        status: 'Pending'
-      };
-      setEntries(prev => [newEntry, ...prev]);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+    // Simulate AI generation
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const newEntry: CapaRcaEntry = {
+      id: `C${entries.length + 1}`,
+      component: "AI Generated",
+      issuePattern: "Based on provided service data.",
+      suggestion: "Consider using a more durable gasket material for high-torque applications and investigate fuel additives to reduce injector deposits.",
+      status: 'Pending'
+    };
+    setEntries(prev => [newEntry, ...prev]);
+    setLoading(false);
   }
 
   const handleStatusChange = (id: string, status: 'Approved' | 'Rejected') => {
@@ -54,7 +49,7 @@ export function ManufacturingInsightsView() {
       <CardHeader>
         <CardTitle>RCA/CAPA Manufacturing Insights</CardTitle>
         <CardDescription>
-          Generate and review AI-powered improvement suggestions from service data.
+          Generate and review improvement suggestions from service data.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

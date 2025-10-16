@@ -6,62 +6,24 @@ import { Badge } from "@/components/ui/badge"
 import { ShieldAlert, ShieldCheck } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { useEffect, useState } from "react"
-import { detectAgentAnomalies, DetectAgentAnomaliesOutput } from "@/ai/flows/detect-agent-anomalies"
+import { uebaEvents as mockUebaEvents } from "@/lib/data";
+import type { UebaEvent } from "@/lib/types";
 
-// Sample agent actions to simulate activity
-const agentActionsLog = [
-    { agentId: 'Data Analysis Agent', action: 'Accessed V1005 sensor data', anomalyThreshold: 0.8 },
-    { agentId: 'Diagnosis Agent', action: 'Predicted failure for V1005', anomalyThreshold: 0.8 },
-    { agentId: 'Scheduling Agent', action: 'Accessed all user calendars', anomalyThreshold: 0.8 },
-    { agentId: 'Customer Engagement Agent', action: 'Initiated contact with owner of V1005', anomalyThreshold: 0.8 },
-    { agentId: 'UEBA Security Agent', action: 'Flagged anomalous behavior from Scheduling Agent', anomalyThreshold: 0.8 },
-    { agentId: 'Manufacturing Insights Agent', action: 'Queried service data from last 90 days', anomalyThreshold: 0.8 },
-    { agentId: 'Data Analysis Agent', action: 'Bulk export of all vehicle data', anomalyThreshold: 0.8 },
-    { agentId: 'Feedback Agent', action: 'Analyzed 500 new feedback entries', anomalyThreshold: 0.8 },
-    { agentId: 'Scheduling Agent', action: 'Accessed V1002 calendar', anomalyThreshold: 0.8 },
-];
-
-type UebaEvent = DetectAgentAnomaliesOutput & {
-  id: string;
-  agentId: string;
-  action: string;
-  timestamp: string;
-};
 
 export function UebaView() {
   const [uebaEvents, setUebaEvents] = useState<UebaEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const analyzeActions = async () => {
+    const loadEvents = () => {
       setLoading(true);
-      const analyzedEvents: UebaEvent[] = [];
-      for (const [index, log] of agentActionsLog.entries()) {
-        try {
-          const result = await detectAgentAnomalies({
-            agentId: log.agentId,
-            agentActions: [log.action],
-            anomalyThreshold: log.anomalyThreshold
-          });
-          analyzedEvents.push({
-            ...result,
-            id: `UEBA${index + 1}`,
-            agentId: log.agentId,
-            action: log.action,
-            timestamp: new Date(Date.now() - 1000 * 60 * (agentActionsLog.length - index)).toISOString()
-          });
-        } catch (error) {
-          console.error("Failed to analyze agent action:", error);
-        }
-      }
-      setUebaEvents(analyzedEvents.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+      // Sort mock events by timestamp
+      const sortedEvents = [...mockUebaEvents].sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      setUebaEvents(sortedEvents);
       setLoading(false);
     };
 
-    analyzeActions();
-
-    const interval = setInterval(analyzeActions, 30000); // Re-analyze every 30 seconds
-    return () => clearInterval(interval);
+    loadEvents();
   }, []);
 
   return (

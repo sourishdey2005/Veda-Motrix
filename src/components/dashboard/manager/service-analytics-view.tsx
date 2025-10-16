@@ -5,8 +5,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Pie, PieChart, Cell } from "recharts"
 import type { ChartConfig } from "@/components/ui/chart"
 import { vehicles } from "@/lib/data"
-import { predictVehicleFailure, PredictVehicleFailureOutput } from "@/ai/flows/predict-vehicle-failures"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Loader2, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -37,27 +36,34 @@ const failureComponentsData = [
 ];
 const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
 
+const mockPredictions = [
+    {
+      component: 'Brake Pads',
+      failureType: 'Excessive Wear',
+      priority: 'HIGH' as const,
+      confidence: 0.92,
+      suggestedActions: 'Replace brake pads and inspect rotors for wear.',
+    },
+    {
+      component: 'Battery',
+      failureType: 'Low Voltage',
+      priority: 'MEDIUM' as const,
+      confidence: 0.78,
+      suggestedActions: 'Perform battery health check and consider replacement.',
+    }
+]
 
 export function ServiceAnalyticsView() {
-  const [predictions, setPredictions] = useState<PredictVehicleFailureOutput['predictedFailures']>([]);
+  const [predictions, setPredictions] = useState<typeof mockPredictions>([]);
   const [loading, setLoading] = useState(false);
 
   const handlePredict = async () => {
     setLoading(true);
     setPredictions([]);
-    try {
-      const vehicleToPredict = vehicles.find(v => v.healthStatus === 'Critical') || vehicles[0];
-      const result = await predictVehicleFailure({
-        vehicleId: vehicleToPredict.id,
-        sensorData: vehicleToPredict.sensorData,
-        maintenanceLogs: JSON.stringify(vehicleToPredict.maintenanceHistory),
-      });
-      setPredictions(result.predictedFailures);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setPredictions(mockPredictions);
+    setLoading(false);
   }
 
   return (
