@@ -107,7 +107,7 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
                   <CollapsibleContent asChild>
                       <TableRow>
                           <TableCell colSpan={6} className="p-0">
-                              <div className="p-4 bg-muted/20">
+                              <div className="p-4 bg-muted/50">
                                  <p className="font-semibold">Service Notes:</p>
                                  <p className="text-sm text-muted-foreground">{item.notes}</p>
                                  <p className="text-xs text-muted-foreground mt-2">Mileage: {item.mileage.toLocaleString('en-IN')} km</p>
