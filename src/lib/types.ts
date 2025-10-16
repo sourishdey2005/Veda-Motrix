@@ -315,3 +315,19 @@ export type CustomerLifetimeValueData = {
     clv: number;
     retentionProbability: number;
 };
+
+export type FailurePattern = {
+  region: 'North' | 'South' | 'East' | 'West' | 'Central';
+  issue: string;
+  insight: string;
+  severity: 'High' | 'Medium' | 'Low';
+};
+
+export type LoadBalancingSuggestion = {
+  id: string;
+  fromCenter: string;
+  toCenter: string;
+  reason: string;
+  etaImpact: number; // percentage
+  status: 'suggested' | 'in-progress' | 'completed';
+};

@@ -1,6 +1,6 @@
 
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, SankeyData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format, addDays } from 'date-fns';
@@ -651,6 +651,13 @@ export const timeOfDayLoadData: TimeOfDayLoadData[] = Array.from({length: 10}).m
     vehicles: Math.floor(Math.random() * 10) + (i > 1 && i < 6 ? 5 : 0) // peak mid-day
 }));
 
+export const failurePatterns: FailurePattern[] = [
+    { region: 'West', issue: 'High Brake Pad Wear', insight: 'Possible correlation with high dust levels and stop-and-go traffic in Mumbai & Pune.', severity: 'High' },
+    { region: 'South', issue: 'Battery Degradation', insight: 'Accelerated degradation in Bengaluru & Chennai, likely due to high ambient temperatures.', severity: 'Medium' },
+    { region: 'North', issue: 'Suspension Damage', insight: 'Increased reports of suspension issues in Delhi NCR, correlating with poor road conditions.', severity: 'High' },
+];
 
-
-    
+export const loadBalancingSuggestions: LoadBalancingSuggestion[] = [
+    { id: 'LB1', fromCenter: 'VedaMotrix Koramangala', toCenter: 'VedaMotrix Whitefield', reason: 'High workload (92%) at Koramangala.', etaImpact: -18, status: 'suggested' },
+    { id: 'LB2', fromCenter: 'VedaMotrix Andheri', toCenter: 'VedaMotrix Thane', reason: 'Andheri at capacity; Thane has 3 available bays.', etaImpact: -12, status: 'suggested' },
+];

@@ -1,10 +1,13 @@
+
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Activity, AlertTriangle, ArrowRight, Bot, ShieldCheck, Factory, Users, Wrench, Siren, Loader2, CheckCircle } from "lucide-react"
+import { Activity, AlertTriangle, ArrowRight, Bot, ShieldCheck, Factory, Users, Wrench, Siren, Loader2, CheckCircle, RefreshCw } from "lucide-react"
 import React, { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+import { loadBalancingSuggestions } from "@/lib/data"
+import { Button } from "@/components/ui/button"
 
 const initialAgents = [
   { name: 'Data Analysis Agent', icon: Activity, href: "/dashboard/analytics", status: 'ok' },
@@ -16,6 +19,66 @@ const initialAgents = [
   { name: 'Manufacturing Insights Agent', icon: Factory, href: "/dashboard/manufacturing", status: 'ok' },
   { name: 'UEBA Security Agent', icon: ShieldCheck, href: "/dashboard/ueba", status: 'ok' },
 ]
+
+function RealTimeLoadBalancer() {
+  const [suggestions, setSuggestions] = useState(loadBalancingSuggestions.slice(0,1));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+        setSuggestions(prev => {
+            const currentSuggestion = prev[0];
+            if (currentSuggestion.status === 'suggested') {
+                return [{...currentSuggestion, status: 'in-progress'}]
+            }
+             if (currentSuggestion.status === 'in-progress') {
+                return [{...currentSuggestion, status: 'completed'}]
+            }
+            // Cycle back to a new suggestion
+            const nextIndex = (loadBalancingSuggestions.findIndex(s => s.id === currentSuggestion.id) + 1) % loadBalancingSuggestions.length;
+            return [loadBalancingSuggestions[nextIndex]];
+        });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const suggestion = suggestions[0];
+  const etaColor = suggestion.etaImpact < 0 ? "text-green-500" : "text-red-500";
+
+  return (
+     <Card>
+        <CardHeader>
+          <CardTitle>Real-Time Service Load Balancer</CardTitle>
+          <CardDescription>AI-powered job redirection to optimize wait times across the network.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            {suggestion && (
+                <div className="bg-muted p-4 rounded-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                           {suggestion.status === 'suggested' && <RefreshCw className="w-5 h-5 text-primary animate-spin" />}
+                           {suggestion.status === 'in-progress' && <Loader2 className="w-5 h-5 text-yellow-500 animate-spin" />}
+                           {suggestion.status === 'completed' && <CheckCircle className="w-5 h-5 text-green-500" />}
+                            <p className="font-semibold">{suggestion.reason}</p>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Redirect overflow from <span className="font-medium text-foreground">{suggestion.fromCenter}</span> to <span className="font-medium text-foreground">{suggestion.toCenter}</span>.
+                        </p>
+                    </div>
+                    <div className="text-center">
+                        <p className="text-xs text-muted-foreground">ETA Impact</p>
+                        <p className={cn("text-xl font-bold", etaColor)}>{suggestion.etaImpact}%</p>
+                    </div>
+                    <Button disabled={suggestion.status !== 'suggested'}>
+                      {suggestion.status === 'suggested' && 'Approve Redirect'}
+                      {suggestion.status === 'in-progress' && 'Redirecting...'}
+                      {suggestion.status === 'completed' && 'Completed'}
+                    </Button>
+                </div>
+            )}
+        </CardContent>
+      </Card>
+  )
+}
 
 export function OrchestrationView() {
   const [agents, setAgents] = useState(initialAgents);
@@ -106,6 +169,8 @@ export function OrchestrationView() {
           </div>
         </CardContent>
       </Card>
+      
+      <RealTimeLoadBalancer />
 
       {failedAgent && (
          <Card className={cn(
