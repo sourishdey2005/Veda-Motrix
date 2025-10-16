@@ -14,9 +14,6 @@ import { usePathname } from "next/navigation";
 
 const managerNav = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Master Agent", href: "/dashboard/master", icon: Cog },
-    { name: "UEBA Security", href: "/dashboard/ueba", icon: Shield },
-    { name: "Manufacturing", href: "/dashboard/manufacturing", icon: Factory },
     { name: "Service Analytics", href: "/dashboard/analytics", icon: BarChart },
 ];
 
