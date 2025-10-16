@@ -113,5 +113,3 @@ export function PredictiveCostEstimator({ vehicle }: { vehicle: Vehicle }) {
     </Card>
   );
 }
-
-    

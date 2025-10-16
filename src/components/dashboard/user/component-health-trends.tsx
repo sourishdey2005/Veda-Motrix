@@ -144,5 +144,3 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
     </Card>
   );
 }
-
-    
