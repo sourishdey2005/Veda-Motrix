@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Calendar, Wrench } from "lucide-react";
 import { format } from "date-fns";
+import Link from "next/link";
 
 const getHealthColor = (score: number) => {
     if (score > 80) return 'text-green-500';
@@ -63,9 +64,11 @@ export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }) {
                         <div className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Next: {format(new Date(vehicle.nextServiceDue), "dd MMM yyyy")}</div>
                     </div>
                 </div>
-                <Button className="w-full">
-                    <Wrench className="mr-2 h-4 w-4" /> Book Service
-                </Button>
+                 <Link href={`/dashboard/vehicles/${vehicle.id}`} className="w-full">
+                    <Button className="w-full">
+                        <Wrench className="mr-2 h-4 w-4" /> View Details & Book Service
+                    </Button>
+                </Link>
             </CardContent>
         </Card>
     );

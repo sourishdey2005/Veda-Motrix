@@ -48,7 +48,7 @@ export function UserDashboard() {
             <MaintenanceAlerts vehicle={primaryVehicle} />
         </div>
 
-        <div className="space-y-6">
+        <div className="lg:col-span-1 grid grid-cols-1 gap-6">
             <ServiceScheduler />
             <AIChat />
         </div>

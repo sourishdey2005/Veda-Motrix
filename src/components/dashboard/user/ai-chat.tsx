@@ -54,7 +54,7 @@ export function AIChat() {
     }
 
     return (
-        <Card className="flex flex-col h-[32rem]">
+        <Card className="flex flex-col h-full">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Bot className="text-primary" /> AI Assistant</CardTitle>
                 <CardDescription>Chat with our AI for assistance and recommendations.</CardDescription>
