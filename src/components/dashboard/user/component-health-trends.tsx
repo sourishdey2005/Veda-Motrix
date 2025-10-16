@@ -29,8 +29,26 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
   const [healthData, setHealthData] = useState(vehicle.healthHistory || []);
 
   useEffect(() => {
+    // This effect ensures the component updates if the vehicle prop changes.
     setHealthData(vehicle.healthHistory || []);
   }, [vehicle.healthHistory]);
+
+  // This effect simulates real-time data changes.
+  useEffect(() => {
+      const interval = setInterval(() => {
+          setHealthData(prevData =>
+              (prevData || []).map(entry => ({
+                  ...entry,
+                  engine: Math.max(0, Math.min(100, entry.engine + (Math.random() - 0.5) * 2)),
+                  brakes: Math.max(0, Math.min(100, entry.brakes + (Math.random() - 0.5) * 3)),
+                  battery: Math.max(0, Math.min(100, entry.battery + (Math.random() - 0.5) * 1)),
+                  suspension: Math.max(0, Math.min(100, entry.suspension + (Math.random() - 0.5) * 4)),
+                  sensors: Math.max(0, Math.min(100, entry.sensors + (Math.random() - 0.5) * 0.5)),
+              }))
+          );
+      }, 3000);
+      return () => clearInterval(interval);
+  }, []);
 
   const toggleComponent = (component: ComponentKey) => {
     setActiveComponents(prev => 

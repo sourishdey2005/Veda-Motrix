@@ -14,11 +14,18 @@ export function PredictiveCostEstimator({ vehicle }: { vehicle: Vehicle }) {
   const [selectedAlertId, setSelectedAlertId] = useState<string | undefined>(vehicleAlerts[0]?.id);
   const [includeOptional, setIncludeOptional] = useState(true);
 
+  // This effect ensures a default alert is selected when the component mounts or the vehicle changes.
   useEffect(() => {
     if (!selectedAlertId && vehicleAlerts.length > 0) {
       setSelectedAlertId(vehicleAlerts[0].id);
+    } else if (vehicleAlerts.length > 0 && !vehicleAlerts.find(a => a.id === selectedAlertId)) {
+      // If the currently selected alert is not in the new list, select the first one.
+      setSelectedAlertId(vehicleAlerts[0].id);
+    } else if (vehicleAlerts.length === 0) {
+      setSelectedAlertId(undefined);
     }
   }, [vehicleAlerts, selectedAlertId]);
+
 
   const selectedAlert = vehicleAlerts.find(a => a.id === selectedAlertId);
 
