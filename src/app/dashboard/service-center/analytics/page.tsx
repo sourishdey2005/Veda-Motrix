@@ -9,6 +9,8 @@ import { TechnicianCorrelationMatrix } from "@/components/dashboard/service-cent
 import { ServiceDurationAnalysis } from "@/components/dashboard/service-center/analytics/service-duration-analysis";
 import { RepairCostAnalysis } from "@/components/dashboard/service-center/analytics/repair-cost-analysis";
 import { PartFailureLifecycle } from "@/components/dashboard/service-center/analytics/part-failure-lifecycle";
+import { ComponentFailurePath } from "@/components/dashboard/manager/advanced/component-failure-path";
+import { AnomalyTimeline } from "@/components/dashboard/manager/advanced/anomaly-timeline";
 
 export default function ServiceCenterAnalyticsPage() {
     return (
@@ -33,9 +35,9 @@ export default function ServiceCenterAnalyticsPage() {
             </div>
             <Card>
                 <CardHeader>
-                    <CardTitle>Advanced Service Analytics</CardTitle>
+                    <CardTitle>Operational Efficiency Analytics</CardTitle>
                     <CardDescription>
-                        Deeper insights into operational efficiency and part lifecycle.
+                        Deeper insights into service duration, cost, and part lifecycle.
                     </CardDescription>
                 </CardHeader>
             </Card>
@@ -45,6 +47,18 @@ export default function ServiceCenterAnalyticsPage() {
             </div>
              <div className="grid grid-cols-1 gap-6">
                 <PartFailureLifecycle />
+            </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Advanced Analytics</CardTitle>
+                    <CardDescription>
+                        Insights into failure paths and system anomalies.
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+            <div className="space-y-6">
+                <ComponentFailurePath />
+                <AnomalyTimeline />
             </div>
         </div>
     )
