@@ -3,7 +3,6 @@
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { AlertTriangle, Bot, Cpu, Car } from "lucide-react"
 import Link from "next/link"
-import { MasterAgentView } from "./master-agent-view"
 
 export function ManagerDashboard() {
 
@@ -48,7 +47,11 @@ export function ManagerDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">Agents currently operational.</p>
+            <p className="text-xs text-muted-foreground">
+                <Link href="/dashboard/orchestration" className="hover:underline">
+                View orchestration
+              </Link>
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -66,8 +69,6 @@ export function ManagerDashboard() {
           </CardContent>
         </Card>
       </div>
-      
-      <MasterAgentView />
     </div>
   )
 }

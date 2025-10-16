@@ -1,14 +1,14 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Activity, AlertTriangle, ArrowRight, Bot, CheckCircle, Cpu, ShieldCheck, Factory, Users, Wrench, BarChart, Car, HeartPulse } from "lucide-react"
+import { Activity, AlertTriangle, ArrowRight, Bot, ShieldCheck, Factory, Users, Wrench } from "lucide-react"
 import React, { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
 const agents = [
   { name: 'Data Analysis Agent', icon: Activity, href: "/dashboard/analytics" },
-  { name: 'Diagnosis Agent', icon: HeartPulse, href: "/dashboard/analytics" },
+  { name: 'Diagnosis Agent', icon: Bot, href: "/dashboard/analytics" },
   { name: 'Failure Prediction Agent', icon: AlertTriangle, href: "/dashboard/analytics" },
   { name: 'Customer Engagement Agent', icon: Users, href: "#" },
   { name: 'Scheduling Agent', icon: Wrench, href: "#" },
@@ -17,7 +17,7 @@ const agents = [
   { name: 'UEBA Security Agent', icon: ShieldCheck, href: "/dashboard/ueba" },
 ]
 
-export function MasterAgentView() {
+export function OrchestrationView() {
   const [activeAgent, setActiveAgent] = useState(-1);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export function MasterAgentView() {
   }, []);
 
   return (
-      <Card className="lg:col-span-4">
+      <Card>
         <CardHeader>
           <CardTitle>Master Agent Orchestration</CardTitle>
           <CardDescription>Visualizing the AI worker agent collaboration flow.</CardDescription>
