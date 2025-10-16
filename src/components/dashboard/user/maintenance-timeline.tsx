@@ -52,6 +52,7 @@ function StarRating({
 
 export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
   const [maintenanceHistory, setMaintenanceHistory] = React.useState(vehicle.maintenanceHistory);
+  const [openItems, setOpenItems] = React.useState<string[]>([]);
   
   const getServiceCenterName = (id: string) => {
     return serviceCenters.find(sc => sc.id === id)?.name || 'Unknown Center';
@@ -64,6 +65,11 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
       )
     );
   };
+  
+  const toggleItem = (itemId: string) => {
+    setOpenItems(prev => prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]);
+  };
+
 
   return (
     <Card>
@@ -85,39 +91,39 @@ export function MaintenanceTimeline({ vehicle }: { vehicle: Vehicle }) {
           </TableHeader>
           <TableBody>
             {maintenanceHistory.map((item) => (
-              <Collapsible key={item.id} asChild>
-                <>
-                  <TableRow>
-                    <TableCell>
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="sm" className="w-9 p-0 data-[state=open]:rotate-180">
-                           <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-                           <span className="sr-only">Toggle details</span>
-                        </Button>
-                      </CollapsibleTrigger>
-                    </TableCell>
-                    <TableCell className="font-medium">{format(new Date(item.date), "dd MMM yyyy")}</TableCell>
-                    <TableCell>{item.service}</TableCell>
-                    <TableCell>{getServiceCenterName(item.serviceCenterId)}</TableCell>
-                    <TableCell className="text-right font-mono flex items-center justify-end gap-1"><IndianRupee size={12}/>{(item.cost || 0).toLocaleString('en-IN')}</TableCell>
-                    <TableCell className="text-right">
-                        <StarRating rating={item.rating || 0} onRate={(newRating) => handleRate(item.id, newRating)} />
-                    </TableCell>
-                  </TableRow>
-                  <CollapsibleContent asChild>
-                      <TableRow>
-                          <TableCell colSpan={6} className="p-0">
-                              <div className="p-4 bg-muted/50">
-                                 <p className="font-semibold">Service Notes:</p>
-                                 <p className="text-sm text-muted-foreground">{item.notes}</p>
-                                 <p className="text-xs text-muted-foreground mt-2">Mileage: {item.mileage.toLocaleString('en-IN')} km</p>
-                                 <Button variant="outline" size="sm" className="mt-2">Rebook Similar Service</Button>
-                              </div>
-                          </TableCell>
-                      </TableRow>
-                  </CollapsibleContent>
-                </>
-              </Collapsible>
+               <React.Fragment key={item.id}>
+                <Collapsible asChild key={item.id} open={openItems.includes(item.id)} onOpenChange={() => toggleItem(item.id)}>
+                    <TableRow>
+                        <TableCell>
+                        <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="sm" className="w-9 p-0 data-[state=open]:rotate-180">
+                                <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                                <span className="sr-only">Toggle details</span>
+                            </Button>
+                        </CollapsibleTrigger>
+                        </TableCell>
+                        <TableCell className="font-medium">{format(new Date(item.date), "dd MMM yyyy")}</TableCell>
+                        <TableCell>{item.service}</TableCell>
+                        <TableCell>{getServiceCenterName(item.serviceCenterId)}</TableCell>
+                        <TableCell className="text-right font-mono flex items-center justify-end gap-1"><IndianRupee size={12}/>{(item.cost || 0).toLocaleString('en-IN')}</TableCell>
+                        <TableCell className="text-right">
+                            <StarRating rating={item.rating || 0} onRate={(newRating) => handleRate(item.id, newRating)} />
+                        </TableCell>
+                    </TableRow>
+                </Collapsible>
+                <CollapsibleContent asChild>
+                    <TableRow>
+                        <TableCell colSpan={6} className="p-0">
+                            <div className="p-4 bg-muted/50">
+                                <p className="font-semibold">Service Notes:</p>
+                                <p className="text-sm text-muted-foreground">{item.notes}</p>
+                                <p className="text-xs text-muted-foreground mt-2">Mileage: {item.mileage.toLocaleString('en-IN')} km</p>
+                                <Button variant="outline" size="sm" className="mt-2">Rebook Similar Service</Button>
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                </CollapsibleContent>
+               </React.Fragment>
             ))}
           </TableBody>
         </Table>
