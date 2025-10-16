@@ -1,4 +1,4 @@
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 
@@ -84,6 +84,12 @@ export const customerFeedbackData: CustomerFeedback[] = [
     { id: 'F1', userId: '3', vehicleId: 'V1001', rating: 5, comment: 'Excellent service at the Mumbai center. The staff was very courteous and explained everything clearly.', date: '2024-08-02' },
     { id: 'F2', userId: '3', vehicleId: 'V1004', rating: 3, comment: 'The service in Delhi took a bit longer than I was told. The car is fine now, but the wait was too long.', date: '2024-07-28' },
     { id: 'F3', userId: '3', vehicleId: 'V1007', rating: 4, comment: 'Good experience in Bengaluru. The lounge was clean and they fixed the issue promptly. Price was reasonable.', date: '2024-07-25' },
+];
+
+export const notifications: Notification[] = [
+  { id: 'N1', title: 'Critical Alert: V1003', description: 'Engine vibration has exceeded critical threshold. Immediate inspection recommended.', timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString() },
+  { id: 'N2', title: 'Agent Anomaly Detected', description: 'Scheduling Agent attempted unauthorized access. Action was blocked.', timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString() },
+  { id: 'N3', title: 'New Feedback Received', description: 'A 5-star review was submitted for service at Mumbai SC.', timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString() },
 ];
 
 const components = ['Engine', 'Transmission', 'Suspension', 'Brakes', 'AC System'];

@@ -9,7 +9,9 @@ import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/compon
 import { VedaMotrixLogo } from '@/components/icons';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { notifications } from '@/lib/data';
 
 export default function DashboardLayout({
   children,
@@ -52,13 +54,30 @@ export default function DashboardLayout({
           </div>
           <div className='flex items-center gap-4'>
             <p className='text-sm text-muted-foreground hidden lg:block'>Namaste, {user.name.split(' ')[0]} 👋</p>
-            <Button variant="ghost" size="icon" className='relative'>
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-              </span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className='relative'>
+                  <Bell className="h-5 w-5" />
+                  {notifications.length > 0 && (
+                    <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    </span>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80" align="end">
+                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {notifications.map((notification) => (
+                  <DropdownMenuItem key={notification.id} className="flex flex-col items-start gap-1 p-2">
+                    <p className='font-semibold text-sm'>{notification.title}</p>
+                    <p className='text-xs text-muted-foreground'>{notification.description}</p>
+                    <p className='text-xs text-muted-foreground/80 mt-1'>{formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}</p>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <UserNav />
           </div>
         </header>

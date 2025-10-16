@@ -76,3 +76,10 @@ export type CustomerFeedback = {
   comment: string;
   date: string;
 };
+
+export type Notification = {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: string;
+};
