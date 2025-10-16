@@ -5,10 +5,13 @@ import { useState } from "react";
 import type { Vehicle } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Legend, ReferenceLine, Label } from "recharts";
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, ReferenceLine, Label } from "recharts";
 import type { ChartConfig } from "@/components/ui/chart";
 import { format, parseISO } from "date-fns";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 const chartConfig = {
   engine: { label: "Engine", color: "hsl(var(--chart-1))" },
@@ -36,14 +39,17 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
 
   const filteredData = healthData.map(entry => {
     const newEntry: any = { date: entry.date };
-    (Object.keys(chartConfig) as ComponentKey[]).forEach(comp => {
-      if (activeComponents.includes(comp)) {
+    activeComponents.forEach(comp => {
+      const value = entry[comp as keyof typeof entry];
+      if (typeof value === 'number') {
         if (showOnlyCritical) {
-          if (entry[comp] < 50) {
-            newEntry[comp] = entry[comp];
+          if (value < 50) {
+            newEntry[comp] = value;
+          } else {
+            newEntry[comp] = null;
           }
         } else {
-          newEntry[comp] = entry[comp];
+          newEntry[comp] = value;
         }
       }
     });
@@ -53,8 +59,8 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+          <div className="flex-1">
             <CardTitle>Component-Level Health Trend (Last 30 Days)</CardTitle>
             <CardDescription>Visualize the health of individual systems over time.</CardDescription>
           </div>
@@ -64,24 +70,32 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
               checked={showOnlyCritical}
               onCheckedChange={setShowOnlyCritical}
             />
-            <label htmlFor="critical-only" className="text-sm font-medium">Show Critical Only (&lt;50%)</label>
+            <label htmlFor="critical-only" className="text-sm font-medium whitespace-nowrap">Show Critical Only (&lt;50%)</label>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 pt-4">
-            {Object.keys(chartConfig).map(key => (
-                <button
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  Select Components
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Visible Components</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {(Object.keys(chartConfig) as ComponentKey[]).map(key => (
+                  <DropdownMenuCheckboxItem
                     key={key}
-                    onClick={() => toggleComponent(key as ComponentKey)}
-                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${activeComponents.includes(key as ComponentKey) ? 'text-white' : 'bg-transparent'}`}
-                    style={{ 
-                      backgroundColor: activeComponents.includes(key as ComponentKey) ? `var(--color-${key})` : 'transparent',
-                      borderColor: `var(--color-${key})`,
-                      color: activeComponents.includes(key as ComponentKey) ? 'white' : `var(--color-${key})`
-                    } as React.CSSProperties}
-                >
-                    {chartConfig[key as ComponentKey].label}
-                </button>
-            ))}
+                    checked={activeComponents.includes(key)}
+                    onCheckedChange={() => toggleComponent(key)}
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    {chartConfig[key].label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
         </div>
       </CardHeader>
       <CardContent>
@@ -101,11 +115,11 @@ export function ComponentHealthTrends({ vehicle }: { vehicle: Vehicle }) {
                 cursor={true}
                 content={<ChartTooltipContent />}
               />
-              <Legend />
               {activeComponents.map(key => (
                  <Line
                     key={key}
                     dataKey={key}
+                    name={chartConfig[key].label}
                     type="monotone"
                     stroke={`var(--color-${key})`}
                     strokeWidth={2}
