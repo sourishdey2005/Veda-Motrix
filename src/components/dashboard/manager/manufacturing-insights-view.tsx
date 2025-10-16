@@ -16,9 +16,8 @@ const chartConfig: ChartConfig = {
   recurrence: { label: "Recurrence", color: "hsl(var(--chart-5))" },
   postCapa: { label: "Post-CAPA", color: "hsl(var(--chart-1))" },
   effectiveness: { label: "Effectiveness", color: "hsl(var(--chart-1))" },
-  tata: { label: "Tata", color: "hsl(var(--chart-1))" },
-  mahindra: { label: "Mahindra", color: "hsl(var(--chart-2))" },
-  maruti: { label: "Maruti", color: "hsl(var(--chart-3))" },
+  Hero: { label: "Hero", color: "hsl(var(--chart-1))" },
+  Mahindra: { label: "Mahindra", color: "hsl(var(--chart-2))" },
 }
 
 const riskColors = {
@@ -36,7 +35,7 @@ function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
             setData(prevData => updater(prevData));
         }, 3000);
         return () => clearInterval(interval);
-    }, [updater]);
+    }, [updater, initialData]);
 
     return data;
 }
@@ -107,9 +106,8 @@ export function ManufacturingInsightsView() {
                                 <ZAxis type="number" dataKey="count" range={[100, 1500]} name="Issue Count" />
                                 <ChartTooltip cursor={{ strokeDasharray: '3 3' }} content={<ChartTooltipContent />} />
                                 <Legend />
-                                <Scatter name="Tata" data={rcaClusters.filter(d => d.make === 'Tata')} fill="var(--color-tata)" className="cursor-pointer" />
-                                <Scatter name="Mahindra" data={rcaClusters.filter(d => d.make === 'Mahindra')} fill="var(--color-mahindra)" className="cursor-pointer" />
-                                <Scatter name="Maruti" data={rcaClusters.filter(d => d.make === 'Maruti')} fill="var(--color-maruti)" className="cursor-pointer" />
+                                <Scatter name="Hero" data={rcaClusters.filter(d => d.make === 'Hero')} fill="var(--color-Hero)" className="cursor-pointer" />
+                                <Scatter name="Mahindra" data={rcaClusters.filter(d => d.make === 'Mahindra')} fill="var(--color-Mahindra)" className="cursor-pointer" />
                             </ScatterChart>
                         </ResponsiveContainer>
                     </ChartContainer>
@@ -312,5 +310,3 @@ export function ManufacturingInsightsView() {
     </div>
   )
 }
-
-    

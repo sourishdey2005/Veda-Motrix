@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Pie, PieChart, Cell, ScatterChart, Scatter, ZAxis, LabelList, Legend, ResponsiveContainer, LineChart, Line } from "recharts"
@@ -16,9 +17,8 @@ const chartConfig: ChartConfig = {
   demand: { label: "Demand", color: "hsl(var(--chart-1))" },
   workload: { label: "Workload", color: "hsl(var(--chart-1))" },
   backlog: { label: "Backlog", color: "hsl(var(--chart-2))" },
-  tata: { label: "Tata", color: "hsl(var(--chart-1))" },
-  mahindra: { label: "Mahindra", color: "hsl(var(--chart-2))" },
-  maruti: { label: "Maruti", color: "hsl(var(--chart-3))" },
+  Hero: { label: "Hero", color: "hsl(var(--chart-1))" },
+  Mahindra: { label: "Mahindra", color: "hsl(var(--chart-2))" },
   count: { label: "Count", color: "hsl(var(--chart-1))" },
   Clutch: { label: "Clutch", color: "hsl(var(--chart-1))" },
   "Brake Pad": { label: "Brake Pad", color: "hsl(var(--chart-2))" },
@@ -47,7 +47,7 @@ function useSimulatedData<T>(initialData: T[], updater: (item: T) => T) {
             setData(prevData => prevData.map(item => updater(item)));
         }, 3000);
         return () => clearInterval(interval);
-    }, [updater]);
+    }, [updater, initialData]);
 
     return data;
 }
@@ -70,7 +70,7 @@ export function AnalyticsDashboard() {
   
   const breakdownData = useSimulatedData(
     analyticsData.predictiveBreakdown,
-    item => ({ ...item, probability: Math.min(1, item.probability + (Math.random() - 0.5) * 0.1) })
+    item => ({ ...item, probability: Math.min(1, Math.max(0, item.probability + (Math.random() - 0.5) * 0.1)) })
   );
 
   const maintenanceForecast = useSimulatedData(
@@ -175,8 +175,8 @@ export function AnalyticsDashboard() {
             </Card>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="lg:col-span-2">
+        <div className="grid gap-6 lg:grid-cols-5">
+            <Card className="lg:col-span-3">
                 <CardHeader>
                     <CardTitle>Predictive Breakdown Probability (Next 90 Days)</CardTitle>
                     <CardDescription>Forecast likelihood of component failure shown as a risk heatmap across models.</CardDescription>
@@ -186,7 +186,7 @@ export function AnalyticsDashboard() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Component</TableHead>
-                                {analyticsData.predictiveBreakdown.filter(d => d.component === 'Engine').map(d => (
+                                {breakdownData.filter(d => d.component === 'Engine').map(d => (
                                     <TableHead key={d.model} className="text-center">{d.model}</TableHead>
                                 ))}
                             </TableRow>
@@ -212,7 +212,7 @@ export function AnalyticsDashboard() {
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="lg:col-span-2">
                 <CardHeader>
                     <CardTitle>Maintenance Forecast Dashboard</CardTitle>
                     <CardDescription>Predicted service demand across major cities for the next month.</CardDescription>
@@ -232,7 +232,7 @@ export function AnalyticsDashboard() {
                 </CardContent>
             </Card>
             
-            <Card>
+            <Card className="lg:col-span-3">
                 <CardHeader>
                     <CardTitle>Service Load Distribution</CardTitle>
                     <CardDescription>Comparison of service center workloads and backlogs.</CardDescription>
@@ -254,30 +254,6 @@ export function AnalyticsDashboard() {
 
             <Card className="lg:col-span-2">
                 <CardHeader>
-                    <CardTitle>Vehicle Age vs. Failure Rate Correlation</CardTitle>
-                    <CardDescription>Bubble plot showing failure frequency as vehicles age. Size indicates fleet volume.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ChartContainer config={chartConfig} className="h-96">
-                        <ResponsiveContainer width="100%" height={300}>
-                            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                                <CartesianGrid />
-                                <XAxis type="number" dataKey="age" name="Vehicle Age (years)" unit="yrs" />
-                                <YAxis type="number" dataKey="failureRate" name="Failure Rate (%)" unit="%" />
-                                <ZAxis type="number" dataKey="vehicleCount" range={[100, 1000]} name="Vehicle Count" />
-                                <ChartTooltip cursor={{ strokeDasharray: '3 3' }} content={<ChartTooltipContent />} />
-                                <Legend />
-                                <Scatter name="Tata" data={ageVsFailure.filter(d => d.make === 'Tata')} fill="var(--color-tata)" />
-                                <Scatter name="Mahindra" data={ageVsFailure.filter(d => d.make === 'Mahindra')} fill="var(--color-mahindra)" />
-                                <Scatter name="Maruti" data={ageVsFailure.filter(d => d.make === 'Maruti')} fill="var(--color-maruti)" />
-                            </ScatterChart>
-                        </ResponsiveContainer>
-                    </ChartContainer>
-                </CardContent>
-            </Card>
-            
-            <Card>
-                <CardHeader>
                     <CardTitle>Failure Severity Distribution</CardTitle>
                     <CardDescription>Histogram dividing issues into severity categories.</CardDescription>
                 </CardHeader>
@@ -295,14 +271,37 @@ export function AnalyticsDashboard() {
                     </ChartContainer>
                 </CardContent>
             </Card>
+
+            <Card className="lg:col-span-3">
+                <CardHeader>
+                    <CardTitle>Vehicle Age vs. Failure Rate Correlation</CardTitle>
+                    <CardDescription>Bubble plot showing failure frequency as vehicles age. Size indicates fleet volume.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer config={chartConfig} className="h-72">
+                        <ResponsiveContainer width="100%" height={300}>
+                            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                                <CartesianGrid />
+                                <XAxis type="number" dataKey="age" name="Vehicle Age (years)" unit="yrs" />
+                                <YAxis type="number" dataKey="failureRate" name="Failure Rate (%)" unit="%" />
+                                <ZAxis type="number" dataKey="vehicleCount" range={[100, 1000]} name="Vehicle Count" />
+                                <ChartTooltip cursor={{ strokeDasharray: '3 3' }} content={<ChartTooltipContent />} />
+                                <Legend />
+                                <Scatter name="Hero" data={ageVsFailure.filter(d => d.make === 'Hero')} fill="var(--color-Hero)" />
+                                <Scatter name="Mahindra" data={ageVsFailure.filter(d => d.make === 'Mahindra')} fill="var(--color-Mahindra)" />
+                            </ScatterChart>
+                        </ResponsiveContainer>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
             
-            <Card>
+            <Card className="lg:col-span-2">
                 <CardHeader>
                     <CardTitle>Parts Replacement Trend Analysis</CardTitle>
                     <CardDescription>Top 3 replaced components by month.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                     <ChartContainer config={chartConfig} className="h-64">
+                     <ChartContainer config={chartConfig} className="h-72">
                         <LineChart data={partsTrend}>
                         <CartesianGrid vertical={false} />
                         <XAxis
@@ -315,9 +314,9 @@ export function AnalyticsDashboard() {
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
                         <Legend />
-                        <Line type="monotone" dataKey="Clutch" stroke="var(--color-tata)" strokeWidth={2} dot={false} />
-                        <Line type="monotone" dataKey="Brake Pad" stroke="var(--color-mahindra)" strokeWidth={2} dot={false} />
-                        <Line type="monotone" dataKey="Injector" stroke="var(--color-maruti)" strokeWidth={2} dot={false} />
+                        <Line type="monotone" dataKey="Clutch" stroke="var(--color-Clutch)" strokeWidth={2} dot={false} />
+                        <Line type="monotone" dataKey="Brake Pad" stroke="var(--color-Brake Pad)" strokeWidth={2} dot={false} />
+                        <Line type="monotone" dataKey="Injector" stroke="var(--color-Injector)" strokeWidth={2} dot={false} />
                         </LineChart>
                     </ChartContainer>
                 </CardContent>

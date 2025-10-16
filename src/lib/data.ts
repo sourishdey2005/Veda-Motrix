@@ -25,8 +25,8 @@ const vehicleImg1 = PlaceHolderImages.find(img => img.id === 'vehicle-1');
 const vehicleImg2 = PlaceHolderImages.find(img => img.id === 'vehicle-2');
 const vehicleImg3 = PlaceHolderImages.find(img => img.id === 'vehicle-3');
 
-const indianMakes = ['Maruti Suzuki', 'Tata', 'Mahindra', 'Hyundai', 'Kia', 'Toyota', 'Honda', 'Skoda', 'Volkswagen', 'MG'];
-const indianModels = ['Swift', 'Nexon', 'XUV700', 'Creta', 'Seltos', 'Innova', 'City', 'Kushaq', 'Virtus', 'Hector'];
+const indianMakes = ['Hero', 'Mahindra'];
+const indianModels = ['Splendor', 'Xtreme', 'XUV700', 'Scorpio', 'Pleasure+', 'Thar', 'Passion', 'Jawa', 'Karizma', 'Bolero'];
 
 export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   const healthStatus = i % 3 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
@@ -34,7 +34,7 @@ export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
   return {
     id: `V${1001 + i}`,
     ownerId: '3', // All owned by Rohan Joshi for simplicity
-    make: indianMakes[i],
+    make: indianMakes[i % 2],
     model: indianModels[i],
     year: 2020 + (i % 4),
     vin: `VIN${Math.random().toString(36).substring(2, 15).toUpperCase()}`,
@@ -84,7 +84,6 @@ export const customerFeedbackData: CustomerFeedback[] = [
 
 const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata'];
 const components = ['Engine', 'Transmission', 'Suspension', 'Brakes', 'AC System'];
-const topParts = ['Clutch', 'Brake Pad', 'Injector', 'Air Filter', 'Oil Filter'];
 
 export const analyticsData = {
   kpis: {
@@ -94,7 +93,7 @@ export const analyticsData = {
     preventiveSavings: 1250000,
   },
   predictiveBreakdown: components.flatMap(component => 
-    indianMakes.slice(0,5).map(model => ({
+    indianMakes.map(model => ({
       component,
       model,
       probability: Math.random()
@@ -109,7 +108,7 @@ export const analyticsData = {
     { name: 'Delhi SC', workload: 90, backlog: 25 },
     { name: 'Bengaluru SC', workload: 110, backlog: 10 },
   ],
-  ageVsFailureRate: indianMakes.slice(0,3).flatMap(make => 
+  ageVsFailureRate: indianMakes.flatMap(make => 
     Array.from({length: 5}, (_, i) => ({
       make,
       age: i + 1,
@@ -131,18 +130,16 @@ export const analyticsData = {
   }))
 };
 
-
-// RCA / CAPA Analytics Data
-const rcaMakes = ['Tata', 'Mahindra', 'Maruti'];
+const rcaMakes = ['Hero', 'Mahindra'];
 const rcaSuppliers = ['Bosch India', 'Minda Corp', 'Bharat Forge', 'Lumax', 'Uno Minda'];
 const rcaComponents = ['ECU', 'Fuel Injector', 'ABS Module', 'Wiring Harness', 'Infotainment Unit'];
 
 export const rcaCapaAnalyticsData = {
   rcaClusters: [
-    { name: 'ECU_Software_Glitch', count: 25, make: 'Tata', x: 0.2, y: 0.3 },
+    { name: 'ECU_Software_Glitch', count: 25, make: 'Hero', x: 0.2, y: 0.3 },
     { name: 'Injector_Clogging', count: 40, make: 'Mahindra', x: 0.6, y: 0.7 },
-    { name: 'Wiring_Harness_Short', count: 15, make: 'Maruti', x: 0.8, y: 0.2 },
-    { name: 'ABS_Sensor_Failure', count: 30, make: 'Tata', x: 0.25, y: 0.35 },
+    { name: 'Wiring_Harness_Short', count: 15, make: 'Hero', x: 0.8, y: 0.2 },
+    { name: 'ABS_Sensor_Failure', count: 30, make: 'Hero', x: 0.25, y: 0.35 },
     { name: 'Infotainment_Lag', count: 50, make: 'Mahindra', x: 0.65, y: 0.75 },
   ],
   defectRecurrence: Array.from({ length: 7 }, (_, i) => ({
@@ -166,13 +163,13 @@ export const rcaCapaAnalyticsData = {
       count: Math.floor(Math.random() * 20),
     })),
   })),
-  designVulnerability: indianModels.slice(0, 5).map(model => ({
-    model,
+  designVulnerability: indianModels.slice(0, 5).map((model, i) => ({
+    model: `${rcaMakes[i % 2]} ${model}`,
     riskScore: 20 + Math.random() * 70,
   })),
   aiRecommendations: [
-    { issue: "Recurring coolant leak on Nexon EV", recommendation: "Investigate thermal expansion properties of hose connector material under high-voltage battery load.", confidence: 0.88 },
-    { issue: "XUV700 infotainment screen freeze", recommendation: "Analyze memory allocation logs for potential overflow during multi-app usage. Suggest firmware patch.", confidence: 0.92 },
+    { issue: "Recurring coolant leak on Hero Xtreme", recommendation: "Investigate thermal expansion properties of hose connector material under high-load.", confidence: 0.88 },
+    { issue: "Mahindra XUV700 screen freeze", recommendation: "Analyze memory allocation logs for potential overflow. Suggest firmware patch.", confidence: 0.92 },
   ],
   assemblyLineRisk: Array.from({length: 5}, (_, i) => ({
       lotId: `PUNE-A${101+i}`,
