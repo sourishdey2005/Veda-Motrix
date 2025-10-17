@@ -19,7 +19,6 @@ export default function SignupPage() {
               Join VEDA-MOTRIX AI and take control of your vehicle's health.
             </p>
           </div>
-          <SignupForm />
 
           <div className="mt-6">
             <h3 className="text-center text-sm font-semibold text-muted-foreground mb-4">For Prototype Demo</h3>
@@ -36,6 +35,8 @@ export default function SignupPage() {
               />
             </div>
           </div>
+
+          <SignupForm />
 
         </div>
       </div>
