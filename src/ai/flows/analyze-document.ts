@@ -56,7 +56,7 @@ const analyzeDocumentFlow = ai.defineFlow(
     const documentText = Buffer.from(b64Data, 'base64').toString('utf8');
 
     const result = await ai.generate({
-      model: googleAI.model('gemini-1.5-flash'),
+      model: googleAI.model('gemini-pro'),
       prompt: `You are an expert data analyst. Analyze the following document content based on the user's request. Provide a clear, concise, and well-structured answer in Markdown format.
 
 User Prompt: ${input.prompt}
