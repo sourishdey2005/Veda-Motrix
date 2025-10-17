@@ -11,34 +11,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Chrome, Apple } from 'lucide-react';
 import type { User } from '@/lib/types';
 
-const credentials = {
-  manager: {
-    email: 'manager@vedamotrix.ai',
-    password: 'VEDA@123',
-  },
-  'service-center': {
-    email: 'service@vedamotrix.ai',
-    password: 'SERVICE@123',
-  },
-  user: {
-    email: 'rohan.joshi@email.com',
-    password: 'password123',
-  }
-};
-
 export function LoginForm({ userType }: { userType: User['role'] }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (credentials[userType]) {
-      setEmail(credentials[userType].email);
-      setPassword(credentials[userType].password);
-    }
-  }, [userType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,8 +32,6 @@ export function LoginForm({ userType }: { userType: User['role'] }) {
     setIsLoading(false);
   };
 
-  const isHardcoded = userType === 'manager' || userType === 'service-center';
-
   return (
     <>
       <div className="grid gap-6">
@@ -70,8 +46,7 @@ export function LoginForm({ userType }: { userType: User['role'] }) {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading || isHardcoded}
-                readOnly={isHardcoded}
+                disabled={isLoading}
               />
             </div>
             <div className="grid gap-2">
@@ -90,8 +65,7 @@ export function LoginForm({ userType }: { userType: User['role'] }) {
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading || isHardcoded}
-                readOnly={isHardcoded}
+                disabled={isLoading}
                 placeholder='Your password'
               />
             </div>
