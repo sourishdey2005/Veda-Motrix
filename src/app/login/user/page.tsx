@@ -70,8 +70,8 @@ export default function UserLoginPage() {
         )}
       </div>
 
-       {/* Credential card in the bottom corner */}
-      <div className="fixed bottom-6 left-6 z-10 hidden lg:block">
+       {/* Credential card in the top right corner */}
+      <div className="fixed top-6 right-6 z-10 hidden lg:block">
           <DemoCredentialCard />
       </div>
     </div>
