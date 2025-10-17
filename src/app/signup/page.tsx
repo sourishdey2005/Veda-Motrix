@@ -20,22 +20,6 @@ export default function SignupPage() {
             </p>
           </div>
 
-          <div className="mt-6">
-            <h3 className="text-center text-sm font-semibold text-muted-foreground mb-4">For Prototype Demo</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <CredentialCard 
-                role="Manager"
-                email="manager@vedamotrix.ai"
-                password="VEDA@123"
-              />
-              <CredentialCard 
-                role="Service Center"
-                email="service@vedamotrix.ai"
-                password="SERVICE@123"
-              />
-            </div>
-          </div>
-
           <SignupForm />
 
         </div>
@@ -51,6 +35,23 @@ export default function SignupPage() {
             className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
           />
         )}
+      </div>
+
+      {/* Credential cards in the bottom corner */}
+      <div className="fixed bottom-4 left-4 z-10 hidden lg:flex flex-col gap-4">
+          <h3 className="text-center text-sm font-semibold text-muted-foreground mb-2">For Prototype Demo</h3>
+          <div className='flex gap-4'>
+            <CredentialCard 
+              role="Manager"
+              email="manager@vedamotrix.ai"
+              password="VEDA@123"
+            />
+            <CredentialCard 
+              role="Service Center"
+              email="service@vedamotrix.ai"
+              password="SERVICE@123"
+            />
+          </div>
       </div>
     </div>
   );
