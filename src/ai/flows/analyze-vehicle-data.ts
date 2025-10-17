@@ -32,7 +32,6 @@ export async function analyzeVehicleData(input: AnalyzeVehicleDataInput): Promis
 
 const prompt = ai.definePrompt({
   name: 'analyzeVehicleDataPrompt',
-  model: googleAI.model('gemini-2.5-flash'),
   input: {schema: AnalyzeVehicleDataInputSchema},
   output: {schema: AnalyzeVehicleDataOutputSchema},
   prompt: `You are a master agent responsible for analyzing vehicle sensor data and detecting anomalies.

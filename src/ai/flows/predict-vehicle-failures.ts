@@ -39,7 +39,6 @@ export async function predictVehicleFailure(input: PredictVehicleFailureInput): 
 
 const prompt = ai.definePrompt({
   name: 'predictVehicleFailurePrompt',
-  model: googleAI.model('gemini-2.5-flash'),
   input: {schema: PredictVehicleFailureInputSchema},
   output: {schema: PredictVehicleFailureOutputSchema},
   prompt: `You are an AI diagnosis agent specializing in predicting vehicle failures.

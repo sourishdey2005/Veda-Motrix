@@ -38,7 +38,6 @@ export type GenerateManufacturingInsightsOutput = z.infer<
 
 const generateManufacturingInsightsPrompt = ai.definePrompt({
   name: 'generateManufacturingInsightsPrompt',
-  model: googleAI.model('gemini-2.5-flash'),
   input: {schema: GenerateManufacturingInsightsInputSchema},
   output: {schema: GenerateManufacturingInsightsOutputSchema},
   prompt: `You are a manufacturing insights expert. Analyze the following service data and generate improvement suggestions for RCA/CAPA.
