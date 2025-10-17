@@ -8,9 +8,7 @@
  * - AnswerQuestionOutput - The return type for the answerQuestion function.
  */
 
-import {ai} from '@/ai/genkit';
-import {googleAI} from '@genkit-ai/google-genai';
-import {z} from 'genkit';
+import {z} from 'genkit/zod';
 import { qnaData } from '@/lib/chatbot-qna';
 
 const AnswerQuestionInputSchema = z.object({
@@ -27,47 +25,49 @@ const AnswerQuestionOutputSchema = z.object({
 });
 export type AnswerQuestionOutput = z.infer<typeof AnswerQuestionOutputSchema>;
 
+// This function now performs a local search instead of calling an AI model.
 export async function answerQuestion(input: AnswerQuestionInput): Promise<AnswerQuestionOutput> {
-  return vehicleQnAFlow(input);
-}
-
-const knowledgeBase = `START KNOWLEDGE BASE
-${qnaData.map((item, index) => `Q${index + 1}: ${item.question}\nA${index + 1}: ${item.answer}`).join('\n\n')}
-END KNOWLEDGE BASE`;
-
-const prompt = ai.definePrompt({
-  name: 'vehicleQnAPrompt',
-  input: {schema: AnswerQuestionInputSchema},
-  output: {schema: AnswerQuestionOutputSchema},
-  prompt: `You are VEDA, an expert AI assistant for VEDA-MOTRIX vehicle owners. Your goal is to answer questions professionally and concisely based on a knowledge base of predefined questions and answers.
-
-You must follow these rules:
-1.  Use the provided Knowledge Base as your primary source of truth.
-2.  If the user's question is a close match to a question in the Knowledge Base, provide the corresponding answer.
-3.  If the question is not in the Knowledge Base, you must state: "I'm sorry, I don't have information on that topic right now. I can help with vehicle maintenance, service, and general questions." Do not attempt to answer it from your own knowledge.
-4.  Keep your answers concise and professional.
-5.  Consider the conversation history for context, but always prioritize the knowledge base for answers.
-
-${knowledgeBase}
-
-Conversation History:
-{{#each conversationHistory}}
-{{role}}: {{content}}
-{{/each}}
-
-User's current question: {{{question}}}
-
-Based on the knowledge base and the conversation history, what is the best answer to the user's current question?`,
-});
-
-const vehicleQnAFlow = ai.defineFlow(
-  {
-    name: 'vehicleQnAFlow',
-    inputSchema: AnswerQuestionInputSchema,
-    outputSchema: AnswerQuestionOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  const userQuestion = input.question.toLowerCase().trim();
+  
+  if (!userQuestion) {
+    return { answer: "I'm sorry, I didn't receive a question. How can I help?" };
   }
-);
+
+  // Find the best match from the knowledge base.
+  let bestMatch: { score: number; answer: string } = { score: 0, answer: "" };
+
+  qnaData.forEach(item => {
+    const qnaQuestion = item.question.toLowerCase().trim();
+    
+    // Simple scoring mechanism:
+    // 3 points for exact match
+    // 2 points if the user's question includes the Q&A question
+    // 1 point if the Q&A question includes part of the user's question
+    
+    if (userQuestion === qnaQuestion) {
+        if (bestMatch.score < 3) {
+            bestMatch = { score: 3, answer: item.answer };
+        }
+    } else if (userQuestion.includes(qnaQuestion)) {
+        if (bestMatch.score < 2) {
+            bestMatch = { score: 2, answer: item.answer };
+        }
+    } else {
+        const userWords = new Set(userQuestion.split(' '));
+        const qnaWords = new Set(qnaQuestion.split(' '));
+        const intersection = new Set([...userWords].filter(x => qnaWords.has(x)));
+        const score = intersection.size / qnaWords.size;
+
+        if (score > bestMatch.score && score > 0.5) { // Require more than 50% word match
+             bestMatch = { score: score, answer: item.answer };
+        }
+    }
+  });
+  
+  if (bestMatch.answer) {
+    return { answer: bestMatch.answer };
+  }
+
+  // Default fallback answer if no good match is found.
+  return { answer: "I'm sorry, I don't have information on that topic right now. I can help with vehicle maintenance, service, and general questions." };
+}
