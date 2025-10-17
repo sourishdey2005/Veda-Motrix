@@ -47,7 +47,7 @@ const analyzeDocumentFlow = ai.defineFlow(
     outputSchema: AnalyzeDocumentOutputSchema,
   },
   async ({ documentDataUri, prompt }) => {
-    const model = googleAI.model('gemini-1.5-flash');
+    const model = googleAI.model('gemini-pro-vision');
 
     const result = await ai.generate({
       model,
