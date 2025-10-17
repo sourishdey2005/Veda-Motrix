@@ -8,9 +8,8 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Chrome, Apple } from 'lucide-react';
 import type { User } from '@/lib/types';
-import { VedaMotrixLogo } from './icons';
 
 const credentials = {
   manager: {
@@ -113,12 +112,12 @@ export function LoginForm({ userType }: { userType: User['role'] }) {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <Button variant="outline" disabled>
-            <VedaMotrixLogo className="mr-2 h-4 w-4" /> {/* Using a generic logo for placeholder */}
+          <Button variant="outline">
+            <Chrome className="mr-2 h-4 w-4" />
             Google
           </Button>
-           <Button variant="outline" disabled>
-             <VedaMotrixLogo className="mr-2 h-4 w-4" /> {/* Using a generic logo for placeholder */}
+           <Button variant="outline">
+             <Apple className="mr-2 h-4 w-4" />
             Apple
           </Button>
         </div>

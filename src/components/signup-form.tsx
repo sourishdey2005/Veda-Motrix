@@ -8,8 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
-import { VedaMotrixLogo } from './icons';
+import { Loader2, Chrome, Apple } from 'lucide-react';
 
 export function SignupForm() {
   const [name, setName] = useState('');
@@ -89,12 +88,12 @@ export function SignupForm() {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <Button variant="outline" disabled>
-             <VedaMotrixLogo className="mr-2 h-4 w-4" /> {/* Placeholder */}
+          <Button variant="outline">
+             <Chrome className="mr-2 h-4 w-4" />
             Google
           </Button>
-          <Button variant="outline" disabled>
-             <VedaMotrixLogo className="mr-2 h-4 w-4" /> {/* Placeholder */}
+          <Button variant="outline">
+             <Apple className="mr-2 h-4 w-4" />
             Apple
           </Button>
         </div>
