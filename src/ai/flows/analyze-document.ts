@@ -11,6 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 
 const AnalyzeDocumentInputSchema = z.object({
   documentDataUri: z
@@ -55,7 +56,7 @@ const analyzeDocumentFlow = ai.defineFlow(
     const documentText = Buffer.from(b64Data, 'base64').toString('utf8');
 
     const result = await ai.generate({
-      model: 'gemini-1.5-flash',
+      model: googleAI.model('gemini-1.5-flash'),
       prompt: `You are an expert data analyst. Analyze the following document content based on the user's request. Provide a clear, concise, and well-structured answer in Markdown format.
 
 User Prompt: ${input.prompt}
