@@ -10,7 +10,6 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 
 const AnalyzeDocumentInputSchema = z.object({
@@ -40,32 +39,27 @@ export async function analyzeDocument(
   return analyzeDocumentFlow(input);
 }
 
+const analyzeDocumentPrompt = ai.definePrompt({
+  name: 'analyzeDocumentPrompt',
+  input: { schema: AnalyzeDocumentInputSchema },
+  output: { schema: AnalyzeDocumentOutputSchema },
+  model: 'gemini-1.5-flash',
+  prompt: `You are an expert data analyst. Analyze the following document based on the user's request. Provide a clear, concise, and well-structured answer in Markdown format.
+
+User Prompt: {{{prompt}}}
+Document: {{media url=documentDataUri}}
+`,
+});
+
+
 const analyzeDocumentFlow = ai.defineFlow(
   {
     name: 'analyzeDocumentFlow',
     inputSchema: AnalyzeDocumentInputSchema,
     outputSchema: AnalyzeDocumentOutputSchema,
   },
-  async ({ documentDataUri, prompt }) => {
-    const model = googleAI.model('gemini-1.5-flash');
-
-    const result = await ai.generate({
-      model,
-      prompt: [
-        {
-          text: `You are an expert data analyst. Analyze the following document based on the user's request. Provide a clear, concise, and well-structured answer in Markdown format.
-
-User Prompt: ${prompt}`
-        },
-        { media: { url: documentDataUri } },
-      ],
-      output: {
-        format: 'markdown',
-        schema: AnalyzeDocumentOutputSchema,
-      },
-    });
-
-    const output = result.output();
+  async (input) => {
+    const { output } = await analyzeDocumentPrompt(input);
     if (!output) {
       throw new Error("Analysis failed to produce an output.");
     }
