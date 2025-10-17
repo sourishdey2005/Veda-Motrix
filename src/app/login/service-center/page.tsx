@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { LoginForm } from '@/components/login-form';
 import { VedaMotrixLogo } from '@/components/icons';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { DemoCredentialCard } from '@/components/credential-card';
 
 export default function ServiceCenterLoginPage() {
   const loginBg = PlaceHolderImages.find(img => img.id === 'login-bg');
@@ -31,6 +32,10 @@ export default function ServiceCenterLoginPage() {
             className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
           />
         )}
+      </div>
+       {/* Credential card in the top right corner */}
+      <div className="fixed top-6 right-6 z-10 hidden lg:block">
+          <DemoCredentialCard />
       </div>
     </div>
   );
