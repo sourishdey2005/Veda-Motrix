@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { LoginForm } from '@/components/login-form';
 import { VedaMotrixLogo } from '@/components/icons';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { CredentialCard } from '@/components/credential-card';
 
 export default function UserLoginPage() {
   const loginBg = PlaceHolderImages.find(img => img.id === 'login-bg');
@@ -31,6 +32,23 @@ export default function UserLoginPage() {
             className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
           />
         )}
+      </div>
+
+       {/* Credential cards in the bottom corner */}
+      <div className="fixed bottom-4 left-4 z-10 hidden lg:flex flex-col gap-4">
+          <h3 className="text-center text-sm font-semibold text-muted-foreground mb-2">For Prototype Demo</h3>
+          <div className='flex gap-4'>
+            <CredentialCard 
+              role="Manager"
+              email="manager@vedamotrix.ai"
+              password="VEDA@123"
+            />
+            <CredentialCard 
+              role="Service Center"
+              email="service@vedamotrix.ai"
+              password="SERVICE@123"
+            />
+          </div>
       </div>
     </div>
   );
