@@ -1,7 +1,12 @@
 import type {Metadata} from 'next';
+import { Inter, Source_Code_Pro } from 'next/font/google';
 import './globals.css';
 import {AuthProvider} from '@/hooks/use-auth';
 import {Toaster} from '@/components/ui/toaster';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-body' });
+const sourceCodePro = Source_Code_Pro({ subsets: ['latin'], variable: '--font-code' });
+
 
 export const metadata: Metadata = {
   title: 'VEDA-MOTRIX AI',
@@ -15,15 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="font-body antialiased">
+      <body className={`${inter.variable} ${sourceCodePro.variable} font-body antialiased`}>
         <AuthProvider>
           {children}
           <Toaster />
