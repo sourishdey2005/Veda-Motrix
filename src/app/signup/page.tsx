@@ -37,7 +37,7 @@ export default function SignupPage() {
         )}
       </div>
 
-       <div className="fixed top-6 left-6 z-10 hidden lg:block">
+       <div className="fixed top-6 right-6 z-10 hidden lg:block">
           <DemoCredentialCard />
       </div>
     </div>
