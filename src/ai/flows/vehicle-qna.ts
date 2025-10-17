@@ -31,6 +31,10 @@ export async function answerQuestion(input: AnswerQuestionInput): Promise<Answer
   return vehicleQnAFlow(input);
 }
 
+const knowledgeBase = `START KNOWLEDGE BASE
+${qnaData.map((item, index) => `Q${index + 1}: ${item.question}\nA${index + 1}: ${item.answer}`).join('\n\n')}
+END KNOWLEDGE BASE`;
+
 const prompt = ai.definePrompt({
   name: 'vehicleQnAPrompt',
   input: {schema: AnswerQuestionInputSchema},
@@ -44,9 +48,7 @@ You must follow these rules:
 4.  Keep your answers concise and professional.
 5.  Consider the conversation history for context, but always prioritize the knowledge base for answers.
 
-START KNOWLEDGE BASE
-${qnaData.map((item, index) => `Q${index + 1}: ${item.question}\nA${index + 1}: ${item.answer}`).join('\n\n')}
-END KNOWLEDGE BASE
+${knowledgeBase}
 
 Conversation History:
 {{#each conversationHistory}}

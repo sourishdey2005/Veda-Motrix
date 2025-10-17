@@ -5,7 +5,7 @@ export const qnaData = [
     { question: "How does the AI work?", answer: "Our AI analyzes real-time sensor data from your vehicle to identify patterns and predict potential failures before they happen, ensuring your safety and saving you money." },
     { question: "Is my data secure?", answer: "Absolutely. We use state-of-the-art security measures to protect your vehicle and personal data. All communication is encrypted." },
     { question: "What vehicles are supported?", answer: "We support a wide range of vehicles from major manufacturers like Hero, Mahindra, Tata, and Maruti Suzuki. You can add your vehicle in the dashboard to check compatibility." },
-    { question: "How do I add a new vehicle?", answer: "On the Manager Dashboard, you can click the 'Add New Vehicle' button to add a new vehicle to your monitored fleet." },
+    { question: "How do I add a new vehicle?", answer: "On the User and Manager Dashboards, you can click the 'Add New Vehicle' button to add a new vehicle to your monitored fleet." },
 
     // Maintenance & Service
     { question: "What does the 'Health Score' mean?", answer: "The Health Score is a percentage from 0 to 100 that represents your vehicle's overall condition based on our AI analysis. A higher score means better health." },
