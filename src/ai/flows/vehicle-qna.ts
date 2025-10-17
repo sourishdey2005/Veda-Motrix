@@ -8,7 +8,7 @@
  * - AnswerQuestionOutput - The return type for the answerQuestion function.
  */
 
-import {z} from 'genkit/zod';
+import { z } from 'zod';
 import { qnaData } from '@/lib/chatbot-qna';
 
 const AnswerQuestionInputSchema = z.object({
