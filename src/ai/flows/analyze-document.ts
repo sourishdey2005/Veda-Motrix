@@ -39,19 +39,6 @@ export async function analyzeDocument(
   return analyzeDocumentFlow(input);
 }
 
-const analyzeDocumentPrompt = ai.definePrompt({
-  name: 'analyzeDocumentPrompt',
-  input: { schema: AnalyzeDocumentInputSchema },
-  output: { schema: AnalyzeDocumentOutputSchema },
-  model: 'gemini-1.5-flash',
-  prompt: `You are an expert data analyst. Analyze the following document based on the user's request. Provide a clear, concise, and well-structured answer in Markdown format.
-
-User Prompt: {{{prompt}}}
-Document: {{media url=documentDataUri}}
-`,
-});
-
-
 const analyzeDocumentFlow = ai.defineFlow(
   {
     name: 'analyzeDocumentFlow',
@@ -59,10 +46,32 @@ const analyzeDocumentFlow = ai.defineFlow(
     outputSchema: AnalyzeDocumentOutputSchema,
   },
   async (input) => {
-    const { output } = await analyzeDocumentPrompt(input);
-    if (!output) {
-      throw new Error("Analysis failed to produce an output.");
+    // This is a simplified approach to handle documents for reliability in the prototype.
+    // It extracts the base64 content and sends it as text to a powerful text model.
+    const b64Data = input.documentDataUri.substring(input.documentDataUri.indexOf(',') + 1);
+    
+    // For a prototype, we will assume the data is text-decodable (like CSV or text-based PDF).
+    // In a real application, you would use a library like pdf-parse or csv-parse.
+    const documentText = Buffer.from(b64Data, 'base64').toString('utf8');
+
+    const result = await ai.generate({
+      model: 'gemini-1.5-flash',
+      prompt: `You are an expert data analyst. Analyze the following document content based on the user's request. Provide a clear, concise, and well-structured answer in Markdown format.
+
+User Prompt: ${input.prompt}
+
+Document Content:
+---
+${documentText.substring(0, 5000)}... 
+---
+`,
+    });
+
+    const analysis = result.text;
+    if (!analysis) {
+        throw new Error("Analysis failed to produce an output.");
     }
-    return output;
+    
+    return { analysis };
   }
 );
