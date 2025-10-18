@@ -165,18 +165,18 @@ export function ManagerDashboard() {
   }));
 
   const [serviceLoad, setServiceLoad] = useState(executiveAnalyticsData.serviceLoad);
-  useEffect(() => {
+    useEffect(() => {
       const interval = setInterval(() => {
-          setServiceLoad(prevData =>
-              prevData.map(item => ({
-                  ...item,
-                  workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
-                  backlog: Math.max(0, item.backlog + Math.floor((Math.random() - 0.45) * 5))
-              }))
-          );
+        setServiceLoad(prevData =>
+          prevData.map(item => ({
+            ...item,
+            workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
+            backlog: Math.max(0, item.backlog + Math.floor((Math.random() - 0.45) * 5))
+          }))
+        );
       }, 3000);
       return () => clearInterval(interval);
-  }, []);
+    }, []);
 
   const globalHealthIndex = useMemo(() => {
     if (simulatedVehicles.length === 0) return 0;
@@ -407,17 +407,17 @@ export function ManagerDashboard() {
             </CardHeader>
             <CardContent>
                 <ChartContainer config={serviceLoadChartConfig} className="h-64">
-                    <BarChart data={serviceLoad} layout="vertical" margin={{ left: 10, right: 30 }}>
-                        <CartesianGrid horizontal={false} />
-                        <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={5} width={80} />
-                        <XAxis type="number" hide />
+                    <BarChart data={serviceLoad}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} />
+                        <YAxis />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                         <RechartsPrimitive.Legend />
-                        <Bar dataKey="workload" stackId="a" fill="var(--color-workload)" radius={[0, 4, 4, 0]}>
-                           <LabelList dataKey="workload" position="insideRight" offset={8} className="fill-white" fontSize={12} />
+                        <Bar dataKey="workload" stackId="a" fill="var(--color-workload)" radius={[4, 4, 0, 0]} >
+                            <LabelList dataKey="workload" position="top" offset={4} className="fill-foreground" fontSize={10} />
                         </Bar>
-                         <Bar dataKey="backlog" stackId="a" fill="var(--color-backlog)" radius={[0, 4, 4, 0]}>
-                            <LabelList dataKey="backlog" position="insideRight" offset={8} className="fill-white" fontSize={12} />
+                         <Bar dataKey="backlog" stackId="a" fill="var(--color-backlog)" radius={[4, 4, 0, 0]}>
+                            <LabelList dataKey="backlog" position="top" offset={4} className="fill-foreground" fontSize={10} />
                         </Bar>
                     </BarChart>
                 </ChartContainer>
@@ -560,3 +560,4 @@ export function ManagerDashboard() {
     
 
     
+
