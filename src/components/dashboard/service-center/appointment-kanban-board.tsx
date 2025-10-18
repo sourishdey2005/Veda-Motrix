@@ -1,8 +1,9 @@
 
+
 "use client"
 
 import { useState, useMemo } from 'react';
-import type { Appointment, AppointmentStatus, Technician } from '@/lib/types';
+import type { Appointment, AppointmentStatus, Technician, DiagnosticTroubleCode } from '@/lib/types';
 import { appointments, vehicles, technicians } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +34,12 @@ const columnStyles = {
   'Awaiting Parts': 'bg-orange-500/10 border-orange-500/50',
   'Completed': 'bg-green-500/10 border-green-500/50',
 };
+
+const DTCBadge = ({ dtc }: { dtc: DiagnosticTroubleCode }) => (
+    <Badge variant={dtc.status === 'Active' ? 'destructive' : 'secondary'} className="text-xs">
+        {dtc.code}: {dtc.description}
+    </Badge>
+);
 
 function AppointmentCard({ appointment, onDragStart, onClick }: { appointment: Appointment; onDragStart: (e: React.DragEvent, id: string) => void; onClick: () => void }) {
   const vehicle = vehicles.find(v => v.id === appointment.vehicleId);
@@ -155,7 +162,7 @@ export function AppointmentKanbanBoard() {
             {columns.map(status => (
                 <KanbanColumn
                 key={status}
-                status={status}
+                status={boardData.filter(app => app.status === status)}
                 appointments={boardData.filter(app => app.status === status)}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
@@ -178,6 +185,14 @@ export function AppointmentKanbanBoard() {
                         <p className="font-medium">Issue Notes</p>
                         <p className="text-muted-foreground">{selectedAppointment.notes}</p>
                     </div>
+                     {vehicleForModal && vehicleForModal.dtcs.length > 0 && (
+                        <div>
+                            <p className="font-medium">Active Diagnostic Codes (DTCs)</p>
+                            <div className="flex flex-wrap gap-2 mt-1">
+                                {vehicleForModal.dtcs.map(dtc => <DTCBadge key={dtc.code} dtc={dtc} />)}
+                            </div>
+                        </div>
+                    )}
                      <div>
                         <p className="font-medium">Technician</p>
                         <Select onValueChange={handleAssignTechnician} defaultValue={technicianForModal?.id}>

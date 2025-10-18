@@ -7,7 +7,7 @@ import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, 
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
 import { executiveAnalyticsData, predictedIssues, vehicles as allVehicles } from "@/lib/data"
-import type { Vehicle } from "@/lib/types"
+import type { Vehicle, DiagnosticTroubleCode } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -24,7 +24,7 @@ import { AddVehicleForm } from "./add-vehicle-form"
 import { AreaChart, Area, PieChart, Pie, Cell, BarChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, RechartsPrimitive } from "@/components/ui/chart"
 import type { ChartConfig } from "@/components/ui/chart"
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "@/components/ui/table"
 
 const maintenanceChartConfig: ChartConfig = {
   predictive: { label: "Predictive", color: "hsl(var(--chart-1))" },
@@ -87,6 +87,12 @@ const healthToPercentage = (status: Vehicle['healthStatus']) => {
         default: return 0;
     }
 }
+
+const DTCBadge = ({ dtc }: { dtc: DiagnosticTroubleCode }) => (
+    <Badge variant={dtc.status === 'Active' ? 'destructive' : 'secondary'} className="text-xs whitespace-nowrap">
+        {dtc.code}
+    </Badge>
+);
 
 export function ManagerDashboard() {
   const { vehicles, addVehicle } = useAuth();
@@ -218,30 +224,47 @@ export function ManagerDashboard() {
                 </div>
                 <p className="font-semibold">Global Health Index</p>
             </div>
-            <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {simulatedVehicles.slice(0, 8).map((vehicle, index) => {
-                    const issue = predictedIssues[index % predictedIssues.length];
-                    return (
-                        <Card key={vehicle.id} className="flex flex-col">
-                            <CardHeader className="pb-2">
-                                <div className="flex justify-between items-center">
-                                    <CardTitle className="text-sm font-medium">{vehicle.make} {vehicle.model}</CardTitle>
-                                    <div className={cn("w-3 h-3 rounded-full", getStatusColor(vehicle.healthStatus))}></div>
-                                </div>
-                                <CardDescription className="text-xs">{vehicle.vin}</CardDescription>
-                            </CardHeader>
-                            <CardContent className="flex-grow flex flex-col justify-end">
-                                <Badge variant={issue.risk === 'High' || issue.risk === 'Critical' ? 'destructive' : 'secondary'} className="mb-2 w-full justify-center text-xs">{issue.risk} Risk: {issue.issue}</Badge>
-                                <Link href={`/dashboard/vehicles/${vehicle.id}`}>
-                                  <Button variant="outline" size="sm" className="w-full">
-                                      <Eye className="mr-2 h-3 w-3"/>
-                                      View Details
-                                  </Button>
-                                </Link>
-                            </CardContent>
-                        </Card>
-                    )
-                })}
+            <div className="md:col-span-3">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Vehicle</TableHead>
+                    <TableHead>VIN</TableHead>
+                    <TableHead>Health</TableHead>
+                    <TableHead>Active DTCs</TableHead>
+                    <TableHead>Next Service</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {simulatedVehicles.slice(0, 5).map((vehicle) => (
+                    <TableRow key={vehicle.id}>
+                      <TableCell className="font-medium">{vehicle.make} {vehicle.model}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{vehicle.vin}</TableCell>
+                      <TableCell>
+                        <div className={cn("font-bold text-sm", getHealthColor(vehicle.healthScore))}>
+                          {vehicle.healthScore.toFixed(0)}%
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          {vehicle.dtcs.filter(d => d.status === 'Active').length > 0
+                            ? vehicle.dtcs.filter(d => d.status === 'Active').map(dtc => <DTCBadge key={dtc.code} dtc={dtc} />)
+                            : <span className="text-xs text-muted-foreground">None</span>}
+                        </div>
+                      </TableCell>
+                       <TableCell className="text-xs text-muted-foreground">{vehicle.nextServiceDue}</TableCell>
+                      <TableCell className="text-right">
+                        <Link href={`/dashboard/vehicles/${vehicle.id}`}>
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
         </CardContent>
       </Card>

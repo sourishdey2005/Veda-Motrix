@@ -1,4 +1,5 @@
 
+
 import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion, CapaItem, WhatIfScenario, DiagnosticTroubleCode } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
@@ -239,11 +240,14 @@ const generatePredictedAlerts = (): PredictedAlert[] => [
 
 const generateDTCs = (): DiagnosticTroubleCode[] => {
   const dtcs: DiagnosticTroubleCode[] = [];
-  if (Math.random() < 0.1) {
+  if (Math.random() < 0.3) { // Increased probability to make it more common
     dtcs.push({ code: 'P0301', description: 'Cylinder 1 Misfire Detected', timestamp: new Date().toISOString(), status: 'Active' });
   }
+  if (Math.random() < 0.4) { // Increased probability
+    dtcs.push({ code: 'U0415', description: 'Invalid Data From ABS Module', timestamp: subDays(new Date(), 5).toISOString(), status: 'Stored' });
+  }
   if (Math.random() < 0.2) {
-    dtcs.push({ code: 'U0415', description: 'Invalid Data Received From Anti-Lock Brake System Control Module', timestamp: subDays(new Date(), 5).toISOString(), status: 'Stored' });
+    dtcs.push({ code: 'P0420', description: 'Catalyst System Efficiency Below Threshold', timestamp: subDays(new Date(), 2).toISOString(), status: 'Active' });
   }
   return dtcs;
 };
