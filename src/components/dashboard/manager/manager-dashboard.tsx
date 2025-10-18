@@ -1,9 +1,8 @@
 
-
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown, ShieldAlert, Legend as LegendIcon } from "lucide-react"
+import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown, ShieldAlert, Legend as LegendIcon, Wrench } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
 import { executiveAnalyticsData, predictedIssues, vehicles as allVehicles } from "@/lib/data"
@@ -21,7 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { AddVehicleForm } from "./add-vehicle-form"
-import { AreaChart, Area, PieChart, Pie, Cell, BarChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts"
+import { AreaChart, Area, PieChart, Pie, Cell, BarChart, CartesianGrid, XAxis, YAxis, Bar, LabelList } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, RechartsPrimitive } from "@/components/ui/chart"
 import type { ChartConfig } from "@/components/ui/chart"
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "@/components/ui/table"
@@ -247,7 +246,7 @@ export function ManagerDashboard() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-wrap">
                           {vehicle.dtcs.filter(d => d.status === 'Active').length > 0
                             ? vehicle.dtcs.filter(d => d.status === 'Active').map(dtc => <DTCBadge key={dtc.code} dtc={dtc} />)
                             : <span className="text-xs text-muted-foreground">None</span>}
@@ -386,14 +385,18 @@ export function ManagerDashboard() {
             </CardHeader>
             <CardContent>
                 <ChartContainer config={serviceLoadChartConfig} className="h-64">
-                    <BarChart data={serviceLoad}>
-                        <CartesianGrid vertical={false} />
-                        <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} />
-                        <YAxis />
-                        <ChartTooltip content={<ChartTooltipContent />} />
+                    <BarChart data={serviceLoad} layout="vertical" margin={{ left: 10, right: 30 }}>
+                        <CartesianGrid horizontal={false} />
+                        <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={5} width={80} />
+                        <XAxis type="number" hide />
+                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                         <RechartsPrimitive.Legend />
-                        <Bar dataKey="workload" fill="var(--color-workload)" radius={4} />
-                        <Bar dataKey="backlog" fill="var(--color-backlog)" radius={4} />
+                        <Bar dataKey="workload" stackId="a" fill="var(--color-workload)" radius={[0, 4, 4, 0]}>
+                           <LabelList dataKey="workload" position="insideRight" offset={8} className="fill-white" fontSize={12} />
+                        </Bar>
+                         <Bar dataKey="backlog" stackId="a" fill="var(--color-backlog)" radius={[0, 4, 4, 0]}>
+                            <LabelList dataKey="backlog" position="insideRight" offset={8} className="fill-white" fontSize={12} />
+                        </Bar>
                     </BarChart>
                 </ChartContainer>
             </CardContent>
@@ -529,4 +532,5 @@ export function ManagerDashboard() {
       </div>
     </div>
   )
-}
+
+    
