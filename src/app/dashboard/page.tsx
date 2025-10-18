@@ -1,3 +1,4 @@
+
 "use client";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
@@ -23,7 +24,7 @@ export default function DashboardRedirectPage() {
             break;
         }
       } else {
-        router.replace('/login/user');
+        router.replace('/login');
       }
     }
   }, [user, loading, router]);
