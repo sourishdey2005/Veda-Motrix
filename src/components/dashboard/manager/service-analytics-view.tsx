@@ -49,7 +49,7 @@ function useSimulatedData<T>(initialData: T[], updater: (item: T) => T) {
             setData(prevData => prevData.map(item => updater(item)));
         }, 3000);
         return () => clearInterval(interval);
-    }, [updater, initialData]);
+    }, [updater]);
 
     return data;
 }
