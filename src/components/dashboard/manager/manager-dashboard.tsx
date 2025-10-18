@@ -51,7 +51,8 @@ const reliabilityChartConfig: ChartConfig = {
   '2024': { label: "2024", color: "hsl(var(--chart-1))" },
 }
 
-function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
+// Custom hook to simulate data updates
+function useSimulatedObjectData<T>(initialData: T, updater: (data: T) => T) {
     const [data, setData] = useState(initialData);
 
     const memoizedUpdater = useCallback(updater, []);
@@ -133,32 +134,50 @@ export function ManagerDashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  const maintenanceRatio = useSimulatedData(executiveAnalyticsData.maintenanceRatio, d => 
-    d.map(m => ({...m, predictive: Math.min(100, m.predictive + 1), reactive: Math.max(0, m.reactive -1)}))
-  );
+  const [maintenanceRatio, setMaintenanceRatio] = useState(executiveAnalyticsData.maintenanceRatio);
+  useEffect(() => {
+    const interval = setInterval(() => {
+        setMaintenanceRatio(d => d.map(m => ({...m, predictive: Math.min(100, m.predictive + 1), reactive: Math.max(0, m.reactive - 1)})));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  const [warrantyCost, setWarrantyCost] = useState(executiveAnalyticsData.warrantyCost);
+  useEffect(() => {
+    const interval = setInterval(() => {
+        setWarrantyCost(d => d.map(w => ({...w, afterAI: Math.max(0, w.afterAI - Math.random() * 5000)})));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const warrantyCost = useSimulatedData(executiveAnalyticsData.warrantyCost, d => 
-    d.map(w => ({...w, afterAI: Math.max(0, w.afterAI - Math.random() * 5000)}))
-  );
-
-  const reliabilityComparison = useSimulatedData(executiveAnalyticsData.fleetReliability, d => 
-    d.map(item => ({...item, '2024': Math.max(0, item['2024'] - (Math.random() * 0.1))}))
-  );
-
-  const aiRoi = useSimulatedData(executiveAnalyticsData.aiRoi, d => ({
+  const [reliabilityComparison, setReliabilityComparison] = useState(executiveAnalyticsData.fleetReliability);
+  useEffect(() => {
+    const interval = setInterval(() => {
+        setReliabilityComparison(d => d.map(item => ({...item, '2024': Math.max(0, item['2024'] - (Math.random() * 0.1))})));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  const aiRoi = useSimulatedObjectData(executiveAnalyticsData.aiRoi, d => ({
     costSavings: d.costSavings + Math.random() * 10000,
     timeSavings: d.timeSavings + Math.random() * 0.1,
     breakdownReduction: d.breakdownReduction + Math.random() * 0.05
   }));
 
-  const serviceLoad = useSimulatedData(executiveAnalyticsData.serviceLoad, (prevData) =>
-    prevData.map(item => ({
-        ...item,
-        workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
-        backlog: Math.max(0, item.backlog + Math.floor((Math.random() - 0.45) * 5))
-    }))
-  );
-  
+  const [serviceLoad, setServiceLoad] = useState(executiveAnalyticsData.serviceLoad);
+  useEffect(() => {
+      const interval = setInterval(() => {
+          setServiceLoad(prevData =>
+              prevData.map(item => ({
+                  ...item,
+                  workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
+                  backlog: Math.max(0, item.backlog + Math.floor((Math.random() - 0.45) * 5))
+              }))
+          );
+      }, 3000);
+      return () => clearInterval(interval);
+  }, []);
+
   const globalHealthIndex = useMemo(() => {
     if (simulatedVehicles.length === 0) return 0;
     const totalHealth = simulatedVehicles.reduce((sum, v) => sum + healthToPercentage(v.healthStatus), 0);
