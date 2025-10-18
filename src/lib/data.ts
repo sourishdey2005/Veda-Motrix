@@ -82,7 +82,6 @@ const heroVehicles = [
     { make: 'Hero', model: 'Passion XPro' },
     { make: 'Hero', model: 'Splendor iSmart' },
     { make: 'Hero', model: 'Glamour Xtec' },
-    { make: 'Hero', model: 'Mavrick 440' },
 ];
 
 export const indianModels = [...mahindraVehicles, ...heroVehicles];

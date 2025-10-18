@@ -5,7 +5,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import type { User, Vehicle, UsageDataPoint, HealthHistoryEntry, PredictedAlert, MaintenanceLog, PredictiveInsight, EnvironmentalData } from '@/lib/types';
-import { users as mockUsers, vehicles as mockVehicles } from '@/lib/data';
+import { users as mockUsers, vehicles as mockVehicles, indianModels } from '@/lib/data';
 import { subDays, format } from 'date-fns';
 
 interface AuthContextType {
@@ -137,15 +137,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       const storedVehicles = localStorage.getItem('veda-vehicles');
       if (storedVehicles) {
-        setVehicles(JSON.parse(storedVehicles));
+        // Quick check to see if the stored data matches the new structure
+        const parsedVehicles = JSON.parse(storedVehicles);
+        if (parsedVehicles.length === indianModels.length) {
+            setVehicles(parsedVehicles);
+        } else {
+             // If not, reset to the new mock data
+            localStorage.setItem('veda-vehicles', JSON.stringify(mockVehicles));
+            setVehicles(mockVehicles);
+        }
       } else {
         localStorage.setItem('veda-vehicles', JSON.stringify(mockVehicles));
+        setVehicles(mockVehicles);
       }
 
     } catch (error) {
       console.error("Failed to parse from localStorage", error);
       localStorage.removeItem('veda-user');
       localStorage.removeItem('veda-vehicles');
+      // Fallback to initial mock data
+      setVehicles(mockVehicles);
+      localStorage.setItem('veda-vehicles', JSON.stringify(mockVehicles));
     } finally {
       setLoading(false);
     }
