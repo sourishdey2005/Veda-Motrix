@@ -181,7 +181,7 @@ export function OrchestrationView() {
             <CardHeader>
                 <div className="flex items-center gap-4">
                      {failedAgent.status === 'failed' && <Siren className="w-8 h-8 text-destructive" />}
-                     {failedágent.status === 'restarting' && <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />}
+                     {failedAgent.status === 'restarting' && <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />}
                      {failedAgent.status === 'ok' && <CheckCircle className="w-8 h-8 text-green-500" />}
                     <div>
                         <CardTitle>Self-Healing Agent Monitor</CardTitle>

@@ -9,6 +9,7 @@ import { DemoCredentialCard } from '@/components/credential-card';
 import type { User } from '@/lib/types';
 import { RoleSelector } from '@/components/role-selector';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 export default function UnifiedLoginPage() {
   const loginBg = PlaceHolderImages.find(img => img.id === 'login-bg');
