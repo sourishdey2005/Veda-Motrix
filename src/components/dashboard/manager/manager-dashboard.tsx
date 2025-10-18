@@ -3,7 +3,7 @@
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown, ShieldAlert, Legend } from "lucide-react"
+import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown, ShieldAlert, Legend as LegendIcon } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
 import { executiveAnalyticsData, predictedIssues, vehicles as allVehicles } from "@/lib/data"
@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog"
 import { AddVehicleForm } from "./add-vehicle-form"
 import { AreaChart, Area, PieChart, Pie, Cell, BarChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { ChartContainer, ChartTooltip, ChartTooltipContent, RechartsPrimitive } from "@/components/ui/chart"
 import type { ChartConfig } from "@/components/ui/chart"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 
@@ -508,5 +508,7 @@ export function ManagerDashboard() {
     </div>
   )
 }
+
+    
 
     
