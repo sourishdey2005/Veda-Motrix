@@ -2,10 +2,10 @@
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle } from "lucide-react"
+import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
-import { allVehicles, executiveAnalyticsData } from "@/lib/data"
+import { allVehicles, executiveAnalyticsData, analyticsData } from "@/lib/data"
 import type { Vehicle } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { AddVehicleForm } from "./add-vehicle-form"
-import { AreaChart, Area, PieChart, Pie, Cell, Legend } from "recharts"
+import { AreaChart, Area, PieChart, Pie, Cell, Legend, BarChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import type { ChartConfig } from "@/components/ui/chart"
 
@@ -35,6 +35,10 @@ const statusChartConfig: ChartConfig = {
   Critical: { label: "Critical", color: "hsl(var(--chart-5))" },
 }
 
+const serviceLoadChartConfig: ChartConfig = {
+  workload: { label: "Workload", color: "hsl(var(--chart-1))" },
+  backlog: { label: "Backlog", color: "hsl(var(--chart-2))" },
+}
 
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
     const [data, setData] = useState(initialData);
@@ -102,6 +106,21 @@ export function ManagerDashboard() {
 
   const maintenanceRatio = useSimulatedData(executiveAnalyticsData.maintenanceRatio, d => 
     d.map(m => ({...m, predictive: Math.min(100, m.predictive + 1), reactive: Math.max(0, m.reactive -1)}))
+  );
+
+  const aiRoi = useSimulatedData(executiveAnalyticsData.aiRoi, d => ({
+    costSavings: d.costSavings + Math.random() * 10000,
+    timeSavings: d.timeSavings + Math.random() * 0.1,
+    breakdownReduction: d.breakdownReduction + Math.random() * 0.05
+  }));
+
+  const serviceLoad = useSimulatedData(
+    analyticsData.serviceLoad,
+    item => ({ 
+        ...item, 
+        workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
+        backlog: Math.max(0, item.backlog + Math.floor((Math.random() - 0.45) * 5))
+    })
   );
   
   const globalHealthIndex = useMemo(() => {
@@ -179,7 +198,7 @@ export function ManagerDashboard() {
                             </CardHeader>
                             <CardContent className="flex-grow flex flex-col justify-end">
                                 <Badge variant={issue.risk === 'High' || issue.risk === 'Critical' ? 'destructive' : 'secondary'} className="mb-2 w-full justify-center text-xs">{issue.risk} Risk: {issue.issue}</Badge>
-                                <Link href={`/dashboard/vehicles/${vehicle.id}`} className="w-full">
+                                <Link href={`/dashboard/vehicles/${vehicle.id}`}>
                                   <Button variant="outline" size="sm" className="w-full">
                                       <Eye className="mr-2 h-3 w-3"/>
                                       View Details
@@ -193,6 +212,36 @@ export function ManagerDashboard() {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>AI ROI Snapshot</CardTitle>
+          <CardDescription>Key performance indicators demonstrating the value of the AI system.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 md:grid-cols-3">
+          <div className="flex items-center gap-4">
+              <DollarSign className="w-10 h-10 text-green-500" />
+              <div>
+                  <p className="text-sm text-muted-foreground">Cost Savings</p>
+                  <p className="text-2xl font-bold">₹{aiRoi.costSavings.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+              </div>
+          </div>
+          <div className="flex items-center gap-4">
+              <TrendingUp className="w-10 h-10 text-blue-500" />
+              <div>
+                  <p className="text-sm text-muted-foreground">Time Savings (Avg. Service)</p>
+                  <p className="text-2xl font-bold">{aiRoi.timeSavings.toFixed(1)}%</p>
+              </div>
+          </div>
+          <div className="flex items-center gap-4">
+              <TrendingDown className="w-10 h-10 text-red-500" />
+              <div>
+                  <p className="text-sm text-muted-foreground">Breakdown Reduction</p>
+                  <p className="text-2xl font-bold">{aiRoi.breakdownReduction.toFixed(1)}%</p>
+              </div>
+          </div>
+        </CardContent>
+      </Card>
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
             <CardHeader>
@@ -239,6 +288,27 @@ export function ManagerDashboard() {
             </CardContent>
         </Card>
       </div>
+
+       <Card>
+        <CardHeader>
+            <CardTitle>Service Center Load Distribution</CardTitle>
+            <CardDescription>Comparison of service center workloads and backlogs.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <ChartContainer config={serviceLoadChartConfig} className="h-64">
+                <BarChart data={serviceLoad}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Legend />
+                    <Bar dataKey="workload" fill="var(--color-workload)" radius={4} />
+                    <Bar dataKey="backlog" fill="var(--color-backlog)" radius={4} />
+                </BarChart>
+            </ChartContainer>
+        </CardContent>
+      </Card>
+
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -295,5 +365,7 @@ export function ManagerDashboard() {
     </div>
   )
 }
+
+    
 
     
