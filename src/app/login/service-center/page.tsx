@@ -12,8 +12,8 @@ export default function ServiceCenterLoginPage() {
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-full max-w-[400px] gap-6 px-4">
           <div className="grid gap-2 text-center">
-            <VedaMotrixLogo className="h-12 w-12 mx-auto" />
-            <h1 className="text-3xl font-bold font-headline">VEDA-MOTRIX AI</h1>
+            <VedaMotrixLogo className="h-12 w-12 mx-auto text-primary" />
+            <h1 className="text-3xl font-bold">VEDA-MOTRIX AI</h1>
             <p className="text-balance text-muted-foreground">
               Knowledge in Motion - Service Center Login
             </p>
@@ -29,7 +29,7 @@ export default function ServiceCenterLoginPage() {
             width="1920"
             height="1080"
             data-ai-hint={loginBg.imageHint}
-            className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+            className="h-full w-full object-cover opacity-10"
           />
         )}
       </div>

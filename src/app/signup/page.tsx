@@ -13,8 +13,8 @@ export default function SignupPage() {
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-full max-w-[400px] gap-6 px-4">
           <div className="grid gap-2 text-center mb-6">
-             <VedaMotrixLogo className="h-12 w-12 mx-auto" />
-            <h1 className="text-3xl font-bold font-headline">Create an Account</h1>
+             <VedaMotrixLogo className="h-12 w-12 mx-auto text-primary" />
+            <h1 className="text-3xl font-bold">Create an Account</h1>
             <p className="text-balance text-muted-foreground">
               Join VEDA-MOTRIX AI and take control of your vehicle's health.
             </p>
@@ -32,7 +32,7 @@ export default function SignupPage() {
             width="1920"
             height="1080"
             data-ai-hint={loginBg.imageHint}
-            className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+            className="h-full w-full object-cover opacity-10"
           />
         )}
       </div>

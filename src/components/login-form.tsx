@@ -102,13 +102,6 @@ export function LoginForm({ userType }: { userType: User['role'] }) {
           Sign up
         </Link>
       </div>
-       <div className="mt-4 text-center text-sm space-x-2">
-         <Link href="/login/user" className="underline">User Login</Link>
-         <span>|</span>
-         <Link href="/login/manager" className="underline">Manager Login</Link>
-         <span>|</span>
-         <Link href="/login/service-center" className="underline">Service Center Login</Link>
-      </div>
     </>
   );
 }
