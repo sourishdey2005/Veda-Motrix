@@ -41,12 +41,12 @@ const riskColors = {
     critical: 'bg-red-500/20 text-red-200 border-red-500/30',
 }
 
-function useSimulatedData<T>(initialData: T[], updater: (item: T) => T) {
+function useSimulatedData<T>(initialData: T[] | undefined, updater: (item: T) => T) {
     const [data, setData] = useState(initialData);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setData(prevData => prevData.map(item => updater(item)));
+            setData(prevData => (prevData || []).map(item => updater(item)));
         }, 3000);
         return () => clearInterval(interval);
     }, [updater]);
@@ -188,13 +188,13 @@ export function AnalyticsDashboard() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Component</TableHead>
-                                {analyticsData.predictiveBreakdown.filter(d => d.component === 'ECU').map(d => (
+                                {analyticsData.predictiveBreakdown && analyticsData.predictiveBreakdown.filter(d => d.component === 'ECU').map(d => (
                                     <TableHead key={d.model} className="text-center">{d.model}</TableHead>
                                 ))}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {useMemo(() => [...new Set(breakdownData.map(d => d.component))], [breakdownData]).map(component => (
+                            {breakdownData && useMemo(() => [...new Set(breakdownData.map(d => d.component))], [breakdownData]).map(component => (
                                 <TableRow key={component}>
                                     <TableCell className="font-medium">{component}</TableCell>
                                     {breakdownData.filter(d => d.component === component).map(d => {
@@ -264,7 +264,7 @@ export function AnalyticsDashboard() {
                         <PieChart>
                             <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
                             <Pie data={failureSeverity} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
-                                {failureSeverity.map((entry, index) => (
+                                {failureSeverity && failureSeverity.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={severityColors[entry.name as keyof typeof severityColors]} />
                                 ))}
                             </Pie>
@@ -289,8 +289,8 @@ export function AnalyticsDashboard() {
                                 <ZAxis type="number" dataKey="vehicleCount" range={[100, 1000]} name="Vehicle Count" />
                                 <ChartTooltip cursor={{ strokeDasharray: '3 3' }} content={<ChartTooltipContent />} />
                                 <Legend />
-                                <Scatter name="Hero" data={ageVsFailure.filter(d => d.make === 'Hero')} fill="var(--color-Hero)" />
-                                <Scatter name="Mahindra" data={ageVsFailure.filter(d => d.make === 'Mahindra')} fill="var(--color-Mahindra)" />
+                                <Scatter name="Hero" data={ageVsFailure?.filter(d => d.make === 'Hero')} fill="var(--color-Hero)" />
+                                <Scatter name="Mahindra" data={ageVsFailure?.filter(d => d.make === 'Mahindra')} fill="var(--color-Mahindra)" />
                             </ScatterChart>
                         </ResponsiveContainer>
                     </ChartContainer>
@@ -327,3 +327,5 @@ export function AnalyticsDashboard() {
     </div>
   )
 }
+
+    
