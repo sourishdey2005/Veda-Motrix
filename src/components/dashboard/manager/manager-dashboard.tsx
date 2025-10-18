@@ -5,7 +5,7 @@ import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/com
 import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
-import { allVehicles } from "@/lib/data"
+import { allVehicles, executiveAnalyticsData } from "@/lib/data"
 import type { Vehicle } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -20,6 +20,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { AddVehicleForm } from "./add-vehicle-form"
+import { AreaChart, Area, PieChart, Pie, Cell, Legend } from "recharts"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import type { ChartConfig } from "@/components/ui/chart"
+
+const maintenanceChartConfig: ChartConfig = {
+  predictive: { label: "Predictive", color: "hsl(var(--chart-1))" },
+  reactive: { label: "Reactive", color: "hsl(var(--chart-5))" },
+}
+
+const statusChartConfig: ChartConfig = {
+  Good: { label: "Good", color: "hsl(var(--chart-2))" },
+  Warning: { label: "Warning", color: "hsl(var(--chart-3))" },
+  Critical: { label: "Critical", color: "hsl(var(--chart-5))" },
+}
+
 
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
     const [data, setData] = useState(initialData);
@@ -65,11 +80,11 @@ export function ManagerDashboard() {
 
   const displayedVehicles = useMemo(() => vehicles.slice(0, 8), [vehicles]);
 
-  const [simulatedVehicles, setSimulatedVehicles] = useState(displayedVehicles);
+  const [simulatedVehicles, setSimulatedVehicles] = useState(vehicles);
 
   useEffect(() => {
-    setSimulatedVehicles(displayedVehicles);
-  }, [displayedVehicles]);
+    setSimulatedVehicles(vehicles);
+  }, [vehicles]);
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -84,11 +99,28 @@ export function ManagerDashboard() {
     }, 4000);
     return () => clearInterval(interval);
   }, []);
+
+  const maintenanceRatio = useSimulatedData(executiveAnalyticsData.maintenanceRatio, d => 
+    d.map(m => ({...m, predictive: Math.min(100, m.predictive + 1), reactive: Math.max(0, m.reactive -1)}))
+  );
   
   const globalHealthIndex = useMemo(() => {
     if (simulatedVehicles.length === 0) return 0;
     const totalHealth = simulatedVehicles.reduce((sum, v) => sum + healthToPercentage(v.healthStatus), 0);
     return totalHealth / simulatedVehicles.length;
+  }, [simulatedVehicles]);
+
+  const statusDistribution = useMemo(() => {
+    const counts = simulatedVehicles.reduce((acc, v) => {
+        acc[v.healthStatus] = (acc[v.healthStatus] || 0) + 1;
+        return acc;
+    }, {} as Record<Vehicle['healthStatus'], number>);
+    
+    return [
+      { name: 'Good', value: counts['Good'] || 0, fill: statusChartConfig.Good.color },
+      { name: 'Warning', value: counts['Warning'] || 0, fill: statusChartConfig.Warning.color },
+      { name: 'Critical', value: counts['Critical'] || 0, fill: statusChartConfig.Critical.color },
+    ];
   }, [simulatedVehicles]);
 
 
@@ -134,7 +166,7 @@ export function ManagerDashboard() {
                 <p className="font-semibold">Global Health Index</p>
             </div>
             <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {simulatedVehicles.map((vehicle, index) => {
+                {simulatedVehicles.slice(0, 8).map((vehicle, index) => {
                     const issue = predictedIssues[index % predictedIssues.length];
                     return (
                         <Card key={vehicle.id} className="flex flex-col">
@@ -147,11 +179,13 @@ export function ManagerDashboard() {
                             </CardHeader>
                             <CardContent className="flex-grow flex flex-col justify-end">
                                 <Badge variant={issue.risk === 'High' || issue.risk === 'Critical' ? 'destructive' : 'secondary'} className="mb-2 w-full justify-center text-xs">{issue.risk} Risk: {issue.issue}</Badge>
-                                <Link href={`/dashboard/vehicles/${vehicle.id}`} className="w-full">
+                                <Link href={`/dashboard/vehicles/${vehicle.id}`} legacyBehavior>
+                                  <a className="w-full">
                                     <Button variant="outline" size="sm" className="w-full">
                                         <Eye className="mr-2 h-3 w-3"/>
                                         View Details
                                     </Button>
+                                  </a>
                                 </Link>
                             </CardContent>
                         </Card>
@@ -160,6 +194,53 @@ export function ManagerDashboard() {
             </div>
         </CardContent>
       </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+            <CardHeader>
+                <CardTitle>Fleet Status Distribution</CardTitle>
+                <CardDescription>Live breakdown of vehicle health across the fleet.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <ChartContainer config={statusChartConfig} className="h-64">
+                    <PieChart>
+                         <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+                         <Pie data={statusDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                            {statusDistribution.map((entry) => (
+                                <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                            ))}
+                         </Pie>
+                         <Legend />
+                    </PieChart>
+                 </ChartContainer>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader>
+                <CardTitle>Predictive vs. Reactive Maintenance</CardTitle>
+                <CardDescription>Shows the shift towards predictive maintenance over time.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={maintenanceChartConfig} className="h-64">
+                    <AreaChart data={maintenanceRatio} stackOffset="expand" margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <defs>
+                            <linearGradient id="fillPredictive" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="var(--color-predictive)" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="var(--color-predictive)" stopOpacity={0.1}/>
+                            </linearGradient>
+                             <linearGradient id="fillReactive" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="var(--color-reactive)" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="var(--color-reactive)" stopOpacity={0.1}/>
+                            </linearGradient>
+                        </defs>
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Area type="monotone" dataKey="predictive" stackId="1" stroke="var(--color-predictive)" fill="url(#fillPredictive)" />
+                        <Area type="monotone" dataKey="reactive" stackId="1" stroke="var(--color-reactive)" fill="url(#fillReactive)" />
+                    </AreaChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+      </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -178,8 +259,8 @@ export function ManagerDashboard() {
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">2 Warnings, 1 Critical</p>
+            <div className="text-2xl font-bold">{simulatedVehicles.filter(v => v.healthStatus === 'Critical').length + simulatedVehicles.filter(v => v.healthStatus === 'Warning').length}</div>
+            <p className="text-xs text-muted-foreground">{simulatedVehicles.filter(v => v.healthStatus === 'Warning').length} Warnings, {simulatedVehicles.filter(v => v.healthStatus === 'Critical').length} Critical</p>
             </CardContent>
         </Card>
         <Card>
