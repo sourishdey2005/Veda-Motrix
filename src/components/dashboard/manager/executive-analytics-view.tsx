@@ -374,7 +374,7 @@ export function ExecutiveAnalyticsView() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {rul.map(item => (
+                            {rul.slice(0, 5).map(item => (
                                 <TableRow key={item.model}>
                                     <TableCell className="font-medium">{item.model}</TableCell>
                                     <TableCell className="text-right font-mono">{item.rul.toFixed(2)}</TableCell>
@@ -388,3 +388,5 @@ export function ExecutiveAnalyticsView() {
     </div>
   )
 }
+
+    

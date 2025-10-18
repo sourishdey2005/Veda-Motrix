@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -19,6 +20,9 @@ const chartConfig: ChartConfig = {
   backlog: { label: "Backlog", color: "hsl(var(--chart-2))" },
   Hero: { label: "Hero", color: "hsl(var(--chart-1))" },
   Mahindra: { label: "Mahindra", color: "hsl(var(--chart-2))" },
+  Tata: { label: "Tata", color: "hsl(var(--chart-3))" },
+  'Maruti Suzuki': { label: "Maruti Suzuki", color: "hsl(var(--chart-4))" },
+  Bajaj: { label: "Bajaj", color: "hsl(var(--chart-5))" },
   count: { label: "Count", color: "hsl(var(--chart-1))" },
   Clutch: { label: "Clutch", color: "hsl(var(--chart-1))" },
   "Brake Pad": { label: "Brake Pad", color: "hsl(var(--chart-2))" },
@@ -186,7 +190,7 @@ export function AnalyticsDashboard() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Component</TableHead>
-                                {breakdownData.filter(d => d.component === 'Engine').map(d => (
+                                {analyticsData.predictiveBreakdown.filter(d => d.component === 'ECU').map(d => (
                                     <TableHead key={d.model} className="text-center">{d.model}</TableHead>
                                 ))}
                             </TableRow>
@@ -221,7 +225,7 @@ export function AnalyticsDashboard() {
                     <ChartContainer config={chartConfig} className="h-64">
                         <BarChart data={maintenanceForecast} layout="vertical" margin={{left: 10, right: 30}}>
                             <CartesianGrid horizontal={false} />
-                            <YAxis dataKey="city" type="category" tickLine={false} axisLine={false} tickMargin={10} />
+                            <YAxis dataKey="city" type="category" tickLine={false} axisLine={false} tickMargin={10} width={80} />
                             <XAxis dataKey="demand" type="number" />
                             <ChartTooltip content={<ChartTooltipContent />} />
                             <Bar dataKey="demand" fill="var(--color-demand)" radius={4}>
@@ -289,6 +293,9 @@ export function AnalyticsDashboard() {
                                 <Legend />
                                 <Scatter name="Hero" data={ageVsFailure.filter(d => d.make === 'Hero')} fill="var(--color-Hero)" />
                                 <Scatter name="Mahindra" data={ageVsFailure.filter(d => d.make === 'Mahindra')} fill="var(--color-Mahindra)" />
+                                <Scatter name="Tata" data={ageVsFailure.filter(d => d.make === 'Tata')} fill="var(--color-Tata)" />
+                                <Scatter name="Maruti Suzuki" data={ageVsFailure.filter(d => d.make === 'Maruti Suzuki')} fill="var(--color-Maruti Suzuki)" />
+                                <Scatter name="Bajaj" data={ageVsFailure.filter(d => d.make === 'Bajaj')} fill="var(--color-Bajaj)" />
                             </ScatterChart>
                         </ResponsiveContainer>
                     </ChartContainer>
@@ -325,3 +332,5 @@ export function AnalyticsDashboard() {
     </div>
   )
 }
+
+    

@@ -1,8 +1,4 @@
 
-
-
-
-
 import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion, CapaItem, WhatIfScenario } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
@@ -31,9 +27,10 @@ const vehicleImg1 = PlaceHolderImages.find(img => img.id === 'vehicle-1');
 const vehicleImg2 = PlaceHolderImages.find(img => img.id === 'vehicle-2');
 const vehicleImg3 = PlaceHolderImages.find(img => img.id === 'vehicle-3');
 
-export const indianMakes = ['Hero', 'Mahindra', 'Tata', 'Maruti Suzuki'];
-export const indianModels = ['Splendor', 'Xtreme', 'XUV700', 'Scorpio', 'Pleasure+', 'Thar', 'Passion', 'Jawa', 'Karizma', 'Bolero', 'Nexon', 'Harrier', 'Swift', 'Baleno'];
-export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal', 'Visakhapatnam', 'Patna', 'Vadodara', 'Ghaziabad', 'Ludhiana', 'Agra', 'Nashik'];
+export const indianMakes = ['Hero', 'Mahindra', 'Tata', 'Maruti Suzuki', 'Bajaj', 'TVS', 'Royal Enfield'];
+export const indianModels = ['Splendor', 'Xtreme', 'XUV700', 'Scorpio', 'Pleasure+', 'Thar', 'Passion', 'Jawa', 'Karizma', 'Bolero', 'Nexon', 'Harrier', 'Swift', 'Baleno', 'Pulsar', 'Apache', 'Classic 350'];
+export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal', 'Visakhapatnam', 'Patna', 'Vadodara', 'Ghaziabad', 'Ludhiana', 'Agra', 'Nashik', 'Faridabad', 'Meerut', 'Rajkot', 'Varanasi', 'Srinagar', 'Aurangabad', 'Dhanbad', 'Amritsar', 'Allahabad', 'Ranchi', 'Howrah', 'Coimbatore', 'Jabalpur', 'Gwalior', 'Vijayawada', 'Jodhpur', 'Madurai', 'Raipur', 'Kota', 'Guwahati', 'Chandigarh', 'Noida'];
+
 
 export const serviceCenters: ServiceCenter[] = [
   { id: 'SC1', name: 'VedaMotrix Andheri', city: 'Mumbai', lat: 19.119, lng: 72.847, capacity: 15, availableSlots: ['09:30', '11:30', '14:30'], rating: 4.8, avgCompletionTime: 2.5, workload: 80, delayIndex: 1.1 },
@@ -87,6 +84,10 @@ export const technicians: Technician[] = [
     { id: 'T4', name: 'Anil Mehta', specialty: 'Suspension', serviceCenterId: 'SC2', performance: generateTechnicianPerformance() },
     { id: 'T5', name: 'Prakash Rao', specialty: 'General', serviceCenterId: 'SC2', performance: generateTechnicianPerformance() },
     { id: 'T6', name: 'Deepak Verma', specialty: 'Engine', serviceCenterId: 'SC3', performance: generateTechnicianPerformance() },
+    { id: 'T7', name: 'Arun Gupta', specialty: 'Brakes', serviceCenterId: 'SC1', performance: generateTechnicianPerformance() },
+    { id: 'T8', name: 'Manoj Patel', specialty: 'General', serviceCenterId: 'SC3', performance: generateTechnicianPerformance() },
+    { id: 'T9', name: 'Ravi Reddy', specialty: 'Electronics', serviceCenterId: 'SC4', performance: generateTechnicianPerformance() },
+    { id: 'T10', name: 'Sunil Yadav', specialty: 'Engine', serviceCenterId: 'SC4', performance: generateTechnicianPerformance() },
 ];
 
 const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => {
@@ -182,7 +183,7 @@ const generateEnvironmentalData = (): EnvironmentalData => ({
 });
 
 
-export const vehicles: Vehicle[] = Array.from({ length: 10 }, (_, i) => {
+export const vehicles: Vehicle[] = Array.from({ length: 25 }, (_, i) => {
   const healthStatus = i % 3 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
   const healthScore = healthStatus === 'Critical' ? 30 + Math.random() * 20 : healthStatus === 'Warning' ? 60 + Math.random() * 20 : 85 + Math.random() * 15;
   const selectedImg = i % 3 === 0 ? vehicleImg1 : i % 2 === 0 ? vehicleImg2 : vehicleImg3;
@@ -232,6 +233,10 @@ export const appointments: Appointment[] = [
   { id: 'A4', vehicleId: 'V1004', serviceCenterId: 'SC1', date: '2024-08-04', time: '11:00', status: 'Pending', notes: 'Annual service and check-up.', technicianId: 'T3', estimatedTime: 4, stageProgress: 0 },
   { id: 'A5', vehicleId: 'V1005', serviceCenterId: 'SC1', date: '2024-08-05', time: '15:00', status: 'In Service', notes: 'Replace battery as per predictive alert.', technicianId: 'T2', estimatedTime: 1, stageProgress: 80 },
   { id: 'A6', vehicleId: 'V1006', serviceCenterId: 'SC1', date: '2024-08-06', time: '10:30', status: 'Awaiting Parts', notes: 'ABS module failure. Part ordered.', technicianId: 'T2', estimatedTime: 6, stageProgress: 40 },
+  { id: 'A7', vehicleId: 'V1007', serviceCenterId: 'SC2', date: '2024-08-02', time: '13:00', status: 'In Service', notes: 'Electrical fault diagnosis.', technicianId: 'T4', estimatedTime: 3, stageProgress: 50 },
+  { id: 'A8', vehicleId: 'V1008', serviceCenterId: 'SC2', date: '2024-08-03', time: '09:00', status: 'Pending', notes: 'Transmission fluid check.', estimatedTime: 2, stageProgress: 0 },
+  { id: 'A9', vehicleId: 'V1009', serviceCenterId: 'SC3', date: '2024-08-02', time: '11:00', status: 'Completed', notes: 'Tire rotation and alignment.', technicianId: 'T6', estimatedTime: 1.5, stageProgress: 100 },
+  { id: 'A10', vehicleId: 'V1010', serviceCenterId: 'SC3', date: '2024-08-04', time: '14:00', status: 'Pending', notes: 'AC compressor check.', technicianId: 'T8', estimatedTime: 2, stageProgress: 0 },
 ];
 
 export const uebaEvents: UebaEvent[] = [
@@ -328,6 +333,7 @@ export const notifications: Notification[] = [
   { id: 'N2', title: 'Agent Anomaly Detected', description: 'Scheduling Agent attempted unauthorized access. Action was blocked.', timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString() },
   { id: 'N3', title: 'New Feedback Received', description: 'A 5-star review was submitted for service at Mumbai SC.', timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString() },
   { id: 'N4', title: 'Parts Shortage Warning', description: 'Low stock for "Brake Pads - XUV700". Consider reordering.', timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString() },
+  { id: 'N5', title: 'High Workload Alert', description: 'Bengaluru SC workload is at 92%. Consider load balancing.', timestamp: new Date(Date.now() - 1000 * 60 * 180).toISOString() },
 ];
 
 export const liveQueueData: LiveQueueVehicle[] = [
@@ -354,7 +360,7 @@ export const analyticsData = {
       probability: Math.random()
     }))
   ),
-  maintenanceForecast: indianCities.map(city => ({
+  maintenanceForecast: indianCities.slice(0, 10).map(city => ({
     city,
     demand: 50 + Math.floor(Math.random() * 100),
   })),
@@ -362,6 +368,8 @@ export const analyticsData = {
     { name: 'Mumbai SC', workload: 120, backlog: 15 },
     { name: 'Delhi SC', workload: 90, backlog: 25 },
     { name: 'Bengaluru SC', workload: 110, backlog: 10 },
+    { name: 'Pune SC', workload: 85, backlog: 5 },
+    { name: 'Chennai SC', workload: 70, backlog: 8 },
   ],
   ageVsFailureRate: indianMakes.flatMap(make => 
     Array.from({length: 5}, (_, i) => ({
@@ -478,7 +486,7 @@ export const executiveAnalyticsData = {
     timeSavings: 25,
     breakdownReduction: 18,
   },
-  regionalPerformance: indianCities.map(city => ({
+  regionalPerformance: indianCities.slice(0, 8).map(city => ({
     city,
     efficiency: 75 + Math.random() * 25,
     uptime: 90 + Math.random() * 10,
@@ -564,7 +572,7 @@ export const customerExperienceData = {
   feedbackToActionRatio: 45,
   retentionProbability: 85,
   networkUtilization: 88,
-  responseTime: indianCities.map(city => ({
+  responseTime: indianCities.slice(0, 5).map(city => ({
     city,
     predictionToAppointment: Math.random() * 3 + 1, // 1-4 days
     appointmentToRepair: Math.random() * 2 + 0.5, // 0.5-2.5 days
@@ -721,3 +729,5 @@ export const loadBalancingSuggestions: LoadBalancingSuggestion[] = [
     { id: 'LB1', fromCenter: 'VedaMotrix Koramangala', toCenter: 'VedaMotrix Whitefield', reason: 'High workload (92%) at Koramangala.', etaImpact: -18, status: 'suggested' },
     { id: 'LB2', fromCenter: 'VedaMotrix Andheri', toCenter: 'VedaMotrix Thane', reason: 'Andheri at capacity; Thane has 3 available bays.', etaImpact: -12, status: 'suggested' },
 ];
+
+    
