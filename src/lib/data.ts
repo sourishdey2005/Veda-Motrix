@@ -1,5 +1,6 @@
 
 
+
 import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion, CapaItem, WhatIfScenario } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
@@ -83,7 +84,7 @@ const heroVehicles = [
     { make: 'Hero', model: 'Passion XPro' },
     { make: 'Hero', model: 'Splendor iSmart' },
     { make: 'Hero', model: 'Glamour Xtec' },
-    { make: 'Hero', model: 'Mavrick 440'}, // One extra to make it 25
+    { make: 'Hero', model: 'Mavrick 440'},
 ];
 
 export const indianModels = [...mahindraVehicles, ...heroVehicles];
@@ -258,13 +259,11 @@ export const predictedIssues = [
   { issue: 'Coolant Level Low', risk: 'Medium' },
 ];
 
-const newVehicleData = [...mahindraVehicles, ...heroVehicles];
-
 export const vehicles: Vehicle[] = Array.from({ length: 50 }, (_, i) => {
   const healthStatus = i % 5 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
   const healthScore = healthStatus === 'Critical' ? 30 + Math.random() * 20 : healthStatus === 'Warning' ? 60 + Math.random() * 20 : 85 + Math.random() * 15;
   const selectedImg = i % 3 === 0 ? vehicleImg1 : i % 2 === 0 ? vehicleImg2 : vehicleImg3;
-  const vehicleInfo = newVehicleData[i % newVehicleData.length];
+  const vehicleInfo = indianModels[i % indianModels.length];
 
   return {
     id: `V${1001 + i}`,

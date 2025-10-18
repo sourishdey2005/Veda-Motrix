@@ -20,9 +20,6 @@ const chartConfig: ChartConfig = {
   backlog: { label: "Backlog", color: "hsl(var(--chart-2))" },
   Hero: { label: "Hero", color: "hsl(var(--chart-1))" },
   Mahindra: { label: "Mahindra", color: "hsl(var(--chart-2))" },
-  Tata: { label: "Tata", color: "hsl(var(--chart-3))" },
-  'Maruti Suzuki': { label: "Maruti Suzuki", color: "hsl(var(--chart-4))" },
-  Bajaj: { label: "Bajaj", color: "hsl(var(--chart-5))" },
   count: { label: "Count", color: "hsl(var(--chart-1))" },
   Clutch: { label: "Clutch", color: "hsl(var(--chart-1))" },
   "Brake Pad": { label: "Brake Pad", color: "hsl(var(--chart-2))" },
@@ -293,9 +290,6 @@ export function AnalyticsDashboard() {
                                 <Legend />
                                 <Scatter name="Hero" data={ageVsFailure.filter(d => d.make === 'Hero')} fill="var(--color-Hero)" />
                                 <Scatter name="Mahindra" data={ageVsFailure.filter(d => d.make === 'Mahindra')} fill="var(--color-Mahindra)" />
-                                <Scatter name="Tata" data={ageVsFailure.filter(d => d.make === 'Tata')} fill="var(--color-Tata)" />
-                                <Scatter name="Maruti Suzuki" data={ageVsFailure.filter(d => d.make === 'Maruti Suzuki')} fill="var(--color-Maruti Suzuki)" />
-                                <Scatter name="Bajaj" data={ageVsFailure.filter(d => d.make === 'Bajaj')} fill="var(--color-Bajaj)" />
                             </ScatterChart>
                         </ResponsiveContainer>
                     </ChartContainer>
