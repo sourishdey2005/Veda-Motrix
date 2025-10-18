@@ -11,7 +11,6 @@
 
 import { z } from 'zod';
 import { openai } from '@/ai/client';
-import pdf from 'pdf-parse';
 
 const AnalyzeDocumentInputSchema = z.object({
   documentDataUri: z
@@ -36,22 +35,16 @@ export type AnalyzeDocumentOutput = z.infer<
 
 async function getDocumentText(dataUri: string): Promise<string> {
     const parts = dataUri.split(',');
-    const meta = parts[0];
     const base64Content = parts[1];
 
-    if (!base64Content || !meta) {
+    if (!base64Content) {
         throw new Error('Invalid document data URI format.');
     }
     
+    // Decode the base64 content into a string.
+    // This will work for text-based files but may produce garbled text for binary files like PDF.
     const buffer = Buffer.from(base64Content, 'base64');
-
-    if (meta.includes('application/pdf')) {
-        const pdfData = await pdf(buffer);
-        return pdfData.text;
-    } else {
-        // For CSV, TXT, etc.
-        return buffer.toString('utf-8');
-    }
+    return buffer.toString('utf-8');
 }
 
 
@@ -62,6 +55,8 @@ export async function analyzeDocument(
     const documentText = await getDocumentText(input.documentDataUri);
     
     const systemPrompt = `You are a professional document analysis AI. Analyze the following document text based on the user's request. Provide a concise, well-structured analysis in Markdown format.
+
+If the document text appears to be garbled or unreadable, please state that you were unable to parse the content of the file because it may be a binary format that you cannot read.
 
 Use headings, bold text, and bullet points to structure your response for clarity.
 
