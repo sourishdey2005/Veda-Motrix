@@ -41,7 +41,7 @@ const riskColors = {
     critical: 'bg-red-500/20 text-red-200 border-red-500/30',
 }
 
-function useSimulatedData<T>(initialData: T[], updater: (item: T) => T) {
+function useSimulatedData<T>(initialData: T[] | undefined, updater: (item: T) => T) {
     const [data, setData] = useState(initialData);
 
     useEffect(() => {
