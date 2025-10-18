@@ -3,43 +3,49 @@
     {
       "id": "login-bg",
       "description": "Abstract background for the login page",
-      "imageUrl": "https://picsum.photos/seed/loginbg/1920/1080",
+      "imageUrl": "https://images.unsplash.com/photo-1568952433726-3896e3881c65?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxhYnN0cmFjdCUyMHRlY2hub2xvZ3l8ZW58MHx8fHwxNzYwNzMwOTE3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "abstract technology"
+    },
+    {
+      "id": "signup-bg",
+      "description": "Lush green grass with sunlight",
+      "imageUrl": "https://images.unsplash.com/photo-1724549038835-73cabdda1368?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxncmFzcyUyMHN1bmxpZ2h0fGVufDB8fHx8MTc2MDgxNTYwM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "grass sunlight"
     },
     {
       "id": "avatar-1",
       "description": "User avatar 1",
-      "imageUrl": "https://picsum.photos/seed/avatar1/100/100",
+      "imageUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjA3MzA4MTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person portrait"
     },
     {
       "id": "avatar-2",
       "description": "User avatar 2",
-      "imageUrl": "https://picsum.photos/seed/avatar2/100/100",
+      "imageUrl": "https://images.unsplash.com/photo-1580489944761-15a19d654956?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2MDczMDk0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "woman portrait"
     },
     {
       "id": "avatar-3",
       "description": "User avatar 3",
-      "imageUrl": "https://picsum.photos/seed/avatar3/100/100",
+      "imageUrl": "https://images.unsplash.com/photo-1636377985931-898218afd306?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjA3MzA5NDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "man portrait"
     },
     {
       "id": "vehicle-1",
       "description": "Sedan vehicle image",
-      "imageUrl": "https://picsum.photos/seed/sedan1/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1616932312541-3dbdd74f6c50?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtb2Rlcm4lMjBjYXJ8ZW58MHx8fHwxNzYwNzUxMTY3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "modern car"
     },
     {
       "id": "vehicle-2",
       "description": "SUV vehicle image",
-      "imageUrl": "https://picsum.photos/seed/suv1/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1760551000177-2c5e1c8ee052?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsdXh1cnklMjBzdXZ8ZW58MHx8fHwxNzYwNzg0MDMxfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "luxury suv"
     },
     {
       "id": "vehicle-3",
       "description": "Sports car image",
-      "imageUrl": "https://picsum.photos/seed/sportscar1/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1723847026152-1c0238504665?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cmVkJTIwc3BvcnRzY2FyfGVufDB8fHx8MTc2MDc1MjE0OXww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "red sportscar"
     }
   ]

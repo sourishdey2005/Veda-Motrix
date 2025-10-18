@@ -83,7 +83,7 @@ export function SignupForm() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Or sign up with
+              Or continue with
             </span>
           </div>
         </div>
@@ -97,12 +97,6 @@ export function SignupForm() {
             Apple
           </Button>
         </div>
-      </div>
-      <div className="mt-4 text-center text-sm">
-        Already have an account?{' '}
-        <Link href="/" className="underline">
-          Login
-        </Link>
       </div>
     </>
   );

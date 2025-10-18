@@ -1,12 +1,13 @@
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { SignupForm } from '@/components/signup-form';
 import { VedaMotrixLogo } from '@/components/icons';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { DemoCredentialCard } from '@/components/credential-card';
 
 export default function SignupPage() {
-  const loginBg = PlaceHolderImages.find(img => img.id === 'login-bg');
+  const signupBg = PlaceHolderImages.find(img => img.id === 'signup-bg');
   
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
@@ -22,23 +23,27 @@ export default function SignupPage() {
 
           <SignupForm />
 
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{' '}
+            <Link href="/login/user" className="underline">
+              Login
+            </Link>
+          </div>
         </div>
       </div>
-      <div className="hidden bg-muted lg:block">
-        {loginBg && (
+      <div className="hidden bg-muted lg:block relative">
+        {signupBg && (
            <Image
-            src={loginBg.imageUrl}
-            alt="Abstract AI background"
-            width="1920"
-            height="1080"
-            data-ai-hint={loginBg.imageHint}
-            className="h-full w-full object-cover opacity-10"
+            src={signupBg.imageUrl}
+            alt="Lush green grass with sunlight"
+            fill
+            data-ai-hint={signupBg.imageHint}
+            className="h-full w-full object-cover"
           />
         )}
-      </div>
-
-       <div className="fixed top-6 right-6 z-10 hidden lg:block">
+         <div className="absolute top-6 right-6 z-10">
           <DemoCredentialCard />
+        </div>
       </div>
     </div>
   );
