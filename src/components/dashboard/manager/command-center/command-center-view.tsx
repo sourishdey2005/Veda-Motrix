@@ -88,8 +88,8 @@ export function CommandCenterView() {
               return (
                 <Tooltip key={center.id}>
                   <TooltipTrigger asChild>
-                    <Link href="/dashboard/service-center/analytics" legacyBehavior>
-                        <a
+                    <Link
+                        href="/dashboard/service-center/analytics"
                         className="absolute flex items-center justify-center w-24 h-24 rounded-full transition-all duration-500 hover:scale-110 focus:scale-110 focus:outline-none focus:ring-2 focus:ring-primary"
                         style={{ top: center.position?.top, left: center.position?.left, transform: 'translate(-50%, -50%)' }}
                         >
@@ -98,7 +98,6 @@ export function CommandCenterView() {
                             <p className="text-xs font-bold truncate px-2">{center.name}</p>
                             <p className="text-[10px] text-muted-foreground">{center.city}</p>
                         </div>
-                        </a>
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -146,4 +145,3 @@ const bgGridPattern = `
 // or handled by a pre-existing setup. For this response, I'll add a style tag.
 const StyleInjector = () => <style>{bgGridPattern}</style>;
 CommandCenterView.StyleInjector = StyleInjector;
-
