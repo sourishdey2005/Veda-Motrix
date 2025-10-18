@@ -5,6 +5,9 @@ import * as RechartsPrimitive from "recharts"
 
 import { cn } from "@/lib/utils"
 
+// Export the recharts primitive.
+export { RechartsPrimitive }
+
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const
 
@@ -363,4 +366,3 @@ export {
   ChartLegendContent,
   ChartStyle,
 }
-export const RechartsPrimitive = RechartsPrimitive;
