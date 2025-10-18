@@ -143,14 +143,19 @@ export function ManagerDashboard() {
     breakdownReduction: d.breakdownReduction + Math.random() * 0.05
   }));
 
-  const serviceLoadUpdater = useCallback((data: typeof executiveAnalyticsData.serviceLoad) => 
-    data.map(item => ({ 
-        ...item, 
-        workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
-        backlog: Math.max(0, item.backlog + Math.floor((Math.random() - 0.45) * 5))
-    })), []);
-
-  const serviceLoad = useSimulatedData(executiveAnalyticsData.serviceLoad, serviceLoadUpdater);
+  const [serviceLoad, setServiceLoad] = useState(executiveAnalyticsData.serviceLoad);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setServiceLoad(prevData =>
+                prevData.map(item => ({
+                    ...item,
+                    workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
+                    backlog: Math.max(0, item.backlog + Math.floor((Math.random() - 0.45) * 5))
+                }))
+            );
+        }, 3000);
+        return () => clearInterval(interval);
+    }, []);
   
   const globalHealthIndex = useMemo(() => {
     if (simulatedVehicles.length === 0) return 0;
