@@ -11,6 +11,7 @@
 
 import { z } from 'zod';
 import { openai } from '@/ai/client';
+import pdf from 'pdf-parse';
 
 const AnalyzeDocumentInputSchema = z.object({
   documentDataUri: z
@@ -33,40 +34,61 @@ export type AnalyzeDocumentOutput = z.infer<
   typeof AnalyzeDocumentOutputSchema
 >;
 
+async function getDocumentText(dataUri: string): Promise<string> {
+    const parts = dataUri.split(',');
+    const meta = parts[0];
+    const base64Content = parts[1];
+
+    if (!base64Content || !meta) {
+        throw new Error('Invalid document data URI format.');
+    }
+    
+    const buffer = Buffer.from(base64Content, 'base64');
+
+    if (meta.includes('application/pdf')) {
+        const pdfData = await pdf(buffer);
+        return pdfData.text;
+    } else {
+        // For CSV, TXT, etc.
+        return buffer.toString('utf-8');
+    }
+}
+
+
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
 ): Promise<AnalyzeDocumentOutput> {
-  // Extract the Base64 content from the data URI
-  const base64Content = input.documentDataUri.split(',')[1];
-  if (!base64Content) {
-    throw new Error('Invalid document data URI: No Base64 content found.');
-  }
-
-  // Decode the Base64 content to a string
-  const documentText = Buffer.from(base64Content, 'base64').toString('utf-8');
-  
-  const systemPrompt = `You are a professional document analysis AI. Analyze the following document text based on the user's request. Provide a concise, well-structured analysis in Markdown format.
+  try {
+    const documentText = await getDocumentText(input.documentDataUri);
+    
+    const systemPrompt = `You are a professional document analysis AI. Analyze the following document text based on the user's request. Provide a concise, well-structured analysis in Markdown format.
 
 Use headings, bold text, and bullet points to structure your response for clarity.
 
-Document Text:
+**Original User Prompt**: ${input.prompt}
 ---
-${documentText}
+**Document Text**:
+${documentText.substring(0, 30000)}
 ---
 `;
 
-  const completion = await openai.chat.completions.create({
-    model: 'openai/gpt-4o',
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: input.prompt },
-    ],
-  });
+    const completion = await openai.chat.completions.create({
+      model: 'openai/gpt-4o',
+      messages: [
+        { role: 'user', content: systemPrompt },
+      ],
+    });
 
-  const analysis = completion.choices[0].message?.content;
-  if (!analysis) {
-    throw new Error('AI failed to generate an analysis.');
+    const analysis = completion.choices[0].message?.content;
+    if (!analysis) {
+      throw new Error('AI failed to generate an analysis.');
+    }
+
+    return { analysis };
+
+  } catch (error: any) {
+      console.error("[Document Analysis Error]", error);
+      // Re-throw a more user-friendly error
+      throw new Error(`Failed to process document: ${error.message}`);
   }
-
-  return { analysis };
 }
