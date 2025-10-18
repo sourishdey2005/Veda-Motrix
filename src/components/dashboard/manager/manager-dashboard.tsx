@@ -53,13 +53,16 @@ const reliabilityChartConfig: ChartConfig = {
 
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
     const [data, setData] = useState(initialData);
+
     const memoizedUpdater = useCallback(updater, []);
+
     useEffect(() => {
         const interval = setInterval(() => {
             setData(prevData => memoizedUpdater(prevData));
         }, 3000);
         return () => clearInterval(interval);
     }, [memoizedUpdater]);
+
     return data;
 }
 
@@ -532,6 +535,8 @@ export function ManagerDashboard() {
       </div>
     </div>
   )
+
+    
 
     
 
