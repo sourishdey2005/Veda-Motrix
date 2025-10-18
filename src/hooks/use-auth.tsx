@@ -150,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (storedVehicles) {
         // Quick check to see if the stored data matches the new structure
         const parsedVehicles = JSON.parse(storedVehicles);
-        if (parsedVehicles.length === indianModels.slice(0, 70).length) {
+        if (parsedVehicles.length === indianModels.slice(0, 100).length) {
             setVehicles(parsedVehicles);
         } else {
              // If not, reset to the new mock data

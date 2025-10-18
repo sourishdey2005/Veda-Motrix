@@ -92,6 +92,14 @@ const tataVehicles = [
     { make: 'Tata', model: 'Altroz' },
     { make: 'Tata', model: 'Tiago' },
     { make: 'Tata', model: 'Tigor' },
+    { make: 'Tata', model: 'Nexon EV' },
+    { make: 'Tata', model: 'Tiago EV' },
+    { make: 'Tata', model: 'Tigor EV' },
+    { make: 'Tata', model: 'Harrier EV' },
+    { make: 'Tata', model: 'Safari EV' },
+    { make: 'Tata', model: 'Sierra EV' },
+    { make: 'Tata', model: 'Curvv' },
+    { make: 'Tata', model: 'Avinya' },
 ];
 
 const marutiVehicles = [
@@ -102,10 +110,18 @@ const marutiVehicles = [
     { make: 'Maruti', model: 'Dzire' },
     { make: 'Maruti', model: 'Ertiga' },
     { make: 'Maruti', model: 'Brezza' },
+    { make: 'Maruti', model: 'Grand Vitara' },
+    { make: 'Maruti', model: 'Fronx' },
+    { make: 'Maruti', model: 'Jimny' },
+    { make: 'Maruti', model: 'Ciaz' },
+    { make: 'Maruti', model: 'XL6' },
+    { make: 'Maruti', model: 'Ignis' },
+    { make: 'Maruti', model: 'S-Presso' },
+    { make: 'Maruti', model: 'Eeco' },
 ];
 
 
-export const indianModels = [...mahindraVehicles.slice(0,20), ...heroVehicles.slice(0,20), ...tataVehicles, ...marutiVehicles];
+export const indianModels = [...mahindraVehicles, ...heroVehicles, ...tataVehicles, ...marutiVehicles];
 
 export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal', 'Visakhapatnam', 'Patna', 'Vadodara', 'Ghaziabad', 'Ludhiana', 'Agra', 'Nashik', 'Faridabad', 'Meerut', 'Rajkot', 'Varanasi', 'Srinagar', 'Aurangabad', 'Dhanbad', 'Amritsar', 'Allahabad', 'Ranchi', 'Howrah', 'Coimbatore', 'Jabalpur', 'Gwalior', 'Vijayawada', 'Jodhpur', 'Madurai', 'Raipur', 'Kota', 'Guwahati', 'Chandigarh', 'Noida'];
 
@@ -287,7 +303,7 @@ const generateEnvironmentalData = (): EnvironmentalData => ({
   ]
 });
 
-export const vehicles: Vehicle[] = indianModels.slice(0, 70).map((vehicleInfo, i) => {
+export const vehicles: Vehicle[] = indianModels.slice(0, 100).map((vehicleInfo, i) => {
   const healthStatus = i % 5 === 0 ? 'Critical' : i % 3 === 0 ? 'Warning' : 'Good';
   const healthScore = healthStatus === 'Critical' ? 30 + Math.random() * 20 : healthStatus === 'Warning' ? 60 + Math.random() * 20 : 85 + Math.random() * 15;
   const selectedImg = i % 3 === 0 ? vehicleImg1 : i % 2 === 0 ? vehicleImg2 : vehicleImg3;
