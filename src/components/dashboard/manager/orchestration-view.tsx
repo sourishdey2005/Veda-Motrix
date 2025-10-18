@@ -146,24 +146,22 @@ export function OrchestrationView() {
           <div className="relative flex flex-wrap items-center justify-center gap-4 p-4 rounded-lg bg-muted/50 min-h-[120px]">
             {agents.map((agent, index) => (
               <React.Fragment key={agent.name}>
-                 <Link href={agent.href} legacyBehavior>
-                  <a>
-                    <div className={cn(
-                      "flex flex-col items-center gap-2 p-3 rounded-lg border bg-background transition-all duration-500 w-28 h-28 justify-center",
-                      activeAgent >= index ? "shadow-lg scale-105" : "opacity-50",
-                      agent.status === 'ok' && activeAgent >= index && "border-primary",
-                      agent.status === 'failed' && "border-destructive bg-destructive/10 shadow-red-500/50 animate-pulse",
-                      agent.status === 'restarting' && "border-yellow-500 bg-yellow-500/10"
-                    )}>
-                      <agent.icon className={cn(
-                        "w-8 h-8 transition-colors", 
-                        agent.status === 'ok' && activeAgent >= index ? "text-primary" : "text-muted-foreground",
-                        agent.status === 'failed' && "text-destructive",
-                        agent.status === 'restarting' && "text-yellow-500",
-                      )} />
-                      <span className="text-xs text-center font-medium">{agent.name}</span>
-                    </div>
-                  </a>
+                 <Link
+                  href={agent.href}
+                  className={cn(
+                    "flex flex-col items-center gap-2 p-3 rounded-lg border bg-background transition-all duration-500 w-28 h-28 justify-center",
+                    activeAgent >= index ? "shadow-lg scale-105" : "opacity-50",
+                    agent.status === 'ok' && activeAgent >= index && "border-primary",
+                    agent.status === 'failed' && "border-destructive bg-destructive/10 shadow-red-500/50 animate-pulse",
+                    agent.status === 'restarting' && "border-yellow-500 bg-yellow-500/10"
+                  )}>
+                  <agent.icon className={cn(
+                    "w-8 h-8 transition-colors", 
+                    agent.status === 'ok' && activeAgent >= index ? "text-primary" : "text-muted-foreground",
+                    agent.status === 'failed' && "text-destructive",
+                    agent.status === 'restarting' && "text-yellow-500",
+                  )} />
+                  <span className="text-xs text-center font-medium">{agent.name}</span>
                 </Link>
                 {index < agents.length -1 && <ArrowRight className={cn("h-6 w-6 text-muted-foreground transition-all duration-500", activeAgent > index ? "text-primary" : "opacity-50")} />}
               </React.Fragment>
@@ -183,7 +181,7 @@ export function OrchestrationView() {
             <CardHeader>
                 <div className="flex items-center gap-4">
                      {failedAgent.status === 'failed' && <Siren className="w-8 h-8 text-destructive" />}
-                     {failedAgent.status === 'restarting' && <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />}
+                     {failedágent.status === 'restarting' && <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />}
                      {failedAgent.status === 'ok' && <CheckCircle className="w-8 h-8 text-green-500" />}
                     <div>
                         <CardTitle>Self-Healing Agent Monitor</CardTitle>
