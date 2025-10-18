@@ -8,10 +8,8 @@
  * - DetectAgentAnomaliesInput - The input type for the detectAgentAnomalies function.
  * - DetectAgentAnomaliesOutput - The return type for the detectAgentAnomalies function.
  */
-
-import {ai} from '@/ai/genkit';
-import {googleAI} from '@genkit-ai/google-genai';
-import {z} from 'genkit';
+import { openai } from '@/ai/client';
+import { z } from 'zod';
 
 const DetectAgentAnomaliesInputSchema = z.object({
   agentId: z.string().describe('The ID of the agent to monitor.'),
@@ -28,40 +26,39 @@ const DetectAgentAnomaliesOutputSchema = z.object({
 export type DetectAgentAnomaliesOutput = z.infer<typeof DetectAgentAnomaliesOutputSchema>;
 
 export async function detectAgentAnomalies(input: DetectAgentAnomaliesInput): Promise<DetectAgentAnomaliesOutput> {
-  return detectAgentAnomaliesFlow(input);
+    const prompt = `You are a UEBA (User and Entity Behavior Analytics) security agent responsible for detecting unauthorized or abnormal behavior from other AI agents.
+
+    You will receive the ID of the agent to monitor, a list of recent actions performed by the agent, and an anomaly threshold.
+
+    Based on this information, you will determine whether the agent's behavior is anomalous and provide an anomaly score and explanation.
+
+    Agent ID: ${input.agentId}
+    Agent Actions: ${input.agentActions.join(', ')}
+    Anomaly Threshold: ${input.anomalyThreshold}
+
+    Consider factors such as:
+    - Deviation from the agent's typical behavior pattern.
+    - Unauthorized actions.
+    - Actions that violate security policies.
+    - Unusual frequency of actions.
+
+    Return a valid JSON object with the following structure:
+    {
+        "isAnomalous": boolean,
+        "anomalyScore": number (0-1),
+        "explanation": "string"
+    }`;
+
+    const completion = await openai.chat.completions.create({
+        model: 'openai/gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+    });
+
+    const result = completion.choices[0].message?.content;
+    if (!result) {
+        throw new Error('AI failed to generate a response.');
+    }
+
+    return DetectAgentAnomaliesOutputSchema.parse(JSON.parse(result));
 }
-
-const prompt = ai.definePrompt({
-  name: 'detectAgentAnomaliesPrompt',
-  input: {schema: DetectAgentAnomaliesInputSchema},
-  output: {schema: DetectAgentAnomaliesOutputSchema},
-  prompt: `You are a UEBA (User and Entity Behavior Analytics) security agent responsible for detecting unauthorized or abnormal behavior from other AI agents.
-
-You will receive the ID of the agent to monitor, a list of recent actions performed by the agent, and an anomaly threshold.
-
-Based on this information, you will determine whether the agent's behavior is anomalous and provide an anomaly score and explanation.
-
-Agent ID: {{{agentId}}}
-Agent Actions: {{#each agentActions}}- {{{this}}}\n{{/each}}
-Anomaly Threshold: {{{anomalyThreshold}}}
-
-Consider factors such as:
-- Deviation from the agent's typical behavior pattern.
-- Unauthorized actions.
-- Actions that violate security policies.
-- Unusual frequency of actions.
-
-Return whether the agent is anomalous (isAnomalous), a numerical anomaly score (anomalyScore), and an explanation of your reasoning (explanation).`,
-});
-
-const detectAgentAnomaliesFlow = ai.defineFlow(
-  {
-    name: 'detectAgentAnomaliesFlow',
-    inputSchema: DetectAgentAnomaliesInputSchema,
-    outputSchema: DetectAgentAnomaliesOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
-  }
-);

@@ -8,10 +8,8 @@
  * - HandleCustomerEnquiryInput - The input type for the handleCustomerEnquiry function.
  * - HandleCustomerEnquiryOutput - The return type for the handleCustomerEnquiry function.
  */
-
-import {ai} from '@/ai/genkit';
-import {googleAI} from '@genkit-ai/google-genai';
-import {z} from 'genkit';
+import { openai } from '@/ai/client';
+import { z } from 'zod';
 
 const HandleCustomerEnquiryInputSchema = z.object({
   vehicleIssue: z.string().describe('Description of the vehicle issue.'),
@@ -28,42 +26,32 @@ export type HandleCustomerEnquiryOutput = z.infer<typeof HandleCustomerEnquiryOu
 export async function handleCustomerEnquiry(
   input: HandleCustomerEnquiryInput
 ): Promise<HandleCustomerEnquiryOutput> {
-  return handleCustomerEnquiryFlow(input);
+  
+    const prompt = `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.
+
+    Vehicle Owner's Name: ${input.userName}
+    Vehicle Issue: ${input.vehicleIssue}
+    Recommended Maintenance: ${input.recommendedMaintenance}
+
+    Generate a short conversation (around 5-6 lines) between you and the vehicle owner. Start with a greeting, explain the issue and the recommended maintenance, and offer assistance with scheduling a service appointment. The response should be in the format of a conversation.
+
+    Agent: (Your greeting and explanation)
+    Owner: (Owner's response)
+    Agent: (Offer assistance with scheduling)
+    Owner: (Owner's reply)
+
+    End the conversation after the owner replies to the scheduling offer. The entire output should be a single string representing the conversation.
+    `;
+
+    const completion = await openai.chat.completions.create({
+        model: 'openai/gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+    });
+
+    const conversationSummary = completion.choices[0].message?.content;
+    if (!conversationSummary) {
+        throw new Error('AI failed to generate a response.');
+    }
+
+    return { conversationSummary };
 }
-
-const prompt = ai.definePrompt({
-  name: 'handleCustomerEnquiryPrompt',
-  input: {schema: HandleCustomerEnquiryInputSchema},
-  output: {schema: HandleCustomerEnquiryOutputSchema},
-  prompt: `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.
-
-  Vehicle Owner's Name: {{{userName}}}
-  Vehicle Issue: {{{vehicleIssue}}}
-  Recommended Maintenance: {{{recommendedMaintenance}}}
-
-  Generate a short conversation (around 5-6 lines) between you and the vehicle owner. Start with a greeting, explain the issue and the recommended maintenance, and offer assistance with scheduling a service appointment.  The response should be in the format of a conversation.
-
-  Agent: (Your greeting and explanation)
-  Owner: (Owner's response)
-  Agent: (Offer assistance with scheduling)
-  Owner: (Owner's reply)
-
-  End the conversation after the owner replies to the scheduling offer.
-
-  CONVERSATION:
-  `,
-});
-
-const handleCustomerEnquiryFlow = ai.defineFlow(
-  {
-    name: 'handleCustomerEnquiryFlow',
-    inputSchema: HandleCustomerEnquiryInputSchema,
-    outputSchema: HandleCustomerEnquiryOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return {
-      conversationSummary: output!.conversationSummary,
-    };
-  }
-);

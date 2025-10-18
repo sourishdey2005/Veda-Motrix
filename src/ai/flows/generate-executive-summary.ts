@@ -8,10 +8,8 @@
  * - GenerateExecutiveSummaryInput - The input type for generateExecutiveSummary.
  * - GenerateExecutiveSummaryOutput - The return type for generateExecutiveSummary.
  */
-
-import {ai} from '@/ai/genkit';
-import {googleAI} from '@genkit-ai/google-genai';
-import {z} from 'genkit';
+import { openai } from '@/ai/client';
+import { z } from 'zod';
 
 const GenerateExecutiveSummaryInputSchema = z.object({
   reportData: z
@@ -36,33 +34,26 @@ export type GenerateExecutiveSummaryOutput = z.infer<
 export async function generateExecutiveSummary(
   input: GenerateExecutiveSummaryInput
 ): Promise<GenerateExecutiveSummaryOutput> {
-  return generateExecutiveSummaryFlow(input);
+    const prompt = `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Your task is to analyze the provided JSON data and generate a clear, concise, and insightful summary for a management audience.
+
+    Focus on key takeaways, trends, and significant metrics.
+
+    Analyze the following data:
+
+    ${input.reportData}
+
+    Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
+    The response should be a plain string, not a JSON object.`;
+
+    const completion = await openai.chat.completions.create({
+        model: 'openai/gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+    });
+
+    const summary = completion.choices[0].message?.content;
+    if (!summary) {
+        throw new Error('AI failed to generate a response.');
+    }
+
+    return { summary };
 }
-
-const generateExecutiveSummaryPrompt = ai.definePrompt({
-  name: 'generateExecutiveSummaryPrompt',
-  input: {schema: GenerateExecutiveSummaryInputSchema},
-  output: {schema: GenerateExecutiveSummaryOutputSchema},
-  prompt: `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Your task is to analyze the provided JSON data and generate a clear, concise, and insightful summary for a management audience.
-
-Focus on key takeaways, trends, and significant metrics.
-
-Analyze the following data:
-
-{{{reportData}}}
-
-Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
-`,
-});
-
-const generateExecutiveSummaryFlow = ai.defineFlow(
-  {
-    name: 'generateExecutiveSummaryFlow',
-    inputSchema: GenerateExecutiveSummaryInputSchema,
-    outputSchema: GenerateExecutiveSummaryOutputSchema,
-  },
-  async input => {
-    const {output} = await generateExecutiveSummaryPrompt(input);
-    return output!;
-  }
-);

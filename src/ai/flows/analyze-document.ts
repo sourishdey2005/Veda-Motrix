@@ -9,9 +9,8 @@
  * - AnalyzeDocumentOutput - The return type for the analyzeDocument function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
+import { z } from 'zod';
+import { openai } from '@/ai/client';
 
 const AnalyzeDocumentInputSchema = z.object({
   documentDataUri: z
@@ -37,61 +36,30 @@ export type AnalyzeDocumentOutput = z.infer<
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
 ): Promise<AnalyzeDocumentOutput> {
-  return analyzeDocumentFlow(input);
-}
+    const base64Data = input.documentDataUri.split(',')[1];
+    const documentContent = Buffer.from(base64Data, 'base64').toString('utf-8');
 
-const analyzeDocumentFlow = ai.defineFlow(
-  {
-    name: 'analyzeDocumentFlow',
-    inputSchema: AnalyzeDocumentInputSchema,
-    outputSchema: AnalyzeDocumentOutputSchema,
-  },
-  async (input) => {
-    // This is a mocked implementation to ensure prototype functionality.
-    // It returns a hardcoded analysis based on the user's prompt.
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
+    const prompt = `You are an expert document analysis AI. A user has uploaded a document and wants you to analyze it.
 
-    const prompt = input.prompt.toLowerCase();
-    let analysis = `### Mocked AI Analysis
+    USER'S PROMPT:
+    "${input.prompt}"
 
-This is a simulated analysis. The connection to the live AI model is currently unstable.
+    DOCUMENT CONTENT:
+    ---
+    ${documentContent.substring(0, 20000)}
+    ---
 
-**Your Prompt:** *${input.prompt}*
+    Based on the user's prompt, analyze the document content and provide a detailed analysis formatted in Markdown. If the document is very long, your analysis should be based on the first 20,000 characters provided.`;
 
----
+    const completion = await openai.chat.completions.create({
+        model: 'openai/gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+    });
 
-`;
-
-    if (prompt.includes('summary') || prompt.includes('summarize')) {
-        analysis += `
-**Summary of the Document**
-
-The document appears to be a standard service report detailing component failures over the last quarter. Key findings include:
-
-*   **Brake Systems**: Account for 45% of all reported issues, showing a significant upward trend.
-*   **ECU Failures**: A notable spike in Engine Control Unit (ECU) failures was observed in Lot B-2023.
-*   **Supplier Correlation**: Data suggests a high correlation between injector failures and parts from Supplier-A.
-`;
-    } else if (prompt.includes('key findings') || prompt.includes('main points')) {
-         analysis += `
-**Key Findings**
-
-Based on the document content, the primary takeaways are:
-
-1.  **High Recurrence in Brake Issues**: The same brake system faults are being reported multiple times, suggesting that initial fixes are not effective.
-2.  **Geographical Clustering**: There is a noticeable cluster of suspension-related failures in the Northern region, likely due to road conditions.
-3.  **Cost Overruns**: Repair costs for electrical issues are consistently 15% over the standard benchmark.
-`;
-    } else {
-        analysis += `
-**General Analysis**
-
-The document provides a detailed log of vehicle maintenance and component data. The AI has processed the content and can provide specific insights if you ask for a "summary" or "key findings".
-
-*This mocked response is designed for demonstration purposes.*
-`;
+    const analysis = completion.choices[0].message?.content;
+    if (!analysis) {
+        throw new Error('AI failed to generate an analysis.');
     }
 
     return { analysis };
-  }
-);
+}

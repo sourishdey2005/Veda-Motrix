@@ -11,10 +11,8 @@
  * @fileExport {type} GenerateManufacturingInsightsInput - The input type for the generateManufacturingInsights function.
  * @fileExport {type} GenerateManufacturingInsightsOutput - The output type for the generateManufacturingInsights function.
  */
-
-import {ai} from '@/ai/genkit';
-import {googleAI} from '@genkit-ai/google-genai';
-import {z} from 'genkit';
+import { openai } from '@/ai/client';
+import { z } from 'zod';
 
 const GenerateManufacturingInsightsInputSchema = z.object({
   serviceData: z
@@ -36,32 +34,24 @@ export type GenerateManufacturingInsightsOutput = z.infer<
   typeof GenerateManufacturingInsightsOutputSchema
 >;
 
-const generateManufacturingInsightsPrompt = ai.definePrompt({
-  name: 'generateManufacturingInsightsPrompt',
-  input: {schema: GenerateManufacturingInsightsInputSchema},
-  output: {schema: GenerateManufacturingInsightsOutputSchema},
-  prompt: `You are a manufacturing insights expert. Analyze the following service data and generate improvement suggestions for RCA/CAPA.
-
-Service Data: {{{serviceData}}}
-
-Provide clear, actionable improvement suggestions.
-`,
-});
-
-const generateManufacturingInsightsFlow = ai.defineFlow(
-  {
-    name: 'generateManufacturingInsightsFlow',
-    inputSchema: GenerateManufacturingInsightsInputSchema,
-    outputSchema: GenerateManufacturingInsightsOutputSchema,
-  },
-  async input => {
-    const {output} = await generateManufacturingInsightsPrompt(input);
-    return output!;
-  }
-);
-
 export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
 ): Promise<GenerateManufacturingInsightsOutput> {
-  return generateManufacturingInsightsFlow(input);
+    const prompt = `You are a manufacturing insights expert. Analyze the following service data and generate improvement suggestions for RCA/CAPA.
+
+    Service Data: ${input.serviceData}
+
+    Provide clear, actionable improvement suggestions as a single string.`;
+
+    const completion = await openai.chat.completions.create({
+        model: 'openai/gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+    });
+
+    const improvementSuggestions = completion.choices[0].message?.content;
+    if (!improvementSuggestions) {
+        throw new Error('AI failed to generate a response.');
+    }
+
+    return { improvementSuggestions };
 }

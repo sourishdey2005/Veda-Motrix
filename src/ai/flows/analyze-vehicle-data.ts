@@ -8,10 +8,8 @@
  * - AnalyzeVehicleDataInput - The input type for the analyzeVehicleData function.
  * - AnalyzeVehicleDataOutput - The return type for the analyzeVehicleData function.
  */
-
-import {ai} from '@/ai/genkit';
-import {googleAI} from '@genkit-ai/google-genai';
-import {z} from 'genkit';
+import { openai } from '@/ai/client';
+import { z } from 'zod';
 
 const AnalyzeVehicleDataInputSchema = z.object({
   vehicleId: z.string().describe('The ID of the vehicle to analyze.'),
@@ -27,44 +25,33 @@ const AnalyzeVehicleDataOutputSchema = z.object({
 export type AnalyzeVehicleDataOutput = z.infer<typeof AnalyzeVehicleDataOutputSchema>;
 
 export async function analyzeVehicleData(input: AnalyzeVehicleDataInput): Promise<AnalyzeVehicleDataOutput> {
-  return analyzeVehicleDataFlow(input);
+  
+    const prompt = `You are a master agent responsible for analyzing vehicle sensor data and detecting anomalies.
+
+    You are provided with sensor data, maintenance logs, and the vehicle ID.
+
+    Analyze the sensor data for any anomalies or unusual patterns. Compare the current sensor data with historical data and maintenance logs to identify potential maintenance needs.
+
+    Vehicle ID: ${input.vehicleId}
+    Sensor Data: ${JSON.stringify(input.sensorData)}
+    Maintenance Logs: ${input.maintenanceLogs}
+
+    Return a valid JSON object with the following structure:
+    {
+      "anomalies": ["list of detected anomalies"],
+      "maintenanceNeeds": ["list of potential maintenance needs"]
+    }`;
+
+    const completion = await openai.chat.completions.create({
+        model: 'openai/gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+    });
+
+    const result = completion.choices[0].message?.content;
+    if (!result) {
+        throw new Error('AI failed to generate a response.');
+    }
+
+    return AnalyzeVehicleDataOutputSchema.parse(JSON.parse(result));
 }
-
-const prompt = ai.definePrompt({
-  name: 'analyzeVehicleDataPrompt',
-  input: {schema: AnalyzeVehicleDataInputSchema},
-  output: {schema: AnalyzeVehicleDataOutputSchema},
-  prompt: `You are a master agent responsible for analyzing vehicle sensor data and detecting anomalies.
-
-You are provided with sensor data, maintenance logs, and the vehicle ID.
-
-Analyze the sensor data for any anomalies or unusual patterns. Compare the current sensor data with historical data and maintenance logs to identify potential maintenance needs.
-
-Vehicle ID: {{{vehicleId}}}
-Sensor Data: {{{sensorData}}}
-Maintenance Logs: {{{maintenanceLogs}}}
-
-Output a list of detected anomalies and potential maintenance needs.
-
-Anomalies:
-{{#each anomalies}}
-- {{{this}}}
-{{/each}}
-
-Maintenance Needs:
-{{#each maintenanceNeeds}}
-- {{{this}}}
-{{/each}}`,
-});
-
-const analyzeVehicleDataFlow = ai.defineFlow(
-  {
-    name: 'analyzeVehicleDataFlow',
-    inputSchema: AnalyzeVehicleDataInputSchema,
-    outputSchema: AnalyzeVehicleDataOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
-  }
-);
