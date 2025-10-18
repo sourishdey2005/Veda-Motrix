@@ -8,9 +8,9 @@
     },
     {
       "id": "signup-bg-2",
-      "description": "Abstract background for the login page",
-      "imageUrl": "https://images.unsplash.com/photo-1568952433726-3896e3881c65?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxhYnN0cmFjdCUyMHRlY2hub2xvZ3l8ZW58MHx8fHwxNzYwNzMwOTE3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "abstract technology"
+      "description": "A modern car interior focusing on the dashboard and steering wheel",
+      "imageUrl": "https://images.unsplash.com/photo-1616422285623-13ff0162193c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjYXIlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NjA3ODYxODR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "car interior"
     },
     {
       "id": "avatar-1",
