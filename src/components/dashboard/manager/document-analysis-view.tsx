@@ -10,6 +10,57 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Bot, File as FileIcon, Loader2 } from 'lucide-react';
 import { analyzeDocument } from '@/ai/flows/analyze-document';
+import { cn } from '@/lib/utils';
+
+// A simple markdown to React component parser
+const MarkdownRenderer = ({ content }: { content: string }) => {
+    const lines = content.split('\n');
+
+    return (
+        <div className="prose prose-sm dark:prose-invert max-w-none space-y-4">
+            {lines.map((line, index) => {
+                line = line.trim();
+                if (line.startsWith('#### ')) {
+                    return <h4 key={index} className="font-semibold text-base !mt-6 !mb-2 border-b pb-1">{line.substring(5)}</h4>;
+                }
+                if (line.startsWith('### ')) {
+                    return <h3 key={index} className="font-semibold text-lg !mt-8 !mb-3">{line.substring(4)}</h3>;
+                }
+                if (line.startsWith('* **')) { // For bolded list items
+                    const cleanedLine = line.replace('* **', '').replace('**', '');
+                    const parts = cleanedLine.split(':');
+                    return (
+                        <div key={index} className="flex gap-2">
+                           <span className="font-semibold">{parts[0]}:</span>
+                           <span>{parts.slice(1).join(':')}</span>
+                        </div>
+                    );
+                }
+                if (line.startsWith('* ')) {
+                    return <li key={index} className="list-disc ml-4">{line.substring(2)}</li>;
+                }
+                if (line.startsWith('---')) {
+                    return <hr key={index} className="my-4" />;
+                }
+                 if (line.startsWith('**')) { // For bolded text, like Original Prompt
+                    const cleanedLine = line.replaceAll('**', '');
+                     const parts = cleanedLine.split(':');
+                    return (
+                         <p key={index}>
+                            <span className="font-semibold text-muted-foreground">{parts[0]}:</span>
+                            <span className="italic">"{parts.slice(1).join(':').trim()}"</span>
+                        </p>
+                    )
+                }
+                if (line === '') {
+                    return null;
+                }
+                return <p key={index}>{line}</p>;
+            })}
+        </div>
+    );
+};
+
 
 export function DocumentAnalysisView() {
   const [file, setFile] = useState<File | null>(null);
@@ -21,12 +72,12 @@ export function DocumentAnalysisView() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      if (selectedFile.type === 'application/pdf' || selectedFile.type === 'text/csv') {
+      if (selectedFile.type === 'application/pdf' || selectedFile.type === 'text/csv' || selectedFile.type === 'text/plain') {
         setFile(selectedFile);
       } else {
         toast({
           title: "Invalid File Type",
-          description: "Please upload a PDF or CSV file.",
+          description: "Please upload a PDF, CSV, or TXT file.",
           variant: "destructive",
         });
       }
@@ -51,7 +102,10 @@ export function DocumentAnalysisView() {
       reader.readAsDataURL(file);
       reader.onload = async () => {
         const documentDataUri = reader.result as string;
+        
+        // This call now hits your working AI flow
         const result = await analyzeDocument({ documentDataUri, prompt });
+
         setAnalysisResult(result.analysis);
       };
       reader.onerror = (error) => {
@@ -62,11 +116,11 @@ export function DocumentAnalysisView() {
             variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Analysis error:", error);
         toast({
             title: "Analysis Failed",
-            description: "The AI failed to analyze the document. Please try again.",
+            description: error.message || "The AI failed to analyze the document. Please try again.",
             variant: "destructive",
         });
     } finally {
@@ -79,12 +133,12 @@ export function DocumentAnalysisView() {
       <Card>
         <CardHeader>
           <CardTitle>Document Analysis Engine</CardTitle>
-          <CardDescription>Upload a CSV or PDF and use AI to get real-time insights.</CardDescription>
+          <CardDescription>Upload a CSV, PDF or TXT and use AI to get real-time insights.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="file-upload">1. Upload Document</Label>
-            <Input id="file-upload" type="file" accept=".csv,.pdf" onChange={handleFileChange} />
+            <Input id="file-upload" type="file" accept=".csv,.pdf,.txt" onChange={handleFileChange} />
             {file && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
                 <FileIcon className="w-4 h-4" />
@@ -96,7 +150,7 @@ export function DocumentAnalysisView() {
             <Label htmlFor="prompt">2. Enter Analysis Prompt</Label>
             <Textarea
               id="prompt"
-              placeholder="e.g., 'Summarize this document' or 'What are the key findings in this report?'"
+              placeholder="e.g., 'Summarize this document' or 'What are the key financial takeaways from this report?'"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               rows={4}
@@ -125,10 +179,7 @@ export function DocumentAnalysisView() {
             </div>
           )}
           {analysisResult ? (
-            <div 
-              className="prose dark:prose-invert max-w-none text-sm"
-              dangerouslySetInnerHTML={{ __html: analysisResult.replace(/\n/g, '<br />') }} 
-            />
+            <MarkdownRenderer content={analysisResult} />
           ) : (
             !isLoading && <p className="text-sm text-muted-foreground text-center h-64 flex items-center justify-center">Awaiting analysis...</p>
           )}
