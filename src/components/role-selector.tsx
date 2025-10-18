@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import { Briefcase, Building, User as UserIcon, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 type Role = User['role'];
 
@@ -25,6 +26,7 @@ const roles: { role: Role; name: string; description: string; icon: React.Elemen
 
 export function RoleSelector({ onRoleSelect, selectedRole }: { onRoleSelect: (role: Role) => void, selectedRole: Role | null }) {
   const [open, setOpen] = useState(!selectedRole);
+  const router = useRouter();
 
   const handleSelect = (role: Role) => {
     onRoleSelect(role);
@@ -35,7 +37,7 @@ export function RoleSelector({ onRoleSelect, selectedRole }: { onRoleSelect: (ro
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
-            {selectedRole ? `Logged in as: ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}` : 'Select Your Role'}
+            {selectedRole ? `Continue as ${roles.find(r => r.role === selectedRole)?.name}` : 'Select Your Role'}
         </Button>
       </DialogTrigger>
       <DialogContent>

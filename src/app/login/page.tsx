@@ -1,7 +1,6 @@
 
 "use client";
 
-import { useState } from 'react';
 import Image from 'next/image';
 import { LoginForm } from '@/components/login-form';
 import { VedaMotrixLogo } from '@/components/icons';
@@ -9,6 +8,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { DemoCredentialCard } from '@/components/credential-card';
 import type { User } from '@/lib/types';
 import { RoleSelector } from '@/components/role-selector';
+import { useState } from 'react';
 
 export default function UnifiedLoginPage() {
   const loginBg = PlaceHolderImages.find(img => img.id === 'login-bg');
@@ -18,6 +18,23 @@ export default function UnifiedLoginPage() {
     setSelectedRole(role);
   };
 
+  if (!selectedRole) {
+    return (
+       <div className="w-full min-h-screen flex items-center justify-center">
+        <div className="mx-auto grid w-full max-w-[400px] gap-6 px-4 text-center">
+             <div className="grid gap-2 text-center mb-6">
+                <VedaMotrixLogo className="h-12 w-12 mx-auto text-primary" />
+                <h1 className="text-3xl font-bold">Welcome to VEDA-MOTRIX AI</h1>
+                <p className="text-balance text-muted-foreground">
+                    Please select your role to continue.
+                </p>
+            </div>
+            <RoleSelector onRoleSelect={handleRoleSelect} selectedRole={selectedRole} />
+        </div>
+       </div>
+    )
+  }
+
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
       <div className="flex items-center justify-center py-12">
@@ -26,15 +43,15 @@ export default function UnifiedLoginPage() {
             <VedaMotrixLogo className="h-12 w-12 mx-auto text-primary" />
             <h1 className="text-3xl font-bold">VEDA-MOTRIX AI</h1>
             <p className="text-balance text-muted-foreground">
-              {selectedRole 
-                ? `Knowledge in Motion - ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1).replace('-', ' ')} Login`
-                : 'Knowledge in Motion'}
+              Knowledge in Motion - {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1).replace('-', ' ')} Login
             </p>
           </div>
           
-          <RoleSelector onRoleSelect={handleRoleSelect} selectedRole={selectedRole} />
-          
-          {selectedRole && <LoginForm userType={selectedRole} />}
+          <LoginForm userType={selectedRole} />
+
+            <Button variant="link" size="sm" onClick={() => setSelectedRole(null)}>
+                Login with a different role
+            </Button>
 
         </div>
       </div>
