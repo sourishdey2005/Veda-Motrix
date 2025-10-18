@@ -88,13 +88,18 @@ export const technicians: Technician[] = [
     { id: 'T8', name: 'Manoj Patel', specialty: 'General', serviceCenterId: 'SC3', performance: generateTechnicianPerformance() },
     { id: 'T9', name: 'Ravi Reddy', specialty: 'Electronics', serviceCenterId: 'SC4', performance: generateTechnicianPerformance() },
     { id: 'T10', name: 'Sunil Yadav', specialty: 'Engine', serviceCenterId: 'SC4', performance: generateTechnicianPerformance() },
+    { id: 'T11', name: 'Girish Jain', specialty: 'General', serviceCenterId: 'SC5', performance: generateTechnicianPerformance() },
+    { id: 'T12', name: 'Hari Prasad', specialty: 'Brakes', serviceCenterId: 'SC6', performance: generateTechnicianPerformance() },
+    { id: 'T13', name: 'Irfan Khan', specialty: 'Suspension', serviceCenterId: 'SC7', performance: generateTechnicianPerformance() },
+    { id: 'T14', name: 'Jitendra Soni', specialty: 'Electronics', serviceCenterId: 'SC8', performance: generateTechnicianPerformance() },
+    { id: 'T15', name: 'Kamal Nath', specialty: 'Engine', serviceCenterId: 'SC9', performance: generateTechnicianPerformance() },
 ];
 
 const generateMaintenanceHistory = (vehicleIndex: number): MaintenanceLog[] => {
     const history: MaintenanceLog[] = [
-        { id: `M${vehicleIndex}1`, date: '2023-03-10', mileage: 12000 + vehicleIndex*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK. Replaced oil filter and topped up fluids.', serviceCenterId: 'SC1', cost: 4500, rating: 5 },
-        { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters. Cleaned throttle body.', serviceCenterId: 'SC2', cost: 2500, rating: 4 },
-        { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up. Customer reported slight shudder, but not reproducible.', serviceCenterId: 'SC1', cost: 7800 },
+        { id: `M${vehicleIndex}1`, date: '2023-03-10', mileage: 12000 + vehicleIndex*1000, service: 'Engine Oil Change', notes: 'General check-up, all OK. Replaced oil filter and topped up fluids.', serviceCenterId: `SC${(vehicleIndex % 10) + 1}`, cost: 4500, rating: 5 },
+        { id: `M${vehicleIndex}2`, date: '2023-09-15', mileage: 21000 + vehicleIndex*1000, service: 'Air Filter Replacement', notes: 'Replaced air and cabin filters. Cleaned throttle body.', serviceCenterId: `SC${(vehicleIndex % 10) + 2}`, cost: 2500, rating: 4 },
+        { id: `M${vehicleIndex}3`, date: '2024-02-20', mileage: 30500 + vehicleIndex*1000, service: 'Brake Pad Replacement', notes: 'Front brake pads replaced. Fluid topped up. Customer reported slight shudder, but not reproducible.', serviceCenterId: `SC${(vehicleIndex % 10) + 1}`, cost: 7800 },
     ];
     return history;
 };
@@ -183,8 +188,8 @@ const generateEnvironmentalData = (): EnvironmentalData => ({
 });
 
 
-export const vehicles: Vehicle[] = Array.from({ length: 25 }, (_, i) => {
-  const healthStatus = i % 3 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
+export const vehicles: Vehicle[] = Array.from({ length: 50 }, (_, i) => {
+  const healthStatus = i % 5 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
   const healthScore = healthStatus === 'Critical' ? 30 + Math.random() * 20 : healthStatus === 'Warning' ? 60 + Math.random() * 20 : 85 + Math.random() * 15;
   const selectedImg = i % 3 === 0 ? vehicleImg1 : i % 2 === 0 ? vehicleImg2 : vehicleImg3;
   return {
@@ -226,18 +231,26 @@ export const vehicles: Vehicle[] = Array.from({ length: 25 }, (_, i) => {
 
 export const allVehicles = vehicles;
 
-export const appointments: Appointment[] = [
-  { id: 'A1', vehicleId: 'V1001', serviceCenterId: 'SC1', date: '2024-08-01', time: '09:30', status: 'Completed', notes: 'Diagnosed high engine temperature.', technicianId: 'T1', estimatedTime: 3, stageProgress: 100 },
-  { id: 'A2', vehicleId: 'V1002', serviceCenterId: 'SC1', date: '2024-08-02', time: '10:00', status: 'In Service', notes: 'Investigating low oil pressure warning.', technicianId: 'T2', estimatedTime: 5, stageProgress: 60 },
-  { id: 'A3', vehicleId: 'V1003', serviceCenterId: 'SC1', date: '2024-08-03', time: '14:00', status: 'Pending', notes: 'Customer reports high vibration during braking.', technicianId: 'T1', estimatedTime: 2, stageProgress: 0 },
-  { id: 'A4', vehicleId: 'V1004', serviceCenterId: 'SC1', date: '2024-08-04', time: '11:00', status: 'Pending', notes: 'Annual service and check-up.', technicianId: 'T3', estimatedTime: 4, stageProgress: 0 },
-  { id: 'A5', vehicleId: 'V1005', serviceCenterId: 'SC1', date: '2024-08-05', time: '15:00', status: 'In Service', notes: 'Replace battery as per predictive alert.', technicianId: 'T2', estimatedTime: 1, stageProgress: 80 },
-  { id: 'A6', vehicleId: 'V1006', serviceCenterId: 'SC1', date: '2024-08-06', time: '10:30', status: 'Awaiting Parts', notes: 'ABS module failure. Part ordered.', technicianId: 'T2', estimatedTime: 6, stageProgress: 40 },
-  { id: 'A7', vehicleId: 'V1007', serviceCenterId: 'SC2', date: '2024-08-02', time: '13:00', status: 'In Service', notes: 'Electrical fault diagnosis.', technicianId: 'T4', estimatedTime: 3, stageProgress: 50 },
-  { id: 'A8', vehicleId: 'V1008', serviceCenterId: 'SC2', date: '2024-08-03', time: '09:00', status: 'Pending', notes: 'Transmission fluid check.', estimatedTime: 2, stageProgress: 0 },
-  { id: 'A9', vehicleId: 'V1009', serviceCenterId: 'SC3', date: '2024-08-02', time: '11:00', status: 'Completed', notes: 'Tire rotation and alignment.', technicianId: 'T6', estimatedTime: 1.5, stageProgress: 100 },
-  { id: 'A10', vehicleId: 'V1010', serviceCenterId: 'SC3', date: '2024-08-04', time: '14:00', status: 'Pending', notes: 'AC compressor check.', technicianId: 'T8', estimatedTime: 2, stageProgress: 0 },
-];
+export const appointments: Appointment[] = Array.from({ length: 30 }, (_, i) => {
+    const statuses: AppointmentStatus[] = ['Pending', 'In Service', 'Awaiting Parts', 'Completed'];
+    const vehicle = vehicles[i % vehicles.length];
+    const serviceCenter = serviceCenters[i % serviceCenters.length];
+    const technician = technicians[i % technicians.length];
+
+    return {
+        id: `A${i + 1}`,
+        vehicleId: vehicle.id,
+        serviceCenterId: serviceCenter.id,
+        date: format(addDays(new Date(), i - 10), 'yyyy-MM-dd'),
+        time: `${9 + (i % 8)}:30`,
+        status: statuses[i % statuses.length],
+        notes: `Diagnosing issue for ${vehicle.make} ${vehicle.model}. Customer reported unusual noise.`,
+        technicianId: technician.id,
+        estimatedTime: 2 + Math.random() * 3,
+        stageProgress: Math.random() * 100,
+    };
+});
+
 
 export const uebaEvents: UebaEvent[] = [
   { id: 'UEBA1', agentId: 'Data Analysis Agent', action: 'Accessed V1005 sensor data', timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(), anomalyScore: 0.1, isAnomalous: false, explanation: 'Routine data access for health monitoring.' },
