@@ -3,10 +3,10 @@
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown, ShieldAlert } from "lucide-react"
+import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown, ShieldAlert, Legend } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
-import { executiveAnalyticsData, predictedIssues } from "@/lib/data"
+import { executiveAnalyticsData, predictedIssues, vehicles as allVehicles } from "@/lib/data"
 import type { Vehicle } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -21,7 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { AddVehicleForm } from "./add-vehicle-form"
-import { AreaChart, Area, PieChart, Pie, Cell, Legend, BarChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts"
+import { AreaChart, Area, PieChart, Pie, Cell, BarChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import type { ChartConfig } from "@/components/ui/chart"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
@@ -292,7 +292,7 @@ export function ManagerDashboard() {
                                 <Cell key={`cell-${entry.name}`} fill={entry.fill} />
                             ))}
                          </Pie>
-                         <Legend />
+                         <RechartsPrimitive.Legend />
                     </PieChart>
                  </ChartContainer>
             </CardContent>
@@ -305,18 +305,30 @@ export function ManagerDashboard() {
             <CardContent>
               <div className="rounded-lg overflow-hidden">
                 <ChartContainer config={maintenanceChartConfig} className="h-64">
-                    <AreaChart data={maintenanceRatio} stackOffset="expand" margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                    <AreaChart data={maintenanceRatio} stackOffset="expand" margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="month" />
+                        <YAxis tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
                         <defs>
                             <linearGradient id="fillPredictive" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--color-predictive)" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="var(--color-predictive)" stopOpacity={0.1}/>
+                                <stop offset="5%" stopColor="var(--color-predictive)" stopOpacity={0.8}>
+                                  <animate attributeName="stop-opacity" values="0.8; 0.4; 0.8" dur="4s" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="95%" stopColor="var(--color-predictive)" stopOpacity={0.1}>
+                                  <animate attributeName="stop-opacity" values="0.1; 0.3; 0.1" dur="4s" repeatCount="indefinite" />
+                                </stop>
                             </linearGradient>
                              <linearGradient id="fillReactive" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--color-reactive)" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="var(--color-reactive)" stopOpacity={0.1}/>
+                                <stop offset="5%" stopColor="var(--color-reactive)" stopOpacity={0.8}>
+                                    <animate attributeName="stop-opacity" values="0.8; 0.4; 0.8" dur="5s" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="95%" stopColor="var(--color-reactive)" stopOpacity={0.1}>
+                                    <animate attributeName="stop-opacity" values="0.1; 0.3; 0.1" dur="5s" repeatCount="indefinite" />
+                                </stop>
                             </linearGradient>
                         </defs>
                         <ChartTooltip content={<ChartTooltipContent />} />
+                        <RechartsPrimitive.Legend />
                         <Area type="monotone" dataKey="predictive" stackId="1" stroke="var(--color-predictive)" fill="url(#fillPredictive)" />
                         <Area type="monotone" dataKey="reactive" stackId="1" stroke="var(--color-reactive)" fill="url(#fillReactive)" />
                     </AreaChart>
@@ -357,7 +369,7 @@ export function ManagerDashboard() {
                         <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} />
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Legend />
+                        <RechartsPrimitive.Legend />
                         <Bar dataKey="workload" fill="var(--color-workload)" radius={4} />
                         <Bar dataKey="backlog" fill="var(--color-backlog)" radius={4} />
                     </BarChart>
@@ -412,7 +424,7 @@ export function ManagerDashboard() {
                       <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
                       <YAxis tickFormatter={(val) => `₹${val/1000}k`} />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      <Legend />
+                      <RechartsPrimitive.Legend />
                       <Bar dataKey="beforeAI" fill="var(--color-beforeAI)" radius={4} />
                       <Bar dataKey="afterAI" fill="var(--color-afterAI)" radius={4} />
                   </BarChart>
@@ -431,7 +443,7 @@ export function ManagerDashboard() {
                         <XAxis dataKey="model" />
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Legend />
+                        <RechartsPrimitive.Legend />
                         <Bar dataKey="2023" fill="var(--color-2023)" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="2024" fill="var(--color-2024)" radius={[4, 4, 0, 0]} />
                     </BarChart>

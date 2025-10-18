@@ -363,3 +363,4 @@ export {
   ChartLegendContent,
   ChartStyle,
 }
+export const RechartsPrimitive = RechartsPrimitive;
