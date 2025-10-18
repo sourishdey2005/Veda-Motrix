@@ -11,7 +11,7 @@ import { subDays, format } from 'date-fns';
 interface AuthContextType {
   user: User | null;
   vehicles: Vehicle[];
-  login: (email: string, pass: string) => Promise<boolean>;
+  login: (email: string, pass: string, role: User['role']) => Promise<boolean>;
   signup: (name: string, email: string, pass: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
@@ -163,9 +163,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = async (email: string, pass: string): Promise<boolean> => {
+  const login = async (email: string, pass: string, role: User['role']): Promise<boolean> => {
     const passwordHash = simpleHash(pass);
-    const foundUser = mockUsers.find(u => u.email === email && u.passwordHash === passwordHash);
+    const foundUser = mockUsers.find(u => u.email === email && u.passwordHash === passwordHash && u.role === role);
     
     if (foundUser) {
       const userToStore = { ...foundUser };
@@ -221,7 +221,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     localStorage.removeItem('veda-user');
     // Don't remove vehicles on logout to persist them for the next session
-    router.push('/');
+    router.push('/login');
   };
 
   const updateUser = (data: Partial<User>) => {
@@ -286,10 +286,3 @@ export const useAuth = () => {
   return context;
 };
 
-  
-
-    
-
-    
-
-    

@@ -4,10 +4,9 @@ import Link from 'next/link';
 import { SignupForm } from '@/components/signup-form';
 import { VedaMotrixLogo } from '@/components/icons';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { DemoCredentialCard } from '@/components/credential-card';
 
 export default function SignupPage() {
-  const signupBg = PlaceHolderImages.find(img => img.id === 'signup-bg');
+  const signupBg = PlaceHolderImages.find(img => img.id === 'signup-bg-2');
   
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
@@ -25,7 +24,7 @@ export default function SignupPage() {
 
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
-            <Link href="/login/user" className="underline">
+            <Link href="/login" className="underline">
               Login
             </Link>
           </div>
@@ -35,16 +34,12 @@ export default function SignupPage() {
         {signupBg && (
            <Image
             src={signupBg.imageUrl}
-            alt="Lush green grass with sunlight"
+            alt={signupBg.description}
             fill
             data-ai-hint={signupBg.imageHint}
             className="h-full w-full object-cover"
           />
         )}
-         <div className="absolute top-6 right-6 z-10">
-          <DemoCredentialCard />
-        </div>
       </div>
     </div>
   );
-}

@@ -1,12 +1,23 @@
 
+"use client";
+
+import { useState } from 'react';
 import Image from 'next/image';
 import { LoginForm } from '@/components/login-form';
 import { VedaMotrixLogo } from '@/components/icons';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { DemoCredentialCard } from '@/components/credential-card';
+import type { User } from '@/lib/types';
+import { RoleSelector } from '@/components/role-selector';
 
-export default function ServiceCenterLoginPage() {
+export default function UnifiedLoginPage() {
   const loginBg = PlaceHolderImages.find(img => img.id === 'login-bg');
+  const [selectedRole, setSelectedRole] = useState<User['role'] | null>(null);
+
+  const handleRoleSelect = (role: User['role']) => {
+    setSelectedRole(role);
+  };
+
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
       <div className="flex items-center justify-center py-12">
@@ -15,10 +26,16 @@ export default function ServiceCenterLoginPage() {
             <VedaMotrixLogo className="h-12 w-12 mx-auto text-primary" />
             <h1 className="text-3xl font-bold">VEDA-MOTRIX AI</h1>
             <p className="text-balance text-muted-foreground">
-              Knowledge in Motion - Service Center Login
+              {selectedRole 
+                ? `Knowledge in Motion - ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1).replace('-', ' ')} Login`
+                : 'Knowledge in Motion'}
             </p>
           </div>
-          <LoginForm userType="service-center" />
+          
+          <RoleSelector onRoleSelect={handleRoleSelect} selectedRole={selectedRole} />
+          
+          {selectedRole && <LoginForm userType={selectedRole} />}
+
         </div>
       </div>
       <div className="hidden bg-muted lg:block">
@@ -33,7 +50,6 @@ export default function ServiceCenterLoginPage() {
           />
         )}
       </div>
-       {/* Credential card in the top right corner */}
       <div className="fixed top-6 right-6 z-10 hidden lg:block">
           <DemoCredentialCard />
       </div>

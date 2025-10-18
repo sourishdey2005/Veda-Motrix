@@ -21,11 +21,11 @@ export function LoginForm({ userType }: { userType: User['role'] }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    const success = await login(email, password);
+    const success = await login(email, password, userType);
     if (!success) {
       toast({
         title: 'Login Failed',
-        description: 'Invalid email or password. Please try again.',
+        description: 'Invalid email or password for the selected role. Please try again.',
         variant: 'destructive',
       });
     }
@@ -71,7 +71,7 @@ export function LoginForm({ userType }: { userType: User['role'] }) {
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Login
+              Login as {userType.charAt(0).toUpperCase() + userType.slice(1).replace('-', ' ')}
             </Button>
           </div>
         </form>
