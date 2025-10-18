@@ -6,7 +6,7 @@ import { Activity, AlertTriangle, ArrowRight, Bot, ShieldCheck, Factory, Users, 
 import React, { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { loadBalancingSuggestions } from "@/lib/data"
+import { loadBalancingSuggestion } from "@/lib/data"
 import { Button } from "@/components/ui/button"
 
 const initialAgents = [
@@ -21,7 +21,7 @@ const initialAgents = [
 ]
 
 function RealTimeLoadBalancer() {
-  const [suggestions, setSuggestions] = useState(loadBalancingSuggestions.slice(0,1));
+  const [suggestions, setSuggestions] = useState(loadBalancingSuggestion.slice(0,1));
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,8 +34,8 @@ function RealTimeLoadBalancer() {
                 return [{...currentSuggestion, status: 'completed'}]
             }
             // Cycle back to a new suggestion
-            const nextIndex = (loadBalancingSuggestions.findIndex(s => s.id === currentSuggestion.id) + 1) % loadBalancingSuggestions.length;
-            return [loadBalancingSuggestions[nextIndex]];
+            const nextIndex = (loadBalancingSuggestion.findIndex(s => s.id === currentSuggestion.id) + 1) % loadBalancingSuggestion.length;
+            return [loadBalancingSuggestion[nextIndex]];
         });
     }, 4000);
     return () => clearInterval(interval);
@@ -146,7 +146,8 @@ export function OrchestrationView() {
           <div className="relative flex flex-wrap items-center justify-center gap-4 p-4 rounded-lg bg-muted/50 min-h-[120px]">
             {agents.map((agent, index) => (
               <React.Fragment key={agent.name}>
-                 <Link href={agent.href}>
+                 <Link href={agent.href} legacyBehavior>
+                  <a>
                     <div className={cn(
                       "flex flex-col items-center gap-2 p-3 rounded-lg border bg-background transition-all duration-500 w-28 h-28 justify-center",
                       activeAgent >= index ? "shadow-lg scale-105" : "opacity-50",
@@ -162,6 +163,7 @@ export function OrchestrationView() {
                       )} />
                       <span className="text-xs text-center font-medium">{agent.name}</span>
                     </div>
+                  </a>
                 </Link>
                 {index < agents.length -1 && <ArrowRight className={cn("h-6 w-6 text-muted-foreground transition-all duration-500", activeAgent > index ? "text-primary" : "opacity-50")} />}
               </React.Fragment>

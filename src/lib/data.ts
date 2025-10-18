@@ -28,7 +28,65 @@ const vehicleImg2 = PlaceHolderImages.find(img => img.id === 'vehicle-2');
 const vehicleImg3 = PlaceHolderImages.find(img => img.id === 'vehicle-3');
 
 export const indianMakes = ['Hero', 'Mahindra', 'Tata', 'Maruti Suzuki', 'Bajaj', 'TVS', 'Royal Enfield'];
-export const indianModels = ['Splendor', 'Xtreme', 'XUV700', 'Scorpio', 'Pleasure+', 'Thar', 'Passion', 'Jawa', 'Karizma', 'Bolero', 'Nexon', 'Harrier', 'Swift', 'Baleno', 'Pulsar', 'Apache', 'Classic 350'];
+
+const mahindraVehicles = [
+    { make: 'Mahindra', model: 'Thar' },
+    { make: 'Mahindra', model: 'Scorpio' },
+    { make: 'Mahindra', model: 'Scorpio-N' },
+    { make: 'Mahindra', model: 'Bolero' },
+    { make: 'Mahindra', model: 'Bolero Neo' },
+    { make: 'Mahindra', model: 'XUV300' },
+    { make: 'Mahindra', model: 'XUV400 EV' },
+    { make: 'Mahindra', model: 'XUV500' },
+    { make: 'Mahindra', model: 'XUV700' },
+    { make: 'Mahindra', model: 'Marazzo' },
+    { make: 'Mahindra', model: 'TUV300' },
+    { make: 'Mahindra', model: 'KUV100 NXT' },
+    { make: 'Mahindra', model: 'Alturas G4' },
+    { make: 'Mahindra', model: 'Verito' },
+    { make: 'Mahindra', model: 'Verito Vibe' },
+    { make: 'Mahindra', model: 'eVerito' },
+    { make: 'Mahindra', model: 'e2o Plus' },
+    { make: 'Mahindra', model: 'Jeeto' },
+    { make: 'Mahindra', model: 'Supro Van' },
+    { make: 'Mahindra', model: 'Supro Maxitruck' },
+    { make: 'Mahindra', model: 'Bolero Pik-Up' },
+    { make: 'Mahindra', model: 'Imperio' },
+    { make: 'Mahindra', model: 'Furio' },
+    { make: 'Mahindra', model: 'Blazo X' },
+    { make: 'Mahindra', model: 'Treo' },
+];
+
+const heroVehicles = [
+    { make: 'Hero', model: 'Splendor Plus' },
+    { make: 'Hero', model: 'HF Deluxe' },
+    { make: 'Hero', model: 'Passion Pro' },
+    { make: 'Hero', model: 'Glamour' },
+    { make: 'Hero', model: 'Super Splendor' },
+    { make: 'Hero', model: 'Xtreme 160R' },
+    { make: 'Hero', model: 'Xtreme 200S' },
+    { make: 'Hero', model: 'Xpulse 200' },
+    { make: 'Hero', model: 'Xpulse 200 4V' },
+    { make: 'Hero', model: 'Hunk 150R' },
+    { make: 'Hero', model: 'Achiever 150' },
+    { make: 'Hero', model: 'Karizma XMR' },
+    { make: 'Hero', model: 'CBZ' },
+    { make: 'Hero', model: 'Ignitor' },
+    { make: 'Hero', model: 'Maestro Edge' },
+    { make: 'Hero', model: 'Pleasure Plus' },
+    { make: 'Hero', model: 'Destini 125' },
+    { make: 'Hero', model: 'Maestro Xoom 110' },
+    { make: 'Hero', model: 'Duet' },
+    { make: 'Hero', model: 'Vida V1' },
+    { make: 'Hero', model: 'HF 100' },
+    { make: 'Hero', model: 'Passion XPro' },
+    { make: 'Hero', model: 'Splendor iSmart' },
+    { make: 'Hero', model: 'Glamour Xtec' },
+];
+
+export const indianModels = [...mahindraVehicles, ...heroVehicles];
+
+
 export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal', 'Visakhapatnam', 'Patna', 'Vadodara', 'Ghaziabad', 'Ludhiana', 'Agra', 'Nashik', 'Faridabad', 'Meerut', 'Rajkot', 'Varanasi', 'Srinagar', 'Aurangabad', 'Dhanbad', 'Amritsar', 'Allahabad', 'Ranchi', 'Howrah', 'Coimbatore', 'Jabalpur', 'Gwalior', 'Vijayawada', 'Jodhpur', 'Madurai', 'Raipur', 'Kota', 'Guwahati', 'Chandigarh', 'Noida'];
 
 
@@ -198,15 +256,19 @@ export const predictedIssues = [
   { issue: 'Coolant Level Low', risk: 'Medium' },
 ];
 
+const newVehicleData = [...mahindraVehicles, ...heroVehicles];
+
 export const vehicles: Vehicle[] = Array.from({ length: 50 }, (_, i) => {
   const healthStatus = i % 5 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
   const healthScore = healthStatus === 'Critical' ? 30 + Math.random() * 20 : healthStatus === 'Warning' ? 60 + Math.random() * 20 : 85 + Math.random() * 15;
   const selectedImg = i % 3 === 0 ? vehicleImg1 : i % 2 === 0 ? vehicleImg2 : vehicleImg3;
+  const vehicleInfo = newVehicleData[i % newVehicleData.length];
+
   return {
     id: `V${1001 + i}`,
     ownerId: '3', // All owned by Rohan Joshi for simplicity
-    make: indianMakes[i % indianMakes.length],
-    model: indianModels[i % indianModels.length],
+    make: vehicleInfo.make,
+    model: vehicleInfo.model,
     year: 2020 + (i % 4),
     vin: `VIN${Math.random().toString(36).substring(2, 15).toUpperCase()}`,
     imageUrl: selectedImg?.imageUrl || '',
@@ -445,8 +507,8 @@ export const rcaCapaAnalyticsData = {
       count: Math.floor(Math.random() * 20),
     })),
   })),
-  designVulnerability: indianModels.slice(0, 5).map((model, i) => ({
-    model: `${indianMakes[i % 2]} ${model}`,
+  designVulnerability: indianModels.slice(0, 5).map((v, i) => ({
+    model: `${v.make} ${v.model}`,
     riskScore: 20 + Math.random() * 70,
   })),
   aiRecommendations: [
@@ -539,8 +601,8 @@ export const executiveAnalyticsData = {
     { month: "May", beforeAI: 530000, afterAI: 320000 },
     { month: "Jun", beforeAI: 580000, afterAI: 300000 },
   ],
-  rulPrediction: indianModels.map((model, i) => ({
-    model: `${indianMakes[i % indianMakes.length]} ${model}`,
+  rulPrediction: indianModels.map((v, i) => ({
+    model: `${v.make} ${v.model}`,
     rul: 3.5 + Math.random() * 4,
   })),
   detectionRate: 85.4,
@@ -748,7 +810,7 @@ export const failurePatterns: FailurePattern[] = [
     { region: 'North', issue: 'Suspension Damage', insight: 'Increased reports of suspension issues in Delhi NCR, correlating with poor road conditions.', severity: 'High' },
 ];
 
-export const loadBalancingSuggestions: LoadBalancingSuggestion[] = [
+export const loadBalancingSuggestion: LoadBalancingSuggestion[] = [
     { id: 'LB1', fromCenter: 'VedaMotrix Koramangala', toCenter: 'VedaMotrix Whitefield', reason: 'High workload (92%) at Koramangala.', etaImpact: -18, status: 'suggested' },
     { id: 'LB2', fromCenter: 'VedaMotrix Andheri', toCenter: 'VedaMotrix Thane', reason: 'Andheri at capacity; Thane has 3 available bays.', etaImpact: -12, status: 'suggested' },
 ];
