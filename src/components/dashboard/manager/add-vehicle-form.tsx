@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -7,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { indianMakes, indianModels } from '@/lib/data';
+import { indianMakes } from '@/lib/data';
 import {
   Select,
   SelectContent,
@@ -62,7 +63,7 @@ export function AddVehicleForm({ onVehicleAdded }: { onVehicleAdded: () => void 
           <Label htmlFor="model">Model</Label>
           <Input
             id="model"
-            placeholder="e.g., XUV700"
+            placeholder="e.g., XUV700 or Splendor Plus"
             required
             value={model}
             onChange={(e) => setModel(e.target.value)}

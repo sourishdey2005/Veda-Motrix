@@ -1,4 +1,5 @@
 
+
 import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion, CapaItem, WhatIfScenario } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
@@ -27,7 +28,7 @@ const vehicleImg1 = PlaceHolderImages.find(img => img.id === 'vehicle-1');
 const vehicleImg2 = PlaceHolderImages.find(img => img.id === 'vehicle-2');
 const vehicleImg3 = PlaceHolderImages.find(img => img.id === 'vehicle-3');
 
-export const indianMakes = ['Hero', 'Mahindra', 'Tata', 'Maruti Suzuki', 'Bajaj', 'TVS', 'Royal Enfield'];
+export const indianMakes = ['Mahindra', 'Hero'];
 
 const mahindraVehicles = [
     { make: 'Mahindra', model: 'Thar' },
@@ -82,6 +83,7 @@ const heroVehicles = [
     { make: 'Hero', model: 'Passion XPro' },
     { make: 'Hero', model: 'Splendor iSmart' },
     { make: 'Hero', model: 'Glamour Xtec' },
+    { make: 'Hero', model: 'Mavrick 440'}, // One extra to make it 25
 ];
 
 export const indianModels = [...mahindraVehicles, ...heroVehicles];
@@ -439,9 +441,9 @@ export const analyticsData = {
     preventiveSavings: 1250000,
   },
   predictiveBreakdown: rcaComponents.flatMap(component => 
-    indianMakes.map(model => ({
+    indianModels.slice(0, 5).map(model => ({ // Use a slice to keep it manageable
       component,
-      model,
+      model: model.model,
       probability: Math.random()
     }))
   ),
@@ -456,9 +458,9 @@ export const analyticsData = {
     { name: 'Pune SC', workload: 85, backlog: 5 },
     { name: 'Chennai SC', workload: 70, backlog: 8 },
   ],
-  ageVsFailureRate: indianMakes.flatMap(make => 
+  ageVsFailureRate: indianModels.slice(0,5).flatMap(make => 
     Array.from({length: 5}, (_, i) => ({
-      make,
+      make: make.make,
       age: i + 1,
       failureRate: (i + 1) * 2 + Math.random() * 5,
       vehicleCount: 100 + Math.random() * 200,
