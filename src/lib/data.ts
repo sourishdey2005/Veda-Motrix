@@ -201,6 +201,17 @@ const generatePredictedAlerts = (): PredictedAlert[] => [
     { id: 'PA3', issue: 'Tire Pressure Imbalance', priority: 'Low', recommendation: 'Check and adjust tire pressures. Monitor for slow leaks.', estimatedTime: '15 mins', estimatedCost: 200, parts: [], laborCost: 200 },
 ];
 
+export const predictedIssues = [
+  { issue: 'Brake Pad Wear', risk: 'High' },
+  { issue: 'Battery Degradation', risk: 'Medium' },
+  { issue: 'Oil Level Low', risk: 'Medium' },
+  { issue: 'Tire Pressure Imbalance', risk: 'Low' },
+  { issue: 'Suspension Weakness', risk: 'High' },
+  { issue: 'ECU Anomaly', risk: 'Critical' },
+  { issue: 'Air Filter Clogged', risk: 'Low' },
+  { issue: 'Coolant Level Low', risk: 'Medium' },
+];
+
 const generatePredictiveInsights = (): PredictiveInsight[] => [
   {
     id: 'PI1',
@@ -244,17 +255,6 @@ const generateEnvironmentalData = (): EnvironmentalData => ({
     { id: 'B4', name: 'Carbon Saver', description: 'Saved 50kg of CO2 through proactive maintenance.', icon: 'shield', earned: false },
   ]
 });
-
-export const predictedIssues = [
-  { issue: 'Brake Pad Wear', risk: 'High' },
-  { issue: 'Battery Degradation', risk: 'Medium' },
-  { issue: 'Oil Level Low', risk: 'Medium' },
-  { issue: 'Tire Pressure Imbalance', risk: 'Low' },
-  { issue: 'Suspension Weakness', risk: 'High' },
-  { issue: 'ECU Anomaly', risk: 'Critical' },
-  { issue: 'Air Filter Clogged', risk: 'Low' },
-  { issue: 'Coolant Level Low', risk: 'Medium' },
-];
 
 export const vehicles: Vehicle[] = indianModels.map((vehicleInfo, i) => {
   const healthStatus = i % 5 === 0 ? 'Critical' : i % 3 === 0 ? 'Warning' : 'Good';
@@ -446,13 +446,6 @@ export const analyticsData = {
     city,
     demand: 50 + Math.floor(Math.random() * 100),
   })),
-  serviceLoad: [
-    { name: 'Mumbai SC', workload: 120, backlog: 15 },
-    { name: 'Delhi SC', workload: 90, backlog: 25 },
-    { name: 'Bengaluru SC', workload: 110, backlog: 10 },
-    { name: 'Pune SC', workload: 85, backlog: 5 },
-    { name: 'Chennai SC', workload: 70, backlog: 8 },
-  ],
   ageVsFailureRate: indianModels.slice(0,5).flatMap(vehicle => 
     Array.from({length: 5}, (_, i) => ({
       make: vehicle.make,
@@ -646,6 +639,13 @@ export const executiveAnalyticsData = {
       ],
     },
   ],
+  serviceLoad: [
+    { name: 'Mumbai SC', workload: 120, backlog: 15 },
+    { name: 'Delhi SC', workload: 90, backlog: 25 },
+    { name: 'Bengaluru SC', workload: 110, backlog: 10 },
+    { name: 'Pune SC', workload: 85, backlog: 5 },
+    { name: 'Chennai SC', workload: 70, backlog: 8 },
+  ],
 };
 
 export const customerExperienceData = {
@@ -812,3 +812,5 @@ export const loadBalancingSuggestion: LoadBalancingSuggestion[] = [
     { id: 'LB1', fromCenter: 'VedaMotrix Koramangala', toCenter: 'VedaMotrix Whitefield', reason: 'High workload (92%) at Koramangala.', etaImpact: -18, status: 'suggested' },
     { id: 'LB2', fromCenter: 'VedaMotrix Andheri', toCenter: 'VedaMotrix Thane', reason: 'Andheri at capacity; Thane has 3 available bays.', etaImpact: -12, status: 'suggested' },
 ];
+
+    

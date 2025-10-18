@@ -6,7 +6,7 @@ import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/com
 import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown, ShieldAlert } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
-import { allVehicles, executiveAnalyticsData, analyticsData, predictedIssues } from "@/lib/data"
+import { executiveAnalyticsData, predictedIssues } from "@/lib/data"
 import type { Vehicle } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -40,6 +40,16 @@ const statusChartConfig: ChartConfig = {
 const serviceLoadChartConfig: ChartConfig = {
   workload: { label: "Workload", color: "hsl(var(--chart-1))" },
   backlog: { label: "Backlog", color: "hsl(var(--chart-2))" },
+}
+
+const warrantyChartConfig: ChartConfig = {
+  beforeAI: { label: "Before AI", color: "hsl(var(--chart-5))" },
+  afterAI: { label: "After AI", color: "hsl(var(--chart-1))" },
+}
+
+const reliabilityChartConfig: ChartConfig = {
+  '2023': { label: "2023", color: "hsl(var(--chart-5))" },
+  '2024': { label: "2024", color: "hsl(var(--chart-1))" },
 }
 
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
@@ -119,6 +129,14 @@ export function ManagerDashboard() {
     d.map(m => ({...m, predictive: Math.min(100, m.predictive + 1), reactive: Math.max(0, m.reactive -1)}))
   );
 
+  const warrantyCost = useSimulatedData(executiveAnalyticsData.warrantyCost, d => 
+    d.map(w => ({...w, afterAI: Math.max(0, w.afterAI - Math.random() * 5000)}))
+  );
+
+  const reliabilityComparison = useSimulatedData(executiveAnalyticsData.fleetReliability, d => 
+    d.map(item => ({...item, '2024': Math.max(0, item['2024'] - (Math.random() * 0.1))}))
+  );
+
   const aiRoi = useSimulatedData(executiveAnalyticsData.aiRoi, d => ({
     costSavings: d.costSavings + Math.random() * 10000,
     timeSavings: d.timeSavings + Math.random() * 0.1,
@@ -126,7 +144,7 @@ export function ManagerDashboard() {
   }));
 
   const serviceLoad = useSimulatedData(
-    analyticsData.serviceLoad,
+    executiveAnalyticsData.serviceLoad,
     data => data.map(item => ({ 
         ...item, 
         workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
@@ -381,6 +399,47 @@ export function ManagerDashboard() {
         </Card>
       </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+              <CardTitle>Warranty Cost Reduction Graph</CardTitle>
+              <CardDescription>Visual comparison of warranty claims before vs. after AI integration.</CardDescription>
+          </CardHeader>
+          <CardContent>
+              <ChartContainer config={warrantyChartConfig} className="h-64">
+                  <BarChart data={warrantyCost}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
+                      <YAxis tickFormatter={(val) => `₹${val/1000}k`} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Legend />
+                      <Bar dataKey="beforeAI" fill="var(--color-beforeAI)" radius={4} />
+                      <Bar dataKey="afterAI" fill="var(--color-afterAI)" radius={4} />
+                  </BarChart>
+              </ChartContainer>
+          </CardContent>
+        </Card>
+        <Card>
+            <CardHeader>
+                <CardTitle>Fleet Reliability Comparison</CardTitle>
+                <CardDescription>“Model XUV700 shows 15% fewer failures than 2023 after CAPA.”</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={reliabilityChartConfig} className="h-64">
+                    <BarChart data={reliabilityComparison}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="model" />
+                        <YAxis />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Legend />
+                        <Bar dataKey="2023" fill="var(--color-2023)" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="2024" fill="var(--color-2024)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+      </div>
+
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -437,3 +496,5 @@ export function ManagerDashboard() {
     </div>
   )
 }
+
+    
