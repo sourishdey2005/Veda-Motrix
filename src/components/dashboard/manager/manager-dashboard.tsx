@@ -54,7 +54,7 @@ const reliabilityChartConfig: ChartConfig = {
 
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
     const [data, setData] = useState(initialData);
-    const memoizedUpdater = useCallback(updater, [updater]);
+    const memoizedUpdater = useCallback(updater, []);
     useEffect(() => {
         const interval = setInterval(() => {
             setData(prevData => memoizedUpdater(prevData));
