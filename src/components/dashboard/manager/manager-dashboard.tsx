@@ -2,10 +2,10 @@
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown } from "lucide-react"
+import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown, ShieldAlert } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
-import { allVehicles, executiveAnalyticsData, analyticsData } from "@/lib/data"
+import { allVehicles, executiveAnalyticsData, analyticsData, predictedIssues } from "@/lib/data"
 import type { Vehicle } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -23,6 +23,7 @@ import { AddVehicleForm } from "./add-vehicle-form"
 import { AreaChart, Area, PieChart, Pie, Cell, Legend, BarChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import type { ChartConfig } from "@/components/ui/chart"
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 
 const maintenanceChartConfig: ChartConfig = {
   predictive: { label: "Predictive", color: "hsl(var(--chart-1))" },
@@ -42,7 +43,7 @@ const serviceLoadChartConfig: ChartConfig = {
 
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
     const [data, setData] = useState(initialData);
-    const memoizedUpdater = useCallback(updater, [updater]);
+    const memoizedUpdater = useCallback(updater, []);
     useEffect(() => {
         const interval = setInterval(() => {
             setData(prevData => memoizedUpdater(prevData));
@@ -61,6 +62,12 @@ const getStatusColor = (status: Vehicle['healthStatus']) => {
     }
 }
 
+const getHealthColor = (score: number) => {
+    if (score > 80) return 'text-green-500';
+    if (score > 50) return 'text-yellow-500';
+    return 'text-red-500';
+};
+
 const healthToPercentage = (status: Vehicle['healthStatus']) => {
     switch (status) {
         case 'Good': return 90 + Math.random() * 10;
@@ -69,14 +76,6 @@ const healthToPercentage = (status: Vehicle['healthStatus']) => {
         default: return 0;
     }
 }
-
-const predictedIssues = [
-    { issue: "Battery Wear", risk: "High" },
-    { issue: "Brake Pad Thinning", risk: "Medium" },
-    { issue: "Oil Pressure Drop", risk: "Critical" },
-    { issue: "Coolant Level Low", risk: "Low" },
-    { issue: "Tire Pressure Imbalance", risk: "Medium" },
-]
 
 export function ManagerDashboard() {
   const { vehicles, addVehicle } = useAuth();
@@ -93,12 +92,23 @@ export function ManagerDashboard() {
   useEffect(() => {
     const interval = setInterval(() => {
         setSimulatedVehicles(currentVehicles => currentVehicles.map(v => {
-            const random = Math.random();
             let newStatus: Vehicle['healthStatus'] = v.healthStatus;
-            if (random < 0.1) newStatus = 'Good';
-            else if (random < 0.2) newStatus = 'Warning';
-            else if (random < 0.3) newStatus = 'Critical';
-            return {...v, healthStatus: newStatus}
+            let newHealthScore = v.healthScore;
+            
+            const random = Math.random();
+            if (random < 0.1) {
+                newStatus = 'Good';
+                newHealthScore = Math.min(100, v.healthScore + 5);
+            } else if (random < 0.2) {
+                newStatus = 'Warning';
+                newHealthScore = Math.max(50, v.healthScore - 5);
+            } else if (random < 0.25) {
+                newStatus = 'Critical';
+                newHealthScore = Math.max(10, v.healthScore - 10);
+            } else {
+                newHealthScore = Math.min(100, Math.max(0, v.healthScore + (Math.random() - 0.5) * 3));
+            }
+            return {...v, healthStatus: newStatus, healthScore: newHealthScore }
         }))
     }, 4000);
     return () => clearInterval(interval);
@@ -140,6 +150,12 @@ export function ManagerDashboard() {
       { name: 'Warning', value: counts['Warning'] || 0, fill: statusChartConfig.Warning.color },
       { name: 'Critical', value: counts['Critical'] || 0, fill: statusChartConfig.Critical.color },
     ];
+  }, [simulatedVehicles]);
+
+  const highestRiskVehicles = useMemo(() => {
+    return [...simulatedVehicles]
+      .sort((a, b) => a.healthScore - b.healthScore)
+      .slice(0, 5);
   }, [simulatedVehicles]);
 
 
@@ -242,7 +258,7 @@ export function ManagerDashboard() {
         </CardContent>
       </Card>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card>
             <CardHeader>
                 <CardTitle>Fleet Status Distribution</CardTitle>
@@ -287,27 +303,80 @@ export function ManagerDashboard() {
                 </ChartContainer>
             </CardContent>
         </Card>
+        <Card>
+            <CardHeader>
+                <CardTitle>Top Predicted Issues</CardTitle>
+                <CardDescription>Most frequent potential failures across the fleet.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <div className="space-y-3">
+                    {predictedIssues.slice(0, 5).map(issue => (
+                        <div key={issue.issue} className="flex justify-between items-center">
+                            <span className="text-sm font-medium">{issue.issue}</span>
+                             <Badge variant={issue.risk === 'High' || issue.risk === 'Critical' ? 'destructive' : 'secondary'}>
+                                {issue.risk}
+                            </Badge>
+                        </div>
+                    ))}
+                 </div>
+            </CardContent>
+        </Card>
       </div>
 
-       <Card>
-        <CardHeader>
-            <CardTitle>Service Center Load Distribution</CardTitle>
-            <CardDescription>Comparison of service center workloads and backlogs.</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <ChartContainer config={serviceLoadChartConfig} className="h-64">
-                <BarChart data={serviceLoad}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Legend />
-                    <Bar dataKey="workload" fill="var(--color-workload)" radius={4} />
-                    <Bar dataKey="backlog" fill="var(--color-backlog)" radius={4} />
-                </BarChart>
-            </ChartContainer>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+            <CardHeader>
+                <CardTitle>Service Center Load Distribution</CardTitle>
+                <CardDescription>Comparison of service center workloads and backlogs.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={serviceLoadChartConfig} className="h-64">
+                    <BarChart data={serviceLoad}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} />
+                        <YAxis />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Legend />
+                        <Bar dataKey="workload" fill="var(--color-workload)" radius={4} />
+                        <Bar dataKey="backlog" fill="var(--color-backlog)" radius={4} />
+                    </BarChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader>
+                <CardTitle>Highest Risk Vehicles</CardTitle>
+                <CardDescription>Vehicles with the lowest health scores requiring attention.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableBody>
+                        {highestRiskVehicles.map(vehicle => (
+                            <TableRow key={vehicle.id}>
+                                <TableCell>
+                                    <div className="font-medium">{vehicle.make} {vehicle.model}</div>
+                                    <div className="text-xs text-muted-foreground">{vehicle.vin}</div>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <div className={cn("font-bold", getHealthColor(vehicle.healthScore))}>
+                                        {vehicle.healthScore.toFixed(0)}%
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">{vehicle.healthStatus}</div>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                     <Link href={`/dashboard/vehicles/${vehicle.id}`}>
+                                        <Button variant="ghost" size="sm">
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                    </Link>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+      </div>
 
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -365,7 +434,3 @@ export function ManagerDashboard() {
     </div>
   )
 }
-
-    
-
-    
