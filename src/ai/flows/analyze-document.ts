@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview An AI agent to analyze uploaded documents (CSV, PDF).
+ * @fileOverview An AI agent to analyze uploaded documents (CSV, PDF, TXT).
  *
  * - analyzeDocument - A function that analyzes the content of a file based on a user prompt.
  * - AnalyzeDocumentInput - The input type for the analyzeDocument function.
@@ -36,29 +36,37 @@ export type AnalyzeDocumentOutput = z.infer<
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
 ): Promise<AnalyzeDocumentOutput> {
-    // This is a mock implementation to ensure the feature works without a live API call.
-    // In a real scenario, you would extract text from the PDF/CSV and send it to the AI.
-    console.log("Analyzing document with prompt:", input.prompt);
-    
-    await new Promise(resolve => setTimeout(resolve, 1500));
+  // Extract the Base64 content from the data URI
+  const base64Content = input.documentDataUri.split(',')[1];
+  if (!base64Content) {
+    throw new Error('Invalid document data URI: No Base64 content found.');
+  }
 
-    const mockAnalysis = `
-### Mock Document Analysis
+  // Decode the Base64 content to a string
+  const documentText = Buffer.from(base64Content, 'base64').toString('utf-8');
+  
+  const systemPrompt = `You are a professional document analysis AI. Analyze the following document text based on the user's request. Provide a concise, well-structured analysis in Markdown format.
 
-This is a **mock analysis** provided because the live AI service was encountering errors. This ensures the application remains interactive for demonstration purposes.
+Use headings, bold text, and bullet points to structure your response for clarity.
 
-**Original Prompt:** "${input.prompt}"
-
+Document Text:
 ---
+${documentText}
+---
+`;
 
-#### Key Findings (Mock Data):
-*   **Total Revenue:** The total revenue for the last quarter was **$1.2M**, an increase of 15% year-over-year.
-*   **Top Performing Region:** The 'West' region showed the highest growth at **25%**.
-*   **Area for Improvement:** The 'Brake Pad' component has a 12% higher failure rate than projected, suggesting a quality control review is needed.
+  const completion = await openai.chat.completions.create({
+    model: 'openai/gpt-4o',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: input.prompt },
+    ],
+  });
 
-#### Summary (Mock Data):
-The uploaded document indicates strong overall performance but highlights a potential quality issue with a specific component. The financial growth is robust, but attention should be directed towards the supply chain or manufacturing process for brake pads to mitigate future warranty claims and improve customer satisfaction.
-    `;
+  const analysis = completion.choices[0].message?.content;
+  if (!analysis) {
+    throw new Error('AI failed to generate an analysis.');
+  }
 
-    return { analysis: mockAnalysis };
+  return { analysis };
 }
