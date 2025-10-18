@@ -42,7 +42,7 @@ const serviceLoadChartConfig: ChartConfig = {
 
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
     const [data, setData] = useState(initialData);
-    const memoizedUpdater = useCallback(updater, []);
+    const memoizedUpdater = useCallback(updater, [updater]);
     useEffect(() => {
         const interval = setInterval(() => {
             setData(prevData => memoizedUpdater(prevData));
@@ -116,11 +116,11 @@ export function ManagerDashboard() {
 
   const serviceLoad = useSimulatedData(
     analyticsData.serviceLoad,
-    item => ({ 
+    data => data.map(item => ({ 
         ...item, 
         workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
         backlog: Math.max(0, item.backlog + Math.floor((Math.random() - 0.45) * 5))
-    })
+    }))
   );
   
   const globalHealthIndex = useMemo(() => {
