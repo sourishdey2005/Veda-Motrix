@@ -187,6 +187,16 @@ const generateEnvironmentalData = (): EnvironmentalData => ({
   ]
 });
 
+export const predictedIssues = [
+  { issue: 'Brake Pad Wear', risk: 'High' },
+  { issue: 'Battery Degradation', risk: 'Medium' },
+  { issue: 'Oil Level Low', risk: 'Medium' },
+  { issue: 'Tire Pressure Imbalance', risk: 'Low' },
+  { issue: 'Suspension Weakness', risk: 'High' },
+  { issue: 'ECU Anomaly', risk: 'Critical' },
+  { issue: 'Air Filter Clogged', risk: 'Low' },
+  { issue: 'Coolant Level Low', risk: 'Medium' },
+];
 
 export const vehicles: Vehicle[] = Array.from({ length: 50 }, (_, i) => {
   const healthStatus = i % 5 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
