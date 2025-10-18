@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -284,8 +285,9 @@ export function ManagerDashboard() {
                 <CardDescription>Shows the shift towards predictive maintenance over time.</CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="rounded-lg overflow-hidden">
                 <ChartContainer config={maintenanceChartConfig} className="h-64">
-                    <AreaChart data={maintenanceRatio} stackOffset="expand" margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    <AreaChart data={maintenanceRatio} stackOffset="expand" margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                         <defs>
                             <linearGradient id="fillPredictive" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="var(--color-predictive)" stopOpacity={0.8}/>
@@ -301,6 +303,7 @@ export function ManagerDashboard() {
                         <Area type="monotone" dataKey="reactive" stackId="1" stroke="var(--color-reactive)" fill="url(#fillReactive)" />
                     </AreaChart>
                 </ChartContainer>
+              </div>
             </CardContent>
         </Card>
         <Card>
