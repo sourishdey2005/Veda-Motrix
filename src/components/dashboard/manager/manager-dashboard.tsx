@@ -54,7 +54,7 @@ const reliabilityChartConfig: ChartConfig = {
 
 function useSimulatedData<T>(initialData: T, updater: (data: T) => T) {
     const [data, setData] = useState(initialData);
-    const memoizedUpdater = useCallback(updater, []);
+    const memoizedUpdater = useCallback(updater, [updater]);
     useEffect(() => {
         const interval = setInterval(() => {
             setData(prevData => memoizedUpdater(prevData));
@@ -143,14 +143,14 @@ export function ManagerDashboard() {
     breakdownReduction: d.breakdownReduction + Math.random() * 0.05
   }));
 
-  const serviceLoad = useSimulatedData(
-    executiveAnalyticsData.serviceLoad,
-    data => data.map(item => ({ 
+  const serviceLoadUpdater = useCallback((data: typeof executiveAnalyticsData.serviceLoad) => 
+    data.map(item => ({ 
         ...item, 
         workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
         backlog: Math.max(0, item.backlog + Math.floor((Math.random() - 0.45) * 5))
-    }))
-  );
+    })), []);
+
+  const serviceLoad = useSimulatedData(executiveAnalyticsData.serviceLoad, serviceLoadUpdater);
   
   const globalHealthIndex = useMemo(() => {
     if (simulatedVehicles.length === 0) return 0;
