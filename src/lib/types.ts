@@ -1,8 +1,4 @@
 
-
-
-
-
 export type User = {
   id: string;
   name: string;
@@ -90,6 +86,13 @@ export type EnvironmentalData = {
   }[];
 };
 
+export type DiagnosticTroubleCode = {
+  code: string;
+  description: string;
+  timestamp: string;
+  status: 'Active' | 'Stored';
+};
+
 export type Vehicle = {
   id: string;
   ownerId: string;
@@ -111,6 +114,7 @@ export type Vehicle = {
   healthHistory: HealthHistoryEntry[];
   predictiveInsights: PredictiveInsight[];
   environmentalData?: EnvironmentalData;
+  dtcs: DiagnosticTroubleCode[];
 };
 
 export type ServiceCenter = {

@@ -2,9 +2,10 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import type { Vehicle } from "@/lib/types";
+import type { Vehicle, DiagnosticTroubleCode } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 const getHealthColor = (score: number) => {
     if (score > 80) return 'text-green-500';
@@ -20,6 +21,12 @@ const getStatusColor = (status: Vehicle['healthStatus']) => {
         default: return 'bg-gray-500';
     }
 }
+
+const DTCBadge = ({ dtc }: { dtc: DiagnosticTroubleCode }) => (
+    <Badge variant={dtc.status === 'Active' ? 'destructive' : 'secondary'} className="text-xs">
+        {dtc.code}: {dtc.description}
+    </Badge>
+);
 
 export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
     const [healthScore, setHealthScore] = useState(vehicle.healthScore);
@@ -80,7 +87,7 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
                     <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted/50">
                         <p className="text-muted-foreground text-xs">Overall Health</p>
                         <p className={cn("text-3xl font-bold", getHealthColor(displayHealthScore))}>{displayHealthScore.toFixed(0)}%</p>
@@ -105,6 +112,14 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
                         <p className="font-medium">Vibration</p>
                         <p className="text-2xl font-bold font-mono">{displaySensorData.vibration.toFixed(2)} m/s²</p>
                     </div>
+                    {vehicle.dtcs && vehicle.dtcs.length > 0 && (
+                         <div className="md:col-span-2 flex flex-col gap-2">
+                            <p className="font-medium">Diagnostic Trouble Codes (DTCs)</p>
+                            <div className="flex flex-wrap gap-2">
+                                {vehicle.dtcs.map(dtc => <DTCBadge key={dtc.code} dtc={dtc} />)}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>

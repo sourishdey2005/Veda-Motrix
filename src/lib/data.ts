@@ -1,5 +1,5 @@
 
-import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion, CapaItem, WhatIfScenario } from './types';
+import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion, CapaItem, WhatIfScenario, DiagnosticTroubleCode } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
 import { subDays, format, addDays } from 'date-fns';
@@ -27,7 +27,7 @@ const vehicleImg1 = PlaceHolderImages.find(img => img.id === 'vehicle-1');
 const vehicleImg2 = PlaceHolderImages.find(img => img.id === 'vehicle-2');
 const vehicleImg3 = PlaceHolderImages.find(img => img.id === 'vehicle-3');
 
-export const indianMakes = ['Mahindra', 'Hero'];
+export const indianMakes = ['Mahindra', 'Hero', 'Tata', 'Maruti'];
 
 const mahindraVehicles = [
     { make: 'Mahindra', model: 'Thar' },
@@ -84,7 +84,28 @@ const heroVehicles = [
     { make: 'Hero', model: 'Glamour Xtec' },
 ];
 
-export const indianModels = [...mahindraVehicles, ...heroVehicles];
+const tataVehicles = [
+    { make: 'Tata', model: 'Nexon' },
+    { make: 'Tata', model: 'Punch' },
+    { make: 'Tata', model: 'Harrier' },
+    { make: 'Tata', model: 'Safari' },
+    { make: 'Tata', model: 'Altroz' },
+    { make: 'Tata', model: 'Tiago' },
+    { make: 'Tata', model: 'Tigor' },
+];
+
+const marutiVehicles = [
+    { make: 'Maruti', model: 'Swift' },
+    { make: 'Maruti', model: 'Baleno' },
+    { make: 'Maruti', model: 'Wagon R' },
+    { make: 'Maruti', model: 'Alto' },
+    { make: 'Maruti', model: 'Dzire' },
+    { make: 'Maruti', model: 'Ertiga' },
+    { make: 'Maruti', model: 'Brezza' },
+];
+
+
+export const indianModels = [...mahindraVehicles.slice(0,20), ...heroVehicles.slice(0,20), ...tataVehicles, ...marutiVehicles];
 
 export const indianCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal', 'Visakhapatnam', 'Patna', 'Vadodara', 'Ghaziabad', 'Ludhiana', 'Agra', 'Nashik', 'Faridabad', 'Meerut', 'Rajkot', 'Varanasi', 'Srinagar', 'Aurangabad', 'Dhanbad', 'Amritsar', 'Allahabad', 'Ranchi', 'Howrah', 'Coimbatore', 'Jabalpur', 'Gwalior', 'Vijayawada', 'Jodhpur', 'Madurai', 'Raipur', 'Kota', 'Guwahati', 'Chandigarh', 'Noida'];
 
@@ -200,6 +221,17 @@ const generatePredictedAlerts = (): PredictedAlert[] => [
     { id: 'PA3', issue: 'Tire Pressure Imbalance', priority: 'Low', recommendation: 'Check and adjust tire pressures. Monitor for slow leaks.', estimatedTime: '15 mins', estimatedCost: 200, parts: [], laborCost: 200 },
 ];
 
+const generateDTCs = (): DiagnosticTroubleCode[] => {
+  const dtcs: DiagnosticTroubleCode[] = [];
+  if (Math.random() < 0.1) {
+    dtcs.push({ code: 'P0301', description: 'Cylinder 1 Misfire Detected', timestamp: new Date().toISOString(), status: 'Active' });
+  }
+  if (Math.random() < 0.2) {
+    dtcs.push({ code: 'U0415', description: 'Invalid Data Received From Anti-Lock Brake System Control Module', timestamp: subDays(new Date(), 5).toISOString(), status: 'Stored' });
+  }
+  return dtcs;
+};
+
 export const predictedIssues = [
   { issue: 'Brake Pad Wear', risk: 'High' },
   { issue: 'Battery Degradation', risk: 'Medium' },
@@ -255,7 +287,7 @@ const generateEnvironmentalData = (): EnvironmentalData => ({
   ]
 });
 
-export const vehicles: Vehicle[] = indianModels.map((vehicleInfo, i) => {
+export const vehicles: Vehicle[] = indianModels.slice(0, 70).map((vehicleInfo, i) => {
   const healthStatus = i % 5 === 0 ? 'Critical' : i % 3 === 0 ? 'Warning' : 'Good';
   const healthScore = healthStatus === 'Critical' ? 30 + Math.random() * 20 : healthStatus === 'Warning' ? 60 + Math.random() * 20 : 85 + Math.random() * 15;
   const selectedImg = i % 3 === 0 ? vehicleImg1 : i % 2 === 0 ? vehicleImg2 : vehicleImg3;
@@ -294,6 +326,7 @@ export const vehicles: Vehicle[] = indianModels.map((vehicleInfo, i) => {
     healthHistory: generateHealthHistory(),
     predictiveInsights: generatePredictiveInsights(),
     environmentalData: generateEnvironmentalData(),
+    dtcs: generateDTCs(),
   };
 });
 

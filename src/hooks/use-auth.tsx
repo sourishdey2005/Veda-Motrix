@@ -4,7 +4,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import type { User, Vehicle, UsageDataPoint, HealthHistoryEntry, PredictedAlert, MaintenanceLog, PredictiveInsight, EnvironmentalData } from '@/lib/types';
+import type { User, Vehicle, UsageDataPoint, HealthHistoryEntry, PredictedAlert, MaintenanceLog, PredictiveInsight, EnvironmentalData, DiagnosticTroubleCode } from '@/lib/types';
 import { users as mockUsers, vehicles as mockVehicles, indianModels } from '@/lib/data';
 import { subDays, format } from 'date-fns';
 
@@ -16,7 +16,7 @@ interface AuthContextType {
   logout: () => void;
   loading: boolean;
   updateUser: (data: Partial<User>) => void;
-  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory' | 'healthHistory' | 'predictiveInsights' | 'environmentalData'>) => void;
+  addVehicle: (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory' | 'healthHistory' | 'predictiveInsights' | 'environmentalData' | 'dtcs'>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -111,7 +111,7 @@ const generateEnvironmentalData = (): EnvironmentalData => ({
     efficiency: 14 + Math.random() * 4 - i * 0.3, // km/L
   })),
   carbonFootprint: {
-    current: 135, // g/km
+    current: 135, // g CO2/km
     reduction: 12, // g/km
   },
   ecoBadges: [
@@ -121,6 +121,17 @@ const generateEnvironmentalData = (): EnvironmentalData => ({
     { id: 'B4', name: 'Carbon Saver', description: 'Saved 50kg of CO2 through proactive maintenance.', icon: 'shield', earned: false },
   ]
 });
+
+const generateDTCs = (): DiagnosticTroubleCode[] => {
+  const dtcs: DiagnosticTroubleCode[] = [];
+  if (Math.random() < 0.1) {
+    dtcs.push({ code: 'P0301', description: 'Cylinder 1 Misfire Detected', timestamp: new Date().toISOString(), status: 'Active' });
+  }
+  if (Math.random() < 0.2) {
+    dtcs.push({ code: 'U0415', description: 'Invalid Data Received From Anti-Lock Brake System Control Module', timestamp: subDays(new Date(), 5).toISOString(), status: 'Stored' });
+  }
+  return dtcs;
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -139,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (storedVehicles) {
         // Quick check to see if the stored data matches the new structure
         const parsedVehicles = JSON.parse(storedVehicles);
-        if (parsedVehicles.length === indianModels.length) {
+        if (parsedVehicles.length === indianModels.slice(0, 70).length) {
             setVehicles(parsedVehicles);
         } else {
              // If not, reset to the new mock data
@@ -238,7 +249,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory' | 'healthHistory' | 'predictiveInsights' | 'environmentalData'>) => {
+  const addVehicle = (data: Omit<Vehicle, 'id' | 'ownerId' | 'vin' | 'imageUrl' | 'imageHint' | 'healthStatus' | 'healthScore' | 'lastService' | 'nextServiceDue' | 'subsystemHealth' | 'predictedAlerts' | 'sensorData' | 'maintenanceHistory' | 'usageHistory' | 'healthHistory' | 'predictiveInsights' | 'environmentalData' | 'dtcs'>) => {
     const newVehicle: Vehicle = {
       ...data,
       id: `V${vehicles.length + 1001}`,
@@ -266,6 +277,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       healthHistory: generateHealthHistory(),
       predictiveInsights: generatePredictiveInsights(),
       environmentalData: generateEnvironmentalData(),
+      dtcs: generateDTCs(),
     };
     const newVehicles = [...vehicles, newVehicle];
     setVehicles(newVehicles);
@@ -285,4 +297,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
