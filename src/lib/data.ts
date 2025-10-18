@@ -1,6 +1,7 @@
 
 
 
+
 import type { User, Vehicle, ServiceCenter, Appointment, UebaEvent, CustomerFeedback, Notification, UsageDataPoint, HealthHistoryEntry, MaintenanceLog, PredictedAlert, PredictiveInsight, EnvironmentalData, Technician, TechnicianPerformance, LiveQueueVehicle, WorkloadForecastData, InventoryPart, PartConsumptionTrend, RootCauseData, CorrelationMatrix, ServiceDurationData, RepairCostData, PartLifecycleData, AnomalyTimelineDataPoint, RepairComplexityData, FirstTimeFixRateData, AiConfidenceData, CenterBenchmarkData, PartReliabilityData, TimeOfDayLoadData, ServiceDelayReason, DiagnosisAccuracyData, CustomerLifetimeValueData, FailurePattern, LoadBalancingSuggestion, CapaItem, WhatIfScenario } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { Bot, CheckCircle, CircuitBoard, Factory, Settings } from 'lucide-react';
@@ -84,7 +85,7 @@ const heroVehicles = [
     { make: 'Hero', model: 'Passion XPro' },
     { make: 'Hero', model: 'Splendor iSmart' },
     { make: 'Hero', model: 'Glamour Xtec' },
-    { make: 'Hero', model: 'Mavrick 440'},
+    { make: 'Hero', model: 'Mavrick 440' },
 ];
 
 export const indianModels = [...mahindraVehicles, ...heroVehicles];
@@ -259,18 +260,17 @@ export const predictedIssues = [
   { issue: 'Coolant Level Low', risk: 'Medium' },
 ];
 
-export const vehicles: Vehicle[] = Array.from({ length: 50 }, (_, i) => {
-  const healthStatus = i % 5 === 0 ? 'Critical' : i % 2 === 0 ? 'Warning' : 'Good';
+export const vehicles: Vehicle[] = indianModels.map((vehicleInfo, i) => {
+  const healthStatus = i % 5 === 0 ? 'Critical' : i % 3 === 0 ? 'Warning' : 'Good';
   const healthScore = healthStatus === 'Critical' ? 30 + Math.random() * 20 : healthStatus === 'Warning' ? 60 + Math.random() * 20 : 85 + Math.random() * 15;
   const selectedImg = i % 3 === 0 ? vehicleImg1 : i % 2 === 0 ? vehicleImg2 : vehicleImg3;
-  const vehicleInfo = indianModels[i % indianModels.length];
 
   return {
     id: `V${1001 + i}`,
     ownerId: '3', // All owned by Rohan Joshi for simplicity
     make: vehicleInfo.make,
     model: vehicleInfo.model,
-    year: 2020 + (i % 4),
+    year: 2020 + (i % 5),
     vin: `VIN${Math.random().toString(36).substring(2, 15).toUpperCase()}`,
     imageUrl: selectedImg?.imageUrl || '',
     imageHint: selectedImg?.imageHint || 'car',
@@ -304,7 +304,7 @@ export const vehicles: Vehicle[] = Array.from({ length: 50 }, (_, i) => {
 
 export const allVehicles = vehicles;
 
-export const appointments: Appointment[] = Array.from({ length: 30 }, (_, i) => {
+export const appointments: Appointment[] = Array.from({ length: 50 }, (_, i) => {
     const statuses: AppointmentStatus[] = ['Pending', 'In Service', 'Awaiting Parts', 'Completed'];
     const vehicle = vehicles[i % vehicles.length];
     const serviceCenter = serviceCenters[i % serviceCenters.length];
@@ -314,7 +314,7 @@ export const appointments: Appointment[] = Array.from({ length: 30 }, (_, i) => 
         id: `A${i + 1}`,
         vehicleId: vehicle.id,
         serviceCenterId: serviceCenter.id,
-        date: format(addDays(new Date(), i - 10), 'yyyy-MM-dd'),
+        date: format(addDays(new Date(), i - 15), 'yyyy-MM-dd'),
         time: `${9 + (i % 8)}:30`,
         status: statuses[i % statuses.length],
         notes: `Diagnosing issue for ${vehicle.make} ${vehicle.model}. Customer reported unusual noise.`,
@@ -440,7 +440,7 @@ export const analyticsData = {
     preventiveSavings: 1250000,
   },
   predictiveBreakdown: rcaComponents.flatMap(component => 
-    indianModels.slice(0, 5).map(model => ({ // Use a slice to keep it manageable
+    indianModels.slice(0, 5).map(model => ({
       component,
       model: model.model,
       probability: Math.random()
@@ -457,9 +457,10 @@ export const analyticsData = {
     { name: 'Pune SC', workload: 85, backlog: 5 },
     { name: 'Chennai SC', workload: 70, backlog: 8 },
   ],
-  ageVsFailureRate: indianModels.slice(0,5).flatMap(make => 
+  ageVsFailureRate: indianModels.slice(0,5).flatMap(vehicle => 
     Array.from({length: 5}, (_, i) => ({
-      make: make.make,
+      make: vehicle.make,
+      model: vehicle.model,
       age: i + 1,
       failureRate: (i + 1) * 2 + Math.random() * 5,
       vehicleCount: 100 + Math.random() * 200,
