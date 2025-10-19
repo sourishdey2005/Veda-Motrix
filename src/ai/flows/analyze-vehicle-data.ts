@@ -5,47 +5,56 @@
  */
 import {
   AnalyzeVehicleDataInput,
+  AnalyzeVehicleDataInputSchema,
   AnalyzeVehicleDataOutput,
+  AnalyzeVehicleDataOutputSchema,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
+import { z } from 'zod';
+
+const analyzeVehicleDataPrompt = ai.definePrompt(
+  {
+    name: 'analyzeVehicleDataPrompt',
+    input: { schema: AnalyzeVehicleDataInputSchema },
+    output: { schema: AnalyzeVehicleDataOutputSchema },
+    model: 'googleai/gemini-1.5-flash-latest',
+    prompt: `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs.
+Analyze the provided sensor data and logs to identify potential issues.
+
+Vehicle ID: {{{vehicleId}}}
+Sensor Data: {{{sensorDataJson}}}
+Maintenance Logs: {{{maintenanceLogs}}}
+
+Respond with a list of detected anomalies and a list of suggested maintenance needs, in the format defined by the output schema.
+`,
+  },
+);
+
+const analyzeVehicleDataFlow = ai.defineFlow(
+  {
+    name: 'analyzeVehicleDataFlow',
+    inputSchema: AnalyzeVehicleDataInputSchema,
+    outputSchema: AnalyzeVehicleDataOutputSchema,
+  },
+  async (input) => {
+    const { output } = await analyzeVehicleDataPrompt(input);
+    if (!output) {
+      throw new Error('Analysis failed: AI did not return a structured response.');
+    }
+    return output;
+  }
+);
+
 
 export async function analyzeVehicleData(
   input: AnalyzeVehicleDataInput
 ): Promise<AnalyzeVehicleDataOutput> {
   try {
-    const prompt = `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs.
-Analyze the provided sensor data and logs to identify potential issues.
-
-Vehicle ID: ${input.vehicleId}
-Sensor Data: ${input.sensorDataJson}
-Maintenance Logs: ${input.maintenanceLogs}
-
-Respond in the following format:
-ANOMALIES: [List detected anomalies, one per line]
----
-MAINTENANCE: [List suggested maintenance needs, one per line]
-`;
-    const { output } = await ai.generate({
-      model: 'googleai/gemini-1.5-flash-latest',
-      prompt: prompt,
-    });
-
-    if (!output || !output.text) {
-      throw new Error('No output from AI');
-    }
-    
-    const sections = output.text.split('---');
-    const anomaliesSection = sections[0].replace('ANOMALIES:', '').trim();
-    const maintenanceSection = sections[1] ? sections[1].replace('MAINTENANCE:', '').trim() : '';
-
-    const anomalies = anomaliesSection.split('\n').map(s => s.trim()).filter(Boolean);
-    const maintenanceNeeds = maintenanceSection.split('\n').map(s => s.trim()).filter(Boolean);
-
+    const result = await analyzeVehicleDataFlow(input);
     return {
-      anomalies: anomalies.length > 0 ? anomalies : ["No anomalies detected."],
-      maintenanceNeeds: maintenanceNeeds.length > 0 ? maintenanceNeeds : ["No immediate maintenance needs identified."],
-    };
-
+        anomalies: result.anomalies.length > 0 ? result.anomalies : ["No anomalies detected."],
+        maintenanceNeeds: result.maintenanceNeeds.length > 0 ? result.maintenanceNeeds : ["No immediate maintenance needs identified."],
+    }
   } catch (error) {
     console.error("Error in analyzeVehicleData:", error);
     return {

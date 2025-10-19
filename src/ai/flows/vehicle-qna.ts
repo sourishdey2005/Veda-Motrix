@@ -6,61 +6,47 @@
 import { qnaData } from '@/lib/chatbot-qna';
 import {
   AnswerQuestionInput,
+  AnswerQuestionInputSchema,
   AnswerQuestionOutput,
+  AnswerQuestionOutputSchema,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import {type Content} from 'genkit/content';
-
-
-const localSearch = (question: string): string | null => {
-  const userQuestion = question.toLowerCase().trim();
-  if (!userQuestion) return null;
-
-  for (const item of qnaData) {
-    if (item.question.toLowerCase().trim() === userQuestion) {
-      return item.answer;
-    }
-  }
-  return null;
-};
+import { z } from 'zod';
+import { content, part } from 'genkit/content';
 
 export async function answerQuestion(
   input: AnswerQuestionInput
 ): Promise<AnswerQuestionOutput> {
   try {
-    const localAnswer = localSearch(input.question);
+    const localAnswer = qnaData.find(
+      (item) => item.question.toLowerCase().trim() === input.question.toLowerCase().trim()
+    );
     if (localAnswer) {
-      return { answer: localAnswer };
+      return { answer: localAnswer.answer };
     }
 
     const systemInstruction = `You are a helpful AI assistant for VEDA-MOTRIX, specializing in vehicle maintenance and troubleshooting. Your conversation history with the user is provided. The user's latest question is at the end. First, check the provided knowledge base. If the user's question is answered there, use that answer. If the user's question is not in the knowledge base, use your general vehicle knowledge to provide a helpful, safe, and accurate answer. Always prioritize user safety. If a user describes a critical issue (e.g., smoke, strange noises, brake failure), strongly advise them to stop driving and seek professional help immediately. Keep your answers concise and easy to understand. Do not mention the knowledge base in your answer. Just answer the question.
 Knowledge Base:
 ---
 ${qnaData
-  .map(item => `Q: ${item.question}\nA: ${item.answer}`)
+  .map((item) => `Q: ${item.question}\nA: ${item.answer}`)
   .join('\n\n')}
 ---`;
-    
-    const history: Content[] = input.conversationHistory.map(msg => ({
-        role: msg.role,
-        parts: [{text: msg.content}]
-    }));
 
     const { output } = await ai.generate({
-        model: 'googleai/gemini-1.5-flash-latest',
-        prompt: input.question,
-        history,
-        config: {
-            systemInstruction
-        }
+      model: 'googleai/gemini-1.5-flash-latest',
+      prompt: input.question,
+      history: input.conversationHistory.map((msg) => content(msg.role, msg.content)),
+      config: {
+        systemInstruction,
+      },
     });
 
     if (!output || !output.text) {
-        throw new Error('No text output from AI');
+      throw new Error('No text output from AI');
     }
 
     return { answer: output.text };
-    
   } catch (error) {
     console.error('Error in answerQuestion:', error);
     return {

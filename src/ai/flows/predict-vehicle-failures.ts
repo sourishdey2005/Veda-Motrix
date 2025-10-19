@@ -5,50 +5,53 @@
  */
 import {
   PredictVehicleFailureInput,
+  PredictVehicleFailureInputSchema,
   PredictVehicleFailureOutput,
+  PredictVehicleFailureOutputSchema,
   PredictedFailure,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
+import { z } from 'zod';
+
+
+const predictFailurePrompt = ai.definePrompt(
+  {
+    name: 'predictFailurePrompt',
+    input: { schema: PredictVehicleFailureInputSchema },
+    output: { schema: PredictVehicleFailureOutputSchema },
+    model: 'googleai/gemini-1.5-flash-latest',
+    prompt: `You are an AI diagnosis agent specializing in predicting vehicle failures.
+Analyze the provided sensor data and maintenance logs for vehicle ID {{{vehicleId}}} to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions.
+
+Sensor Data: {{{sensorDataJson}}}
+Maintenance Logs: {{{maintenanceLogs}}}
+
+Respond in the format defined by the output schema.
+`,
+  },
+);
+
+const predictVehicleFailureFlow = ai.defineFlow(
+  {
+    name: 'predictVehicleFailureFlow',
+    inputSchema: PredictVehicleFailureInputSchema,
+    outputSchema: PredictVehicleFailureOutputSchema,
+  },
+  async (input) => {
+    const { output } = await predictFailurePrompt(input);
+    if (!output) {
+      throw new Error('Prediction failed: AI did not return a structured response.');
+    }
+    return output;
+  }
+);
+
 
 export async function predictVehicleFailure(
   input: PredictVehicleFailureInput
 ): Promise<PredictVehicleFailureOutput> {
   try {
-    const prompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
-Analyze the provided sensor data and maintenance logs for vehicle ID ${input.vehicleId} to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions.
-
-Sensor Data: ${input.sensorDataJson}
-Maintenance Logs: ${input.maintenanceLogs}
-
-Format each failure on a new line, using "||" as a separator between fields.
-Example:
-Brake Pads||Wear and Tear||HIGH||0.95||Replace front brake pads within 2 weeks.
-Battery||Degradation||MEDIUM||0.80||Voltage dropping. Test and replacement recommended at next service.
-`;
-
-    const { output } = await ai.generate({
-      model: 'googleai/gemini-1.5-flash-latest',
-      prompt: prompt,
-    });
-
-    if (!output || !output.text) {
-      throw new Error('No output from AI');
-    }
-    
-    const lines = output.text.split('\n').filter(Boolean);
-    const predictedFailures: PredictedFailure[] = lines.map(line => {
-        const parts = line.split('||');
-        return {
-            component: parts[0]?.trim() || "Unknown Component",
-            failureType: parts[1]?.trim() || "Unknown Failure",
-            priority: (parts[2]?.trim() as 'HIGH' | 'MEDIUM' | 'LOW') || 'LOW',
-            confidence: parseFloat(parts[3]?.trim() || '0'),
-            suggestedActions: parts[4]?.trim() || "No actions suggested.",
-        };
-    });
-
-    return { predictedFailures };
-
+    return await predictVehicleFailureFlow(input);
   } catch (error) {
     console.error("Error in predictVehicleFailure:", error);
     return {
