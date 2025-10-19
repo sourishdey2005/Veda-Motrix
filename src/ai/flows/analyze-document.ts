@@ -42,7 +42,7 @@ const documentAnalysisPrompt = ai.definePrompt(
 
         If the document seems unreadable or empty, state that you were unable to parse the content. Otherwise, provide a concise, well-structured analysis in Markdown format, using headings, bold text, and bullet points for clarity.
 
-        User Prompt: "{{{prompt}}}"
+        User Prompt: "{{prompt}}"
         Document: {{media url=documentDataUri}}
         `
     }
