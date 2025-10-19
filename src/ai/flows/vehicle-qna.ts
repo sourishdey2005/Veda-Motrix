@@ -55,7 +55,7 @@ export async function answerQuestion(input: AnswerQuestionInput): Promise<Answer
             model: 'openai/gpt-4o',
             messages: [
                 { role: 'system', content: systemPrompt },
-                ...input.conversationHistory.map(msg => ({ role: msg.role, content: msg.content })),
+                ...input.conversationHistory.map(msg => ({ role: msg.role === 'model' ? 'assistant' : 'user', content: msg.content })),
                 { role: 'user', content: input.question },
             ],
         });
