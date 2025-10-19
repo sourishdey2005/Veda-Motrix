@@ -3,12 +3,18 @@
 /**
  * @fileoverview A Genkit flow that answers user questions about vehicles, using a knowledge base and conversation history.
  */
-import {ai} from '@/ai/genkit';
-import {qnaData} from '@/lib/chatbot-qna';
+import { qnaData } from '@/lib/chatbot-qna';
 import {
   AnswerQuestionInput,
   AnswerQuestionOutput,
 } from '@/ai/types';
+import { GoogleGenerativeAI, Content } from "@google/genai";
+
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+    throw new Error("GEMINI_API_KEY environment variable not set.");
+}
+const genAI = new GoogleGenerativeAI(apiKey);
 
 const localSearch = (question: string): string | null => {
   const userQuestion = question.toLowerCase().trim();
@@ -29,6 +35,8 @@ export async function answerQuestion(
   if (localAnswer) {
     return {answer: localAnswer};
   }
+  
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
   const knowledgeBase = `
     Knowledge Base:
@@ -39,25 +47,26 @@ export async function answerQuestion(
     ---
   `;
 
-  const systemInstruction = `You are a helpful AI assistant for VEDA-MOTRIX, specializing in vehicle maintenance and troubleshooting.
-Your conversation history with the user is provided below.
-The user's latest question is at the end.
-
-First, check the provided knowledge base. If the user's question is answered there, use that answer.
-If the user's question is not in the knowledge base, use your general vehicle knowledge to provide a helpful, safe, and accurate answer.
-Always prioritize user safety. If a user describes a critical issue (e.g., smoke, strange noises, brake failure), strongly advise them to stop driving and seek professional help immediately.
-Keep your answers concise and easy to understand.
-Do not mention the knowledge base in your answer. Just answer the question.
-`;
+  const systemInstruction = `You are a helpful AI assistant for VEDA-MOTRIX, specializing in vehicle maintenance and troubleshooting. Your conversation history with the user is provided. The user's latest question is at the end. First, check the provided knowledge base. If the user's question is answered there, use that answer. If the user's question is not in the knowledge base, use your general vehicle knowledge to provide a helpful, safe, and accurate answer. Always prioritize user safety. If a user describes a critical issue (e.g., smoke, strange noises, brake failure), strongly advise them to stop driving and seek professional help immediately. Keep your answers concise and easy to understand. Do not mention the knowledge base in your answer. Just answer the question.
+  ${knowledgeBase}`;
 
   try {
-    const {text} = await ai.generate({
-      model: 'googleai/gemini-pro',
-      history: input.conversationHistory,
-      prompt: input.question,
-      system: `${systemInstruction}\n${knowledgeBase}`,
+    const chat = model.startChat({
+        history: input.conversationHistory.map(msg => ({
+            role: msg.role,
+            parts: [{ text: msg.content }]
+        })),
+        generationConfig: {
+            maxOutputTokens: 1000,
+        },
     });
+    
+    const result = await chat.sendMessage(input.question);
+    const response = await result.response;
+    const text = response.text();
+
     return {answer: text};
+    
   } catch (error) {
     console.error('Error in answerQuestion:', error);
     return {
