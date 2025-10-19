@@ -10,32 +10,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Bot, File as FileIcon, Loader2 } from 'lucide-react';
 import { analyzeDocument } from '@/ai/flows/analyze-document';
-import { cn } from '@/lib/utils';
 import React from 'react';
 
 const MarkdownRenderer = ({ content }: { content: string }) => {
+    // Simple parser for basic markdown
+    const createMarkup = (text: string) => {
+        const html = text
+            .replace(/^#### (.*$)/gim, '<h4 class="font-semibold text-base mt-6 mb-2 border-b pb-1">$1</h4>')
+            .replace(/^### (.*$)/gim, '<h3 class="font-semibold text-lg mt-8 mb-3">$1</h3>')
+            .replace(/^\* (.*$)/gim, '<li class="list-disc ml-4">$1</li>')
+            .replace(/---/g, '<hr class="my-4" />')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br />');
+        return { __html: html };
+    };
+
     return (
-        <div className="prose prose-sm dark:prose-invert max-w-none space-y-4">
-            {content.split('\n').map((line, index) => {
-                line = line.trim();
-                if (line.startsWith('#### ')) {
-                    return <h4 key={index} className="font-semibold text-base !mt-6 !mb-2 border-b pb-1">{line.substring(5)}</h4>;
-                }
-                if (line.startsWith('### ')) {
-                    return <h3 key={index} className="font-semibold text-lg !mt-8 !mb-3">{line.substring(4)}</h3>;
-                }
-                 if (line.startsWith('* ')) {
-                    return <li key={index} className="list-disc ml-4">{line.substring(2)}</li>;
-                }
-                if (line.startsWith('---')) {
-                    return <hr key={index} className="my-4" />;
-                }
-                if (line === '') {
-                    return <br key={index} />;
-                }
-                return <p key={index} dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />;
-            })}
-        </div>
+        <div className="prose prose-sm dark:prose-invert max-w-none space-y-2" dangerouslySetInnerHTML={createMarkup(content)} />
     );
 };
 
@@ -50,13 +41,13 @@ export function DocumentAnalysisView() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      const ALLOWED_TYPES = ['application/pdf', 'text/csv', 'text/plain', 'image/jpeg', 'image/png', 'image/webp'];
+      const ALLOWED_TYPES = ['application/pdf', 'text/csv', 'text/plain', 'image/jpeg', 'image/png'];
       if (ALLOWED_TYPES.includes(selectedFile.type)) {
         setFile(selectedFile);
       } else {
         toast({
           title: "Invalid File Type",
-          description: "Please upload a supported file (PDF, CSV, TXT, JPG, PNG).",
+          description: `File type "${selectedFile.type}" is not supported. Please use PDF, CSV, TXT, JPG, or PNG.`,
           variant: "destructive",
         });
       }
@@ -123,7 +114,7 @@ export function DocumentAnalysisView() {
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="file-upload">1. Upload Document</Label>
-            <Input id="file-upload" type="file" accept=".csv,.pdf,.txt,.jpg,.jpeg,.png" onChange={handleFileChange} />
+            <Input id="file-upload" type="file" accept=".pdf,.csv,.txt,.jpg,.jpeg,.png" onChange={handleFileChange} />
             {file && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
                 <FileIcon className="w-4 h-4" />

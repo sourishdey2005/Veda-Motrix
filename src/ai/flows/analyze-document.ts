@@ -3,6 +3,7 @@
 
 import openai from '@/ai/client';
 import { ChatCompletionContentPart } from 'openai/resources/chat';
+import pdf from 'pdf-parse';
 
 export interface AnalyzeDocumentInput {
   documentDataUri: string;
@@ -26,49 +27,48 @@ export async function analyzeDocument(
       },
     ];
 
-    if (input.documentDataUri.startsWith('data:image')) {
+    const dataUriParts = input.documentDataUri.match(/^data:(.+?);base64,(.*)$/);
+    if (!dataUriParts) {
+      return {
+        analysis: '#### Error\nInvalid document format. Could not read the uploaded file.',
+      };
+    }
+    
+    const mimeType = dataUriParts[1];
+    const base64Data = dataUriParts[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+
+
+    if (mimeType.startsWith('image/')) {
       messages.push({
         type: 'image_url',
         image_url: {
           url: input.documentDataUri,
         },
       });
-    } else {
-      // Handle text-based files
-      try {
-        const base64Data = input.documentDataUri.split(',')[1];
-        if (!base64Data) {
-          throw new Error('Invalid Data URI format.');
+    } else if (mimeType === 'application/pdf') {
+        try {
+            const pdfData = await pdf(buffer);
+            messages.push({
+                type: 'text',
+                text: `\n\n--- Document Content (from PDF) ---\n${pdfData.text}\n--- End Document ---`,
+            });
+        } catch (pdfError) {
+             console.error('Error parsing PDF:', pdfError);
+             return {
+                analysis: '#### Error\nFailed to parse the PDF document. It might be corrupted or password-protected.',
+             };
         }
-
-        const decodedContent = Buffer.from(base64Data, 'base64').toString(
-          'utf8'
-        );
-
-        // A simple heuristic to check if the content is mostly readable text.
-        // This avoids passing large binary gibberish to the model.
-        const isLikelyText = !/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(
-          decodedContent.substring(0, 500)
-        );
-
-        if (isLikelyText) {
-          messages.push({
+    } else if (mimeType.startsWith('text/')) {
+        const decodedContent = buffer.toString('utf8');
+        messages.push({
             type: 'text',
             text: `\n\n--- Document Content ---\n${decodedContent}\n--- End Document ---`,
-          });
-        } else {
-          return {
-            analysis:
-              '#### Error\nBinary file format (like PDF) is not supported for text-based analysis. Please upload a plain text file, CSV, or an image.',
-          };
-        }
-      } catch (e) {
-        console.error('Error decoding file content:', e);
+        });
+    } else {
         return {
-          analysis:
-            '#### Error\nCould not decode the file content. It might be a binary format that is not supported for text analysis. Please upload a plain text file, CSV, or an image.',
+            analysis: `#### Error\nUnsupported file type: \`${mimeType}\`. Please upload a supported document format like PDF, JPG, PNG, or plain text.`,
         };
-      }
     }
 
     const completion = await openai.chat.completions.create({
@@ -83,7 +83,7 @@ export async function analyzeDocument(
 
     const analysis = completion.choices[0].message?.content;
     if (!analysis) {
-      return { analysis: '#### Error\nAI failed to generate a response.' };
+      return { analysis: '#### Error\nAI failed to generate a response after processing the document.' };
     }
 
     return { analysis };
