@@ -4,7 +4,7 @@
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 import { NextRequest } from 'next/server';
-import { GenkitMetric, genkitMetric } from '@genkit-ai/next/server';
+import { GenkitMetric, genkitMetric } from '@genkit-ai/next';
 
 // Initialize the Genkit AI client with the Google AI plugin.
 // This will use the GEMINI_API_KEY environment variable.
