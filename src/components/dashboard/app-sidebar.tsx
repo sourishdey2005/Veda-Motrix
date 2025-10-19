@@ -13,7 +13,7 @@ import {
   SidebarFooter,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { ActivitySquare, BarChart, Car, Factory, LayoutDashboard, ShieldCheck, Users, Bot, Briefcase, Smile, Settings, User as UserIcon, Warehouse, FileSearch, Server, Target, Globe, Binary } from "lucide-react";
+import { ActivitySquare, BarChart, Car, Factory, LayoutDashboard, ShieldCheck, Users, Bot, Briefcase, Smile, Settings, User as UserIcon, Warehouse, FileSearch, Server, Target, Globe } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -45,7 +45,6 @@ const userNav = [
 ];
 
 const commonNav = [
-    { name: "Num Trees", href: "/dashboard/num-trees", icon: Binary },
     { name: "Profile", href: "/dashboard/profile", icon: UserIcon },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
