@@ -7,11 +7,8 @@ import {ai} from '@/ai/genkit';
 import {qnaData} from '@/lib/chatbot-qna';
 import {
   AnswerQuestionInput,
-  AnswerQuestionInputSchema,
   AnswerQuestionOutput,
-  AnswerQuestionOutputSchema,
 } from '@/ai/types';
-import {z} from 'zod';
 
 const localSearch = (question: string): string | null => {
   const userQuestion = question.toLowerCase().trim();
@@ -54,13 +51,13 @@ Do not mention the knowledge base in your answer. Just answer the question.
 `;
 
   try {
-    const {output} = await ai.generate({
+    const {text} = await ai.generate({
       model: 'googleai/gemini-pro',
       history: input.conversationHistory,
       prompt: input.question,
       system: `${systemInstruction}\n${knowledgeBase}`,
     });
-    return {answer: output?.answer || 'Sorry, I could not find an answer.'};
+    return {answer: text};
   } catch (error) {
     console.error('Error in answerQuestion:', error);
     return {

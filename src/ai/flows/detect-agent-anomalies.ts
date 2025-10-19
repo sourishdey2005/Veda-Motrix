@@ -10,17 +10,12 @@ import {
   DetectAgentAnomaliesOutput,
   DetectAgentAnomaliesOutputSchema,
 } from '@/ai/types';
-import {z} from 'zod';
 
-export async function detectAgentAnomalies(
-  input: DetectAgentAnomaliesInput
-): Promise<DetectAgentAnomaliesOutput> {
-  const prompt = ai.definePrompt(
-    {
-      name: 'agentAnomaliesPrompt',
-      input: {schema: DetectAgentAnomaliesInputSchema},
-      output: {schema: DetectAgentAnomaliesOutputSchema},
-      prompt: `You are a UEBA (User and Entity Behavior Analytics) security agent responsible for detecting unauthorized or abnormal behavior from other AI agents.
+const agentAnomaliesPrompt = ai.definePrompt({
+  name: 'agentAnomaliesPrompt',
+  input: {schema: DetectAgentAnomaliesInputSchema},
+  output: {schema: DetectAgentAnomaliesOutputSchema},
+  prompt: `You are a UEBA (User and Entity Behavior Analytics) security agent responsible for detecting unauthorized or abnormal behavior from other AI agents.
 You will receive the ID of the agent to monitor, a list of recent actions performed by the agent, and an anomaly threshold.
 Based on this information, you will determine whether the agent's behavior is anomalous and provide an anomaly score and explanation.
 
@@ -34,20 +29,20 @@ Consider factors such as:
 - Actions that violate security policies.
 - Unusual frequency of actions.
 `,
+});
+
+export async function detectAgentAnomalies(
+  input: DetectAgentAnomaliesInput
+): Promise<DetectAgentAnomaliesOutput> {
+  const {output} = await ai.generate({
+    prompt: agentAnomaliesPrompt(input),
+    model: 'googleai/gemini-pro',
+    config: {
+      output: {
+        format: 'json',
+        schema: DetectAgentAnomaliesOutputSchema,
+      },
     },
-    async input => {
-      const {output} = await ai.generate({
-        prompt: input,
-        model: 'googleai/gemini-pro',
-        config: {
-          output: {
-            format: 'json',
-            schema: DetectAgentAnomaliesOutputSchema,
-          },
-        },
-      });
-      return output!;
-    }
-  );
-  return prompt(input);
+  });
+  return output!;
 }
