@@ -11,14 +11,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Bot, File as FileIcon, Loader2 } from 'lucide-react';
 import { analyzeDocument } from '@/ai/flows/analyze-document';
 import { cn } from '@/lib/utils';
+import React from 'react';
 
-// A simple markdown to React component parser
 const MarkdownRenderer = ({ content }: { content: string }) => {
-    const lines = content.split('\n');
-
     return (
         <div className="prose prose-sm dark:prose-invert max-w-none space-y-4">
-            {lines.map((line, index) => {
+            {content.split('\n').map((line, index) => {
                 line = line.trim();
                 if (line.startsWith('#### ')) {
                     return <h4 key={index} className="font-semibold text-base !mt-6 !mb-2 border-b pb-1">{line.substring(5)}</h4>;
@@ -26,36 +24,16 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
                 if (line.startsWith('### ')) {
                     return <h3 key={index} className="font-semibold text-lg !mt-8 !mb-3">{line.substring(4)}</h3>;
                 }
-                if (line.startsWith('* **')) { // For bolded list items
-                    const cleanedLine = line.replace('* **', '').replace('**', '');
-                    const parts = cleanedLine.split(':');
-                    return (
-                        <div key={index} className="flex gap-2">
-                           <span className="font-semibold">{parts[0]}:</span>
-                           <span>{parts.slice(1).join(':')}</span>
-                        </div>
-                    );
-                }
-                if (line.startsWith('* ')) {
+                 if (line.startsWith('* ')) {
                     return <li key={index} className="list-disc ml-4">{line.substring(2)}</li>;
                 }
                 if (line.startsWith('---')) {
                     return <hr key={index} className="my-4" />;
                 }
-                 if (line.startsWith('**')) { // For bolded text, like Original Prompt
-                    const cleanedLine = line.replaceAll('**', '');
-                     const parts = cleanedLine.split(':');
-                    return (
-                         <p key={index}>
-                            <span className="font-semibold text-muted-foreground">{parts[0]}:</span>
-                            <span className="italic">"{parts.slice(1).join(':').trim()}"</span>
-                        </p>
-                    )
-                }
                 if (line === '') {
-                    return null;
+                    return <br key={index} />;
                 }
-                return <p key={index}>{line}</p>;
+                return <p key={index} dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />;
             })}
         </div>
     );
@@ -102,11 +80,18 @@ export function DocumentAnalysisView() {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = async () => {
-        const documentDataUri = reader.result as string;
-        
-        const result = await analyzeDocument({ documentDataUri, prompt });
+        try {
+            const documentDataUri = reader.result as string;
+            
+            const result = await analyzeDocument({ documentDataUri, prompt });
 
-        setAnalysisResult(result.analysis);
+            setAnalysisResult(result.analysis);
+        } catch (error: any) {
+            console.error("Analysis error inside onload:", error);
+            setAnalysisResult(`#### Error\nThe AI failed to analyze the document. Please try again.\n\nDetails: ${error.message}`);
+        } finally {
+             setIsLoading(false);
+        }
       };
       reader.onerror = (error) => {
         console.error("Error reading file:", error);
@@ -115,16 +100,16 @@ export function DocumentAnalysisView() {
             description: "Could not read the selected file.",
             variant: "destructive",
         });
+        setIsLoading(false);
       }
     } catch (error: any) {
         console.error("Analysis error:", error);
         toast({
             title: "Analysis Failed",
-            description: error.message || "The AI failed to analyze the document. Please try again.",
+            description: error.message || "An unexpected error occurred.",
             variant: "destructive",
         });
-    } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 
