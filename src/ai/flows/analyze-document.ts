@@ -129,8 +129,7 @@ ${documentContent}
         }
 
         const summaries: string[] = [];
-        for (let i = 0; i < chunks.length; i++) {
-          const chunk = chunks[i];
+        for (const [i, chunk] of chunks.entries()) {
           const summary = await summarizeChunk(
             chunk,
             input.prompt,
@@ -149,18 +148,20 @@ ${documentContent}
   } catch (error: any) {
     console.error('Error in document analysis flow:', error);
     let errorMessage = `An unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${error.message}`;
-    if (error.code) { // OpenRouter often includes a 'code' in the error object
-        errorMessage += `\n\nError Code: ${error.code}`;
+    if (error.response?.data?.error?.message) {
+      errorMessage = error.response.data.error.message;
+    } else if (error.message) {
+      errorMessage = error.message;
     }
-     if (error.message?.includes('429')) {
-      errorMessage = `The document analysis process is being rate-limited by the AI provider. Please wait a moment and try again.\n\nDetails: ${error.message}`;
+    
+    if (errorMessage.includes('429')) {
+      errorMessage = `The document analysis process is being rate-limited by the AI provider. Please wait a moment and try again.\n\nDetails: ${errorMessage}`;
     }
-    if (error.message?.includes('Invalid data URI')) {
-      errorMessage =
-        'The uploaded file could not be read. It might be corrupted or in a format the system cannot process.';
+    if (errorMessage.includes('Invalid data URI')) {
+      errorMessage = 'The uploaded file could not be read. It might be corrupted or in a format the system cannot process.';
     }
-    if (error.message?.includes('context length')) {
-      errorMessage = `The document is too large to be analyzed, even after attempting to split it into smaller parts. Please try with a smaller document. \n\nDetails: ${error.message}`;
+    if (errorMessage.includes('context length')) {
+      errorMessage = `The document is too large to be analyzed, even after attempting to split it into smaller parts. Please try with a smaller document. \n\nDetails: ${errorMessage}`;
     }
     return {
       analysis: `#### Error\n${errorMessage}`,
