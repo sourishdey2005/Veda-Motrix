@@ -3,7 +3,6 @@
 
 import openai from '@/ai/client';
 import { ChatCompletionContentPart } from 'openai/resources/chat';
-import pdf from 'pdf-parse';
 
 export interface AnalyzeDocumentInput {
   documentDataUri: string;
@@ -35,9 +34,6 @@ export async function analyzeDocument(
     }
     
     const mimeType = dataUriParts[1];
-    const base64Data = dataUriParts[2];
-    const buffer = Buffer.from(base64Data, 'base64');
-
 
     if (mimeType.startsWith('image/')) {
       messages.push({
@@ -47,19 +43,14 @@ export async function analyzeDocument(
         },
       });
     } else if (mimeType === 'application/pdf') {
-        try {
-            const pdfData = await pdf(buffer);
-            messages.push({
-                type: 'text',
-                text: `\n\n--- Document Content (from PDF) ---\n${pdfData.text}\n--- End Document ---`,
-            });
-        } catch (pdfError) {
-             console.error('Error parsing PDF:', pdfError);
-             return {
-                analysis: '#### Error\nFailed to parse the PDF document. It might be corrupted or password-protected.',
-             };
-        }
+        // PDF text extraction is complex and was causing server errors.
+        // For now, inform the user it's not supported in this way.
+        return {
+            analysis: `#### Feature Not Available\nText extraction from PDF files is not currently supported. Please try uploading an image (JPG, PNG) of the document or a plain text (.txt) file instead.`,
+        };
     } else if (mimeType.startsWith('text/')) {
+        const base64Data = dataUriParts[2];
+        const buffer = Buffer.from(base64Data, 'base64');
         const decodedContent = buffer.toString('utf8');
         messages.push({
             type: 'text',
@@ -67,7 +58,7 @@ export async function analyzeDocument(
         });
     } else {
         return {
-            analysis: `#### Error\nUnsupported file type: \`${mimeType}\`. Please upload a supported document format like PDF, JPG, PNG, or plain text.`,
+            analysis: `#### Error\nUnsupported file type: \`${mimeType}\`. Please upload a supported document format like an image (JPG, PNG) or plain text file (.txt).`,
         };
     }
 
@@ -92,7 +83,7 @@ export async function analyzeDocument(
     if (error.message.includes('unsupported content type')) {
       return {
         analysis:
-          '#### Error\nUnsupported file type. Please upload a supported document format like PDF, JPG, PNG, or plain text.',
+          '#### Error\nUnsupported file type. Please upload a supported document format like JPG, PNG, or plain text.',
       };
     }
     return {
