@@ -8,7 +8,8 @@ import {
   DetectAgentAnomaliesOutput,
   DetectAgentAnomaliesOutputSchema,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import {openAiClient} from '@/ai/genkit';
+import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 export async function detectAgentAnomalies(
   input: DetectAgentAnomaliesInput
@@ -19,33 +20,39 @@ Respond with a JSON object that strictly follows this Zod schema, providing a bo
 ${JSON.stringify(DetectAgentAnomaliesOutputSchema.shape, null, 2)}
 `;
 
-    const userPrompt = `Analyze based on an anomaly threshold of ${input.anomalyThreshold}.
+    const userPrompt = `Analyze based on an anomaly threshold of ${
+      input.anomalyThreshold
+    }.
 
 Agent ID: ${input.agentId}
 Agent Actions:
-${input.agentActions.map(action => `- ${action}`).join('\n')}
+${input.agentActions.map((action) => `- ${action}`).join('\n')}
 `;
-    
-    const rawResponse = await openAiClient(
-        [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
-        true
-    );
-    const parsedResponse = JSON.parse(rawResponse);
-    
-    const validation = DetectAgentAnomaliesOutputSchema.safeParse(parsedResponse);
-    if (!validation.success) {
-        console.error("AI response validation failed:", validation.error);
-        throw new Error("The AI returned data in an unexpected format.");
-    }
-    
-    return validation.data;
 
+    const messages: ChatCompletionMessageParam[] = [
+      {role: 'system', content: systemPrompt},
+      {role: 'user', content: userPrompt},
+    ];
+
+    const rawResponse = await openAiClient(messages, true);
+    const parsedResponse = JSON.parse(rawResponse);
+
+    const validation =
+      DetectAgentAnomaliesOutputSchema.safeParse(parsedResponse);
+    if (!validation.success) {
+      console.error('AI response validation failed:', validation.error);
+      throw new Error('The AI returned data in an unexpected format.');
+    }
+
+    return validation.data;
   } catch (error) {
-    console.error("Error in detectAgentAnomalies:", error);
+    console.error('Error in detectAgentAnomalies:', error);
     return {
       isAnomalous: true,
       anomalyScore: 1.0,
-      explanation: `An unexpected error occurred during analysis: ${error instanceof Error ? error.message : String(error)}`,
+      explanation: `An unexpected error occurred during analysis: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 }

@@ -8,7 +8,8 @@ import {
   AnalyzeCustomerFeedbackOutput,
   AnalyzeCustomerFeedbackOutputSchema,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import {openAiClient} from '@/ai/genkit';
+import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 export async function analyzeCustomerFeedback(
   input: AnalyzeCustomerFeedbackInput
@@ -22,27 +23,31 @@ ${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.shape, null, 2)}
     const userPrompt = `Analyze the following customer feedback:
 Feedback: "${input.feedbackText}"`;
 
-    const rawResponse = await openAiClient(
-        [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
-        true // Enable JSON mode
-    );
+    const messages: ChatCompletionMessageParam[] = [
+      {role: 'system', content: systemPrompt},
+      {role: 'user', content: userPrompt},
+    ];
+
+    const rawResponse = await openAiClient(messages, true); // Enable JSON mode
 
     const parsedResponse = JSON.parse(rawResponse);
-    
-    const validation = AnalyzeCustomerFeedbackOutputSchema.safeParse(parsedResponse);
-    if (!validation.success) {
-        console.error("AI response validation failed:", validation.error);
-        throw new Error("The AI returned data in an unexpected format.");
-    }
-    
-    return validation.data;
 
+    const validation =
+      AnalyzeCustomerFeedbackOutputSchema.safeParse(parsedResponse);
+    if (!validation.success) {
+      console.error('AI response validation failed:', validation.error);
+      throw new Error('The AI returned data in an unexpected format.');
+    }
+
+    return validation.data;
   } catch (error) {
-    console.error("Error in analyzeCustomerFeedback:", error);
+    console.error('Error in analyzeCustomerFeedback:', error);
     return {
-      sentiment: "Error",
-      keyAreas: "Could not analyze feedback.",
-      suggestions: `An unexpected error occurred: ${error instanceof Error ? error.message : String(error)}`,
+      sentiment: 'Error',
+      keyAreas: 'Could not analyze feedback.',
+      suggestions: `An unexpected error occurred: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 }

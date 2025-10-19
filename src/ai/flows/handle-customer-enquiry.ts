@@ -7,7 +7,8 @@ import {
   HandleCustomerEnquiryInput,
   HandleCustomerEnquiryOutput,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import {openAiClient} from '@/ai/genkit';
+import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 export async function handleCustomerEnquiry(
   input: HandleCustomerEnquiryInput
@@ -30,13 +31,18 @@ Owner: [Owner's reply]
 Provide the final conversation script as a single block of text.
 `;
 
-    const conversationSummary = await openAiClient([{ role: 'user', content: userPrompt }]);
-    return { conversationSummary };
+    const messages: ChatCompletionMessageParam[] = [
+      {role: 'user', content: userPrompt},
+    ];
 
+    const conversationSummary = await openAiClient(messages);
+    return {conversationSummary};
   } catch (error) {
-    console.error("Error in handleCustomerEnquiry:", error);
+    console.error('Error in handleCustomerEnquiry:', error);
     return {
-      conversationSummary: `Failed to generate conversation. Error: ${error instanceof Error ? error.message : String(error)}`,
+      conversationSummary: `Failed to generate conversation. Error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 }

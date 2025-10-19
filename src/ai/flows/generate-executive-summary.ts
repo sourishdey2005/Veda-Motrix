@@ -7,7 +7,8 @@ import {
   GenerateExecutiveSummaryInput,
   GenerateExecutiveSummaryOutput,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import {openAiClient} from '@/ai/genkit';
+import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 export async function generateExecutiveSummary(
   input: GenerateExecutiveSummaryInput
@@ -22,13 +23,18 @@ ${input.reportData}
 Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
 `;
 
-    const summary = await openAiClient([{ role: 'user', content: userPrompt }]);
-    return { summary };
+    const messages: ChatCompletionMessageParam[] = [
+      {role: 'user', content: userPrompt},
+    ];
 
+    const summary = await openAiClient(messages);
+    return {summary};
   } catch (error) {
-    console.error("Error in generateExecutiveSummary:", error);
+    console.error('Error in generateExecutiveSummary:', error);
     return {
-      summary: `Failed to generate summary. Error: ${error instanceof Error ? error.message : String(error)}`,
+      summary: `Failed to generate summary. Error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 }

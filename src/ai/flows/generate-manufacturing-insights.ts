@@ -7,7 +7,8 @@ import {
   GenerateManufacturingInsightsInput,
   GenerateManufacturingInsightsOutput,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import {openAiClient} from '@/ai/genkit';
+import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
@@ -18,13 +19,18 @@ export async function generateManufacturingInsights(
 Service Data: ${input.serviceData}
 `;
 
-    const improvementSuggestions = await openAiClient([{ role: 'user', content: userPrompt }]);
-    return { improvementSuggestions };
+    const messages: ChatCompletionMessageParam[] = [
+      {role: 'user', content: userPrompt},
+    ];
 
+    const improvementSuggestions = await openAiClient(messages);
+    return {improvementSuggestions};
   } catch (error) {
-    console.error("Error in generateManufacturingInsights:", error);
+    console.error('Error in generateManufacturingInsights:', error);
     return {
-      improvementSuggestions: `Failed to generate insights. Error: ${error instanceof Error ? error.message : String(error)}`,
+      improvementSuggestions: `Failed to generate insights. Error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 }
