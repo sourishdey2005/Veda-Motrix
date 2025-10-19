@@ -37,7 +37,7 @@ export const AnalyzeDocumentInputSchema = z.object({
 export type AnalyzeDocumentInput = z.infer<typeof AnalyzeDocumentInputSchema>;
 
 export const AnalyzeDocumentOutputSchema = z.object({
-  analysis: z.string(),
+  analysis: z.string().describe("The detailed analysis of the document, formatted in Markdown."),
 });
 export type AnalyzeDocumentOutput = z.infer<typeof AnalyzeDocumentOutputSchema>;
 
@@ -133,7 +133,7 @@ export type HandleCustomerEnquiryOutput = z.infer<
 export const PredictVehicleFailureInputSchema = z.object({
   vehicleId: z.string(),
   sensorDataJson: z.string(),
-  maintenanceLogs: z-string(),
+  maintenanceLogs: z.string(),
 });
 export type PredictVehicleFailureInput = z.infer<
   typeof PredictVehicleFailureInputSchema

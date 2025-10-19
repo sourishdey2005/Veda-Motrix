@@ -95,11 +95,13 @@ export function DocumentAnalysisView() {
       }
     } catch (error: any) {
         console.error("Analysis error:", error);
+        const errorMessage = error.cause || error.message || "An unexpected error occurred.";
         toast({
             title: "Analysis Failed",
-            description: error.message || "An unexpected error occurred.",
+            description: `The AI failed to analyze the document. Please try again.\n\nDetails: ${errorMessage}`,
             variant: "destructive",
         });
+        setAnalysisResult(`#### Error\nAn unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${errorMessage}`);
         setIsLoading(false);
     }
   };
