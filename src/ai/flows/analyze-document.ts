@@ -13,8 +13,6 @@ if (!apiKey) {
 }
 const genAI = new GoogleGenAI(apiKey);
 
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
 ): Promise<AnalyzeDocumentOutput> {
@@ -36,13 +34,11 @@ export async function analyzeDocument(
       },
     };
 
-    const prompt = [
-        input.prompt,
-        imagePart,
-    ];
-
     try {
-        const result = await model.generateContent({ contents: [{ role: 'user', parts: prompt.map(p => typeof p === 'string' ? { text: p } : p) }]});
+        const result = await genAI.models.generateContent({ 
+            model: "gemini-1.5-flash",
+            contents: [{ role: 'user', parts: [{text: input.prompt}, imagePart] }],
+        });
         const response = result.response;
         return { analysis: response.text() };
     } catch(e: any) {
@@ -69,7 +65,10 @@ export async function analyzeDocument(
       `;
 
       try {
-        const result = await model.generateContent(prompt);
+        const result = await genAI.models.generateContent({
+            model: "gemini-1.5-flash",
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        });
         const response = result.response;
         return { analysis: response.text() };
       } catch (e) {

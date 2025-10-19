@@ -14,7 +14,7 @@ if (!apiKey) {
 }
 const genAI = new GoogleGenAI(apiKey);
 
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.models.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const localSearch = (question: string): string | null => {
   const userQuestion = question.toLowerCase().trim();
@@ -41,8 +41,6 @@ export async function answerQuestion(
     parts: [{ text: message.content }]
   }));
 
-  const lastUserMessage = { role: 'user', parts: [{ text: input.question }] };
-
   const knowledgeBase = `
     Knowledge Base:
     ---
@@ -65,11 +63,13 @@ export async function answerQuestion(
 
   try {
     const chat = model.startChat({
-        history: history,
-        systemInstruction: {
-            role: "system",
-            parts: [{ text: systemInstruction }, { text: knowledgeBase }]
-        }
+        history: [
+            ...history,
+            {
+                role: "model",
+                parts: [{ text: systemInstruction }, { text: knowledgeBase }]
+            }
+        ]
     });
 
     const result = await chat.sendMessage(input.question);

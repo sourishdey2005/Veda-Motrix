@@ -13,11 +13,6 @@ if (!apiKey) {
 }
 const genAI = new GoogleGenAI(apiKey);
 
-const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    generationConfig: { responseMimeType: "application/json" },
-});
-
 export async function handleCustomerEnquiry(
   input: HandleCustomerEnquiryInput
 ): Promise<HandleCustomerEnquiryOutput> {
@@ -40,7 +35,11 @@ export async function handleCustomerEnquiry(
     Example: { "conversationSummary": "Agent: ...\nOwner: ...\nAgent: ...\nOwner: ..." }`;
 
   try {
-    const result = await model.generateContent(prompt);
+    const result = await genAI.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" },
+    });
     const response = result.response;
     const jsonString = response.text();
     return JSON.parse(jsonString) as HandleCustomerEnquiryOutput;

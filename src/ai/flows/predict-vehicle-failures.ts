@@ -14,11 +14,6 @@ if (!apiKey) {
 }
 const genAI = new GoogleGenAI(apiKey);
 
-const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    generationConfig: { responseMimeType: "application/json" },
-});
-
 
 export async function predictVehicleFailure(
   input: PredictVehicleFailureInput
@@ -46,7 +41,11 @@ export async function predictVehicleFailure(
     }`;
 
   try {
-    const result = await model.generateContent(prompt);
+    const result = await genAI.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" },
+    });
     const response = result.response;
     const jsonString = response.text();
     return JSON.parse(jsonString) as PredictVehicleFailureOutput;
