@@ -1,109 +1,78 @@
-
 'use server';
 
-if (!process.env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
+if (!process.env.OPENROUTER_API_KEY) {
+    console.warn("OPENROUTER_API_KEY environment variable not set. Using placeholder. AI features will not work.");
 }
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-interface TextPart {
-    text: string;
-}
-
-interface InlineDataPart {
-    inline_data: {
-        mime_type: string;
-        data: string;
-    };
-}
-
-type Part = TextPart | InlineDataPart;
+// It's recommended to set these in your environment variables for real use.
+const YOUR_SITE_URL = process.env.YOUR_SITE_URL || 'http://localhost:3000';
+const YOUR_SITE_NAME = process.env.YOUR_SITE_NAME || 'VEDA-MOTRIX';
 
 interface Message {
-    role: 'user' | 'model';
-    parts: Part[];
+  role: 'user' | 'assistant' | 'system';
+  content: string | (string | { type: 'image_url', image_url: { url: string } })[];
 }
 
-interface GeminiResponse {
-    candidates: {
-        content: {
-            parts: {
-                text: string;
-            }[];
+interface OpenAiResponse {
+    choices: {
+        message: {
+            content: string;
         };
     }[];
 }
 
-export async function geminiClient(
-    prompt: string,
-    history: Message[] = [],
-    isJsonMode: boolean = false,
-    imageDataUri?: string
+export async function openAiClient(
+    messages: Message[],
+    isJsonMode: boolean = false
 ): Promise<string> {
     try {
-        const isVision = !!imageDataUri;
-        // Use stable, versioned model names to avoid 404 errors
-        const modelName = isVision ? 'gemini-1.0-pro-vision' : 'gemini-1.0-pro';
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
-
-        const userParts: Part[] = [{ text: prompt }];
-
-        if (imageDataUri) {
-            const dataUriMatch = imageDataUri.match(/^data:(.+?);base64,(.*)$/);
-            if (!dataUriMatch) {
-                throw new Error('Invalid data URI for image.');
-            }
-            const mimeType = dataUriMatch[1];
-            const base64Data = dataUriMatch[2];
-            userParts.push({
-                inline_data: {
-                    mime_type: mimeType,
-                    data: base64Data,
-                },
-            });
+        const apiKey = process.env.OPENROUTER_API_KEY || 'YOUR_OPENROUTER_API_KEY_PLACEHOLDER';
+        if (apiKey === 'YOUR_OPENROUTER_API_KEY_PLACEHOLDER') {
+             throw new Error("OpenRouter API key is not configured.");
         }
-        
-        const contents: Message[] = [...history, { role: 'user', parts: userParts }];
 
-        const payload: Record<string, any> = { contents };
+        const body: any = {
+            model: 'openai/gpt-4o',
+            messages: messages,
+        };
 
         if (isJsonMode) {
-             payload.generationConfig = {
-                response_mime_type: "application/json",
-            };
+            body.response_format = { type: "json_object" };
+            // Add a system message to ensure JSON output if not already present
+            if (!messages.some(m => m.role === 'system' && typeof m.content === 'string' && m.content.includes('JSON'))) {
+                 messages.unshift({
+                    role: 'system',
+                    content: 'You are a helpful assistant designed to output JSON.'
+                });
+            }
         }
         
-        const response = await fetch(url, {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'HTTP-Referer': YOUR_SITE_URL,
+                'X-Title': YOUR_SITE_NAME,
                 'Content-Type': 'application/json',
-                'x-goog-api-key': GEMINI_API_KEY,
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(body),
         });
 
         if (!response.ok) {
             const errorBody = await response.text();
-            console.error('Google AI API Error:', errorBody);
+            console.error('OpenRouter API Error:', errorBody);
             throw new Error(`API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
         }
 
-        const data: GeminiResponse = await response.json();
+        const data: OpenAiResponse = await response.json();
         
-        if (data.candidates && data.candidates.length > 0 && data.candidates[0].content.parts.length > 0) {
-            return data.candidates[0].content.parts[0].text;
-        }
-
-        // Handle cases where the API returns a candidate but with no text parts (e.g., safety block)
-        if (data.candidates && data.candidates.length > 0) {
-            // A more detailed check could be added here for specific finishReasons like "SAFETY"
-            return "The model returned a response with no text content. This might be due to safety filters blocking the response.";
+        if (data.choices && data.choices.length > 0 && data.choices[0].message.content) {
+            return data.choices[0].message.content;
         }
 
         throw new Error('No response content returned from the API.');
     } catch (error) {
-        console.error('Error in geminiClient:', error);
+        console.error('Error in openAiClient:', error);
         throw error; 
     }
 }

@@ -156,7 +156,7 @@ export type PredictVehicleFailureOutput = z.infer<
 
 // vehicle-qna
 const MessageSchema = z.object({
-  role: z.enum(['user', 'model']),
+  role: z.enum(['user', 'assistant']),
   content: z.string(),
 });
 export type Message = z.infer<typeof MessageSchema>;

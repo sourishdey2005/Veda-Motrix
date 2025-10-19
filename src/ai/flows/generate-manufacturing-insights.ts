@@ -7,18 +7,18 @@ import {
   GenerateManufacturingInsightsInput,
   GenerateManufacturingInsightsOutput,
 } from '@/ai/types';
-import { geminiClient } from '@/ai/genkit';
+import { openAiClient } from '@/ai/genkit';
 
 export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
 ): Promise<GenerateManufacturingInsightsOutput> {
   try {
-    const prompt = `You are a manufacturing insights expert. Analyze the following service data and generate clear, actionable improvement suggestions for RCA/CAPA.
+    const userPrompt = `You are a manufacturing insights expert. Analyze the following service data and generate clear, actionable improvement suggestions for RCA/CAPA.
 
 Service Data: ${input.serviceData}
 `;
 
-    const improvementSuggestions = await geminiClient(prompt);
+    const improvementSuggestions = await openAiClient([{ role: 'user', content: userPrompt }]);
     return { improvementSuggestions };
 
   } catch (error) {

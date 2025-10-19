@@ -8,27 +8,30 @@ import {
   AnalyzeVehicleDataOutput,
   AnalyzeVehicleDataOutputSchema,
 } from '@/ai/types';
-import { geminiClient } from '@/ai/genkit';
-import { z } from 'zod';
+import { openAiClient } from '@/ai/genkit';
 
 export async function analyzeVehicleData(
   input: AnalyzeVehicleDataInput
 ): Promise<AnalyzeVehicleDataOutput> {
   try {
-    const prompt = `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs.
-Analyze the provided sensor data and logs to identify potential issues.
-
-Vehicle ID: ${input.vehicleId}
-Sensor Data (JSON): ${input.sensorDataJson}
-Maintenance Logs: ${input.maintenanceLogs}
-
+    const systemPrompt = `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs.
 Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
 ${JSON.stringify(AnalyzeVehicleDataOutputSchema.shape, null, 2)}
 
 Your response should contain a list of detected anomalies and a list of suggested maintenance needs. If none are found, return empty arrays.
 `;
+    
+    const userPrompt = `Analyze the provided sensor data and logs to identify potential issues.
 
-    const rawResponse = await geminiClient(prompt, [], true);
+Vehicle ID: ${input.vehicleId}
+Sensor Data (JSON): ${input.sensorDataJson}
+Maintenance Logs: ${input.maintenanceLogs}
+`;
+
+    const rawResponse = await openAiClient(
+        [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+        true
+    );
     const parsedResponse = JSON.parse(rawResponse);
 
     const validation = AnalyzeVehicleDataOutputSchema.safeParse(parsedResponse);

@@ -7,13 +7,13 @@ import {
   GenerateExecutiveSummaryInput,
   GenerateExecutiveSummaryOutput,
 } from '@/ai/types';
-import { geminiClient } from '@/ai/genkit';
+import { openAiClient } from '@/ai/genkit';
 
 export async function generateExecutiveSummary(
   input: GenerateExecutiveSummaryInput
 ): Promise<GenerateExecutiveSummaryOutput> {
   try {
-    const prompt = `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Analyze the provided JSON data and generate a clear, concise, and insightful summary in plain text for a management audience.
+    const userPrompt = `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Analyze the provided JSON data and generate a clear, concise, and insightful summary in plain text for a management audience.
 Focus on key takeaways, trends, and significant metrics.
 
 Analyze the following data:
@@ -22,7 +22,7 @@ ${input.reportData}
 Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
 `;
 
-    const summary = await geminiClient(prompt);
+    const summary = await openAiClient([{ role: 'user', content: userPrompt }]);
     return { summary };
 
   } catch (error) {

@@ -8,24 +8,28 @@ import {
   PredictVehicleFailureOutput,
   PredictVehicleFailureOutputSchema,
 } from '@/ai/types';
-import { geminiClient } from '@/ai/genkit';
-import { z } from 'zod';
+import { openAiClient } from '@/ai/genkit';
 
 export async function predictVehicleFailure(
   input: PredictVehicleFailureInput
 ): Promise<PredictVehicleFailureOutput> {
   try {
-    const prompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
-Analyze the provided sensor data and maintenance logs for vehicle ID ${input.vehicleId} to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions.
-
-Sensor Data (JSON): ${input.sensorDataJson}
-Maintenance Logs: ${input.maintenanceLogs}
+    const systemPrompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
+Analyze the provided sensor data and maintenance logs to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions.
 
 Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
 ${JSON.stringify({predictedFailures: PredictVehicleFailureOutputSchema.shape.predictedFailures}, null, 2)}
 `;
+    
+    const userPrompt = `Vehicle ID ${input.vehicleId}
+Sensor Data (JSON): ${input.sensorDataJson}
+Maintenance Logs: ${input.maintenanceLogs}
+`;
 
-    const rawResponse = await geminiClient(prompt, [], true);
+    const rawResponse = await openAiClient(
+        [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+        true
+    );
     const parsedResponse = JSON.parse(rawResponse);
     
     const validation = PredictVehicleFailureOutputSchema.safeParse(parsedResponse);

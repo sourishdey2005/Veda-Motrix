@@ -8,23 +8,25 @@ import {
   AnalyzeCustomerFeedbackOutput,
   AnalyzeCustomerFeedbackOutputSchema,
 } from '@/ai/types';
-import { geminiClient } from '@/ai/genkit';
-import { z } from 'zod';
+import { openAiClient } from '@/ai/genkit';
 
 export async function analyzeCustomerFeedback(
   input: AnalyzeCustomerFeedbackInput
 ): Promise<AnalyzeCustomerFeedbackOutput> {
   try {
-    const prompt = `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements.
-
-Analyze the following customer feedback:
-Feedback: "${input.feedbackText}"
-
+    const systemPrompt = `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements.
 Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
 ${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.shape, null, 2)}
 `;
 
-    const rawResponse = await geminiClient(prompt, [], true);
+    const userPrompt = `Analyze the following customer feedback:
+Feedback: "${input.feedbackText}"`;
+
+    const rawResponse = await openAiClient(
+        [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+        true // Enable JSON mode
+    );
+
     const parsedResponse = JSON.parse(rawResponse);
     
     const validation = AnalyzeCustomerFeedbackOutputSchema.safeParse(parsedResponse);
