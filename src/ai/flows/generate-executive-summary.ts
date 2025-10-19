@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileoverview A Genkit flow that generates an executive summary from business intelligence data.

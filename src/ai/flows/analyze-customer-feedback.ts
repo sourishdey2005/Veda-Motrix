@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileoverview A Genkit flow that analyzes customer feedback for sentiment and actionable insights.
@@ -6,10 +5,8 @@
 import {
   AnalyzeCustomerFeedbackInput,
   AnalyzeCustomerFeedbackOutput,
-  AnalyzeCustomerFeedbackOutputSchema,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
 
 export async function analyzeCustomerFeedback(
   input: AnalyzeCustomerFeedbackInput

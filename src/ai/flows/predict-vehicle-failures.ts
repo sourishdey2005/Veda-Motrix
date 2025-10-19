@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileoverview A Genkit flow that predicts vehicle failures from sensor data and maintenance logs.

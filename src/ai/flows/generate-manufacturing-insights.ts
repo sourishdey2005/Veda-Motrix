@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileoverview A Genkit flow that generates manufacturing insights from service data.

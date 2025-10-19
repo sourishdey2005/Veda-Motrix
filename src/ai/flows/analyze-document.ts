@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileoverview A Genkit flow that analyzes a document (CSV, TXT, image).
@@ -9,7 +8,6 @@ import {
   AnalyzeDocumentOutput,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import {Part} from '@google/genai';
 
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
@@ -23,7 +21,7 @@ export async function analyzeDocument(
     const base64Data = dataUriMatch[2];
     
     let prompt;
-    const requestParts: Part[] = [];
+    const requestParts: (string | { inlineData: { mimeType: string; data: string } })[] = [];
 
     if (mimeType.startsWith('image/')) {
         prompt = `You are an expert data analyst AI. A user has provided an image and a prompt. Describe the contents of the image and answer the user's prompt based on the image. Provide a clear, well-structured analysis in Markdown format.
@@ -52,7 +50,7 @@ ${textContent}
         };
     }
     
-    requestParts.unshift({ text: prompt });
+    requestParts.unshift(prompt);
     
     const { output } = await ai.generate({
         model: 'googleai/gemini-pro',

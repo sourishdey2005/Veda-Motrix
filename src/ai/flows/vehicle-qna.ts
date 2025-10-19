@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileoverview A Genkit flow that answers user questions about vehicles, using a knowledge base and conversation history.
@@ -7,11 +6,9 @@ import { qnaData } from '@/lib/chatbot-qna';
 import {
   AnswerQuestionInput,
   AnswerQuestionOutput,
-  AnswerQuestionOutputSchema,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
-import { Content, roleToModel } from 'genkit/model';
+import {type Content} from 'genkit/model';
 
 
 const localSearch = (question: string): string | null => {
