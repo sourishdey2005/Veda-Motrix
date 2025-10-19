@@ -49,26 +49,34 @@ const documentAnalysisPrompt = ai.definePrompt(
 );
 
 export const analyzeDocumentFlow = ai.defineFlow(
-    {
-        name: 'analyzeDocumentFlow',
-        inputSchema: AnalyzeDocumentInputSchema,
-        outputSchema: AnalyzeDocumentOutputSchema,
-    },
-    async (input) => {
-        try {
-            const { output } = await documentAnalysisPrompt(input);
-            if (!output) {
-                return { analysis: '#### Error\nAI failed to generate a response.' };
-            }
-            return output;
-        } catch (error: any) {
-            console.error('Error in document analysis flow:', error);
-            if (error.message.includes('unsupported content type')) {
-                 return { analysis: `#### Error\nUnsupported file type. Please upload a supported document format like PDF, JPG, PNG, or plain text.` };
-            }
-            return { analysis: `#### Error\nAn unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.` };
-        }
+  {
+    name: 'analyzeDocumentFlow',
+    inputSchema: AnalyzeDocumentInputSchema,
+    outputSchema: AnalyzeDocumentOutputSchema,
+  },
+  async (input) => {
+    try {
+      const { output } = await documentAnalysisPrompt(input);
+      if (!output) {
+        return {
+          analysis: '#### Error\nAI failed to generate a response.',
+        };
+      }
+      return output;
+    } catch (error: any) {
+      console.error('Error in document analysis flow:', error);
+      if (error.message.includes('unsupported content type')) {
+        return {
+          analysis:
+            '#### Error\nUnsupported file type. Please upload a supported document format like PDF, JPG, PNG, or plain text.',
+        };
+      }
+      return {
+        analysis:
+          '#### Error\nAn unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.',
+      };
     }
+  }
 );
 
 
