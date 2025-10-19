@@ -8,7 +8,7 @@
  * - GenerateExecutiveSummaryInput - The input type for generateExecutiveSummary.
  * - GenerateExecutiveSummaryOutput - The return type for generateExecutiveSummary.
  */
-import { openai } from '@/ai/client';
+import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const GenerateExecutiveSummaryInputSchema = z.object({
@@ -31,29 +31,38 @@ export type GenerateExecutiveSummaryOutput = z.infer<
   typeof GenerateExecutiveSummaryOutputSchema
 >;
 
-export async function generateExecutiveSummary(
-  input: GenerateExecutiveSummaryInput
-): Promise<GenerateExecutiveSummaryOutput> {
-    const prompt = `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Your task is to analyze the provided JSON data and generate a clear, concise, and insightful summary for a management audience.
+const summaryPrompt = ai.definePrompt({
+    name: 'generateExecutiveSummaryPrompt',
+    input: { schema: GenerateExecutiveSummaryInputSchema },
+    output: { schema: GenerateExecutiveSummaryOutputSchema },
+    prompt: `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Your task is to analyze the provided JSON data and generate a clear, concise, and insightful summary for a management audience.
 
     Focus on key takeaways, trends, and significant metrics.
 
     Analyze the following data:
 
-    ${input.reportData}
+    {{{reportData}}}
 
     Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
-    The response should be a plain string, not a JSON object.`;
+`
+});
 
-    const completion = await openai.chat.completions.create({
-        model: 'openrouter/auto',
-        messages: [{ role: 'user', content: prompt }],
-    });
 
-    const summary = completion.choices[0].message?.content;
-    if (!summary) {
+const generateExecutiveSummaryFlow = ai.defineFlow({
+    name: 'generateExecutiveSummaryFlow',
+    inputSchema: GenerateExecutiveSummaryInputSchema,
+    outputSchema: GenerateExecutiveSummaryOutputSchema,
+}, async (input) => {
+    const { output } = await summaryPrompt(input);
+    if (!output) {
         throw new Error('AI failed to generate a response.');
     }
+    return output;
+});
 
-    return { summary };
+
+export async function generateExecutiveSummary(
+  input: GenerateExecutiveSummaryInput
+): Promise<GenerateExecutiveSummaryOutput> {
+  return await generateExecutiveSummaryFlow(input);
 }

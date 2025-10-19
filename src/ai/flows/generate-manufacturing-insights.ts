@@ -11,7 +11,7 @@
  * @fileExport {type} GenerateManufacturingInsightsInput - The input type for the generateManufacturingInsights function.
  * @fileExport {type} GenerateManufacturingInsightsOutput - The output type for the generateManufacturingInsights function.
  */
-import { openai } from '@/ai/client';
+import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const GenerateManufacturingInsightsInputSchema = z.object({
@@ -34,24 +34,32 @@ export type GenerateManufacturingInsightsOutput = z.infer<
   typeof GenerateManufacturingInsightsOutputSchema
 >;
 
+const insightsPrompt = ai.definePrompt({
+    name: 'generateManufacturingInsightsPrompt',
+    input: { schema: GenerateManufacturingInsightsInputSchema },
+    output: { schema: GenerateManufacturingInsightsOutputSchema },
+    prompt: `You are a manufacturing insights expert. Analyze the following service data and generate improvement suggestions for RCA/CAPA.
+
+    Service Data: {{{serviceData}}}
+
+    Provide clear, actionable improvement suggestions.`
+});
+
+
+const generateManufacturingInsightsFlow = ai.defineFlow({
+    name: 'generateManufacturingInsightsFlow',
+    inputSchema: GenerateManufacturingInsightsInputSchema,
+    outputSchema: GenerateManufacturingInsightsOutputSchema,
+}, async (input) => {
+    const { output } = await insightsPrompt(input);
+    if (!output) {
+        throw new Error('AI failed to generate a response.');
+    }
+    return output;
+});
+
 export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
 ): Promise<GenerateManufacturingInsightsOutput> {
-    const prompt = `You are a manufacturing insights expert. Analyze the following service data and generate improvement suggestions for RCA/CAPA.
-
-    Service Data: ${input.serviceData}
-
-    Provide clear, actionable improvement suggestions as a single string.`;
-
-    const completion = await openai.chat.completions.create({
-        model: 'openrouter/auto',
-        messages: [{ role: 'user', content: prompt }],
-    });
-
-    const improvementSuggestions = completion.choices[0].message?.content;
-    if (!improvementSuggestions) {
-        throw new Error('AI failed to generate a response.');
-    }
-
-    return { improvementSuggestions };
+  return await generateManufacturingInsightsFlow(input);
 }

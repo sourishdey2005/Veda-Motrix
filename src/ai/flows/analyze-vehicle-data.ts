@@ -8,7 +8,7 @@
  * - AnalyzeVehicleDataInput - The input type for the analyzeVehicleData function.
  * - AnalyzeVehicleDataOutput - The return type for the analyzeVehicleData function.
  */
-import { openai } from '@/ai/client';
+import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const AnalyzeVehicleDataInputSchema = z.object({
@@ -24,34 +24,42 @@ const AnalyzeVehicleDataOutputSchema = z.object({
 });
 export type AnalyzeVehicleDataOutput = z.infer<typeof AnalyzeVehicleDataOutputSchema>;
 
-export async function analyzeVehicleData(input: AnalyzeVehicleDataInput): Promise<AnalyzeVehicleDataOutput> {
-  
-    const prompt = `You are a master agent responsible for analyzing vehicle sensor data and detecting anomalies.
+const vehicleDataPrompt = ai.definePrompt({
+    name: 'analyzeVehicleDataPrompt',
+    input: { schema: z.object({ vehicleId: z.string(), sensorDataJson: z.string(), maintenanceLogs: z.string() }) },
+    output: { schema: AnalyzeVehicleDataOutputSchema },
+    prompt: `You are a master agent responsible for analyzing vehicle sensor data and detecting anomalies.
 
     You are provided with sensor data, maintenance logs, and the vehicle ID.
 
     Analyze the sensor data for any anomalies or unusual patterns. Compare the current sensor data with historical data and maintenance logs to identify potential maintenance needs.
 
-    Vehicle ID: ${input.vehicleId}
-    Sensor Data: ${JSON.stringify(input.sensorData)}
-    Maintenance Logs: ${input.maintenanceLogs}
+    Vehicle ID: {{{vehicleId}}}
+    Sensor Data: {{{sensorDataJson}}}
+    Maintenance Logs: {{{maintenanceLogs}}}
+`
+});
 
-    Return a valid JSON object with the following structure:
-    {
-      "anomalies": ["list of detected anomalies"],
-      "maintenanceNeeds": ["list of potential maintenance needs"]
-    }`;
-
-    const completion = await openai.chat.completions.create({
-        model: 'openrouter/auto',
-        messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' },
+const analyzeVehicleDataFlow = ai.defineFlow(
+  {
+    name: 'analyzeVehicleDataFlow',
+    inputSchema: AnalyzeVehicleDataInputSchema,
+    outputSchema: AnalyzeVehicleDataOutputSchema,
+  },
+  async (input) => {
+    const { output } = await vehicleDataPrompt({
+        vehicleId: input.vehicleId,
+        sensorDataJson: JSON.stringify(input.sensorData),
+        maintenanceLogs: input.maintenanceLogs
     });
-
-    const result = completion.choices[0].message?.content;
-    if (!result) {
+    if (!output) {
         throw new Error('AI failed to generate a response.');
     }
+    return output;
+  }
+);
 
-    return AnalyzeVehicleDataOutputSchema.parse(JSON.parse(result));
+
+export async function analyzeVehicleData(input: AnalyzeVehicleDataInput): Promise<AnalyzeVehicleDataOutput> {
+  return await analyzeVehicleDataFlow(input);
 }

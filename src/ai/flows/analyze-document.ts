@@ -9,12 +9,8 @@
  * - AnalyzeDocumentOutput - The return type for the analyzeDocument function.
  */
 
-import { openai } from '@/ai/client';
+import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { fromPath } from 'pdf-parse/lib/pdf-parse';
-import * as fs from 'fs/promises';
-import { tmpdir } from 'os';
-import { join } from 'path';
 
 export const AnalyzeDocumentInputSchema = z.object({
   documentDataUri: z
@@ -37,64 +33,47 @@ export type AnalyzeDocumentOutput = z.infer<
   typeof AnalyzeDocumentOutputSchema
 >;
 
-async function extractTextFromDataUri(dataUri: string): Promise<string> {
-    const [header, base64Data] = dataUri.split(',');
-    if (!header || !base64Data) {
-        throw new Error('Invalid data URI format');
+const documentAnalysisPrompt = ai.definePrompt(
+    {
+        name: 'documentAnalysisPrompt',
+        input: { schema: z.object({ documentDataUri: z.string(), prompt: z.string() }) },
+        output: { schema: AnalyzeDocumentOutputSchema },
+        prompt: `You are a professional document analysis AI. Analyze the document provided based on the user's request.
+
+        If the document seems unreadable or empty, state that you were unable to parse the content. Otherwise, provide a concise, well-structured analysis in Markdown format, using headings, bold text, and bullet points for clarity.
+
+        User Prompt: "{{{prompt}}}"
+        Document: {{media url=documentDataUri}}
+        `
     }
-    
-    const mimeType = header.split(':')[1].split(';')[0];
-    const buffer = Buffer.from(base64Data, 'base64');
-    
-    if (mimeType === 'application/pdf') {
-        const tempFilePath = join(tmpdir(), `doc-${Date.now()}.pdf`);
-        await fs.writeFile(tempFilePath, buffer);
-        const data = await fromPath(tempFilePath);
-        await fs.unlink(tempFilePath); // Clean up the temp file
-        return data.text;
-    } else if (mimeType === 'text/csv' || mimeType === 'text/plain') {
-        return buffer.toString('utf-8');
-    } else {
-        throw new Error(`Unsupported file type: ${mimeType}`);
+);
+
+export const analyzeDocumentFlow = ai.defineFlow(
+    {
+        name: 'analyzeDocumentFlow',
+        inputSchema: AnalyzeDocumentInputSchema,
+        outputSchema: AnalyzeDocumentOutputSchema,
+    },
+    async (input) => {
+        try {
+            const { output } = await documentAnalysisPrompt(input);
+            if (!output) {
+                return { analysis: '#### Error\nAI failed to generate a response.' };
+            }
+            return output;
+        } catch (error: any) {
+            console.error('Error in document analysis flow:', error);
+            if (error.message.includes('unsupported content type')) {
+                 return { analysis: `#### Error\nUnsupported file type. Please upload a supported document format like PDF, JPG, PNG, or plain text.` };
+            }
+            return { analysis: `#### Error\nAn unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.` };
+        }
     }
-}
+);
 
 
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
 ): Promise<AnalyzeDocumentOutput> {
-    const { documentDataUri, prompt } = input;
-    
-    let documentText = '';
-    try {
-        documentText = await extractTextFromDataUri(documentDataUri);
-    } catch (error) {
-         console.error('Error extracting text:', error);
-         return { analysis: `#### Error\nCould not read the content of the file. It might be corrupted or in an unsupported format.` };
-    }
-
-    if (!documentText.trim()) {
-        return { analysis: `#### Analysis Result\nThe document appears to be empty or could not be read.` };
-    }
-
-    const systemPrompt = `You are a professional document analysis AI. Analyze the following document content based on the user's request. Provide a concise, well-structured analysis in Markdown format.
-If the document text appears to be garbled or unreadable, please state that you were unable to parse the content of the file.
-Use headings, bold text, and bullet points to structure your response for clarity.`;
-    
-    const userPrompt = `**Original User Prompt:** "${prompt}"\n\n**Document Content:**\n\n---\n\n${documentText.substring(0, 15000)}`; // Limit content size to avoid exceeding token limits
-
-    const completion = await openai.chat.completions.create({
-        model: 'openrouter/auto',
-        messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
-        ],
-    });
-
-    const analysis = completion.choices[0].message?.content;
-     if (!analysis) {
-        throw new Error('AI failed to generate a response.');
-    }
-
-    return { analysis };
+  return await analyzeDocumentFlow(input);
 }

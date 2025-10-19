@@ -8,7 +8,7 @@
  * - HandleCustomerEnquiryInput - The input type for the handleCustomerEnquiry function.
  * - HandleCustomerEnquiryOutput - The return type for the handleCustomerEnquiry function.
  */
-import { openai } from '@/ai/client';
+import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const HandleCustomerEnquiryInputSchema = z.object({
@@ -21,17 +21,17 @@ export type HandleCustomerEnquiryInput = z.infer<typeof HandleCustomerEnquiryInp
 const HandleCustomerEnquiryOutputSchema = z.object({
   conversationSummary: z.string().describe('A summary of the simulated conversation.'),
 });
-export type HandleCustomerEnquiryOutput = z.infer<typeof HandleCustomerEnquiryOutputSchema>;
+export type HandleCustomerEnquiryOutput = zinfer<typeof HandleCustomerEnquiryOutputSchema>;
 
-export async function handleCustomerEnquiry(
-  input: HandleCustomerEnquiryInput
-): Promise<HandleCustomerEnquiryOutput> {
-  
-    const prompt = `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.
+const enquiryPrompt = ai.definePrompt({
+    name: 'handleCustomerEnquiryPrompt',
+    input: { schema: HandleCustomerEnquiryInputSchema },
+    output: { schema: HandleCustomerEnquiryOutputSchema },
+    prompt: `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.
 
-    Vehicle Owner's Name: ${input.userName}
-    Vehicle Issue: ${input.vehicleIssue}
-    Recommended Maintenance: ${input.recommendedMaintenance}
+    Vehicle Owner's Name: {{{userName}}}
+    Vehicle Issue: {{{vehicleIssue}}}
+    Recommended Maintenance: {{{recommendedMaintenance}}}
 
     Generate a short conversation (around 5-6 lines) between you and the vehicle owner. Start with a greeting, explain the issue and the recommended maintenance, and offer assistance with scheduling a service appointment. The response should be in the format of a conversation.
 
@@ -40,18 +40,26 @@ export async function handleCustomerEnquiry(
     Agent: (Offer assistance with scheduling)
     Owner: (Owner's reply)
 
-    End the conversation after the owner replies to the scheduling offer. The entire output should be a single string representing the conversation.
-    `;
+    End the conversation after the owner replies to the scheduling offer.
+    `
+});
 
-    const completion = await openai.chat.completions.create({
-        model: 'openrouter/auto',
-        messages: [{ role: 'user', content: prompt }],
-    });
 
-    const conversationSummary = completion.choices[0].message?.content;
-    if (!conversationSummary) {
+const handleCustomerEnquiryFlow = ai.defineFlow({
+    name: 'handleCustomerEnquiryFlow',
+    inputSchema: HandleCustomerEnquiryInputSchema,
+    outputSchema: HandleCustomerEnquiryOutputSchema,
+}, async (input) => {
+    const { output } = await enquiryPrompt(input);
+    if (!output) {
         throw new Error('AI failed to generate a response.');
     }
+    return output;
+});
 
-    return { conversationSummary };
+
+export async function handleCustomerEnquiry(
+  input: HandleCustomerEnquiryInput
+): Promise<HandleCustomerEnquiryOutput> {
+  return await handleCustomerEnquiryFlow(input);
 }

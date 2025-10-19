@@ -8,7 +8,7 @@
  * - PredictVehicleFailureInput - Input type for the predictVehicleFailure function.
  * - PredictVehicleFailureOutput - Output type for the predictVehicleFailure function.
  */
-import { openai } from '@/ai/client';
+import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const PredictVehicleFailureInputSchema = z.object({
@@ -31,38 +31,36 @@ const PredictVehicleFailureOutputSchema = z.object({
 });
 export type PredictVehicleFailureOutput = z.infer<typeof PredictVehicleFailureOutputSchema>;
 
-export async function predictVehicleFailure(input: PredictVehicleFailureInput): Promise<PredictVehicleFailureOutput> {
-    const prompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
+const failurePredictionPrompt = ai.definePrompt({
+    name: 'predictVehicleFailurePrompt',
+    input: { schema: z.object({ vehicleId: z.string(), sensorDataJson: z.string(), maintenanceLogs: z.string() }) },
+    output: { schema: PredictVehicleFailureOutputSchema },
+    prompt: `You are an AI diagnosis agent specializing in predicting vehicle failures.
 
-    Analyze the provided sensor data and maintenance logs for vehicle ID ${input.vehicleId} to predict potential failures.
+    Analyze the provided sensor data and maintenance logs for vehicle ID {{{vehicleId}}} to predict potential failures.
 
-    Sensor Data: ${JSON.stringify(input.sensorData)}
-    Maintenance Logs: ${input.maintenanceLogs}
+    Sensor Data: {{{sensorDataJson}}}
+    Maintenance Logs: {{{maintenanceLogs}}}
 
-    Based on your analysis, predict potential failures, assign a priority (HIGH, MEDIUM, LOW) to each, and suggest actions to mitigate the failures. Include a confidence score (0-1) for each prediction.
-    Return a valid JSON object with the following structure:
-    {
-      "predictedFailures": [
-        {
-          "component": "string",
-          "failureType": "string",
-          "priority": "HIGH" | "MEDIUM" | "LOW",
-          "confidence": number,
-          "suggestedActions": "string"
-        }
-      ]
-    }`;
+    Based on your analysis, predict potential failures, assign a priority (HIGH, MEDIUM, LOW) to each, and suggest actions to mitigate the failures. Include a confidence score (0-1) for each prediction.`
+});
 
-    const completion = await openai.chat.completions.create({
-        model: 'openrouter/auto',
-        messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' },
+const predictVehicleFailureFlow = ai.defineFlow({
+    name: 'predictVehicleFailureFlow',
+    inputSchema: PredictVehicleFailureInputSchema,
+    outputSchema: PredictVehicleFailureOutputSchema,
+}, async (input) => {
+    const { output } = await failurePredictionPrompt({
+        vehicleId: input.vehicleId,
+        sensorDataJson: JSON.stringify(input.sensorData),
+        maintenanceLogs: input.maintenanceLogs
     });
-
-    const result = completion.choices[0].message?.content;
-    if (!result) {
+    if (!output) {
         throw new Error('AI failed to generate a response.');
     }
+    return output;
+});
 
-    return PredictVehicleFailureOutputSchema.parse(JSON.parse(result));
+export async function predictVehicleFailure(input: PredictVehicleFailureInput): Promise<PredictVehicleFailureOutput> {
+    return await predictVehicleFailureFlow(input);
 }

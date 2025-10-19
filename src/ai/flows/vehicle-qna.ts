@@ -7,12 +7,12 @@
  * - AnswerQuestionInput - The input type for the answerQuestion function.
  * - AnswerQuestionOutput - The return type for the answerQuestion function.
  */
-
+import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { qnaData } from '@/lib/chatbot-qna';
 
 const AnswerQuestionInputSchema = z.object({
-  question: z.string().describe('The user\'s question about their vehicle.'),
+  question: z.string().describe("The user's question about their vehicle."),
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'model']),
     content: z.string(),
@@ -21,53 +21,80 @@ const AnswerQuestionInputSchema = z.object({
 export type AnswerQuestionInput = z.infer<typeof AnswerQuestionInputSchema>;
 
 const AnswerQuestionOutputSchema = z.object({
-  answer: z.string().describe('The AI\'s answer to the user\'s question.'),
+  answer: z.string().describe("The AI's answer to the user's question."),
 });
 export type AnswerQuestionOutput = z.infer<typeof AnswerQuestionOutputSchema>;
 
-// This function now performs a local search instead of calling an AI model.
-export async function answerQuestion(input: AnswerQuestionInput): Promise<AnswerQuestionOutput> {
-  const userQuestion = input.question.toLowerCase().trim();
-  
-  if (!userQuestion) {
-    return { answer: "I'm sorry, I didn't receive a question. How can I help?" };
-  }
-
-  // Find the best match from the knowledge base.
-  let bestMatch: { score: number; answer: string } = { score: 0, answer: "" };
-
-  qnaData.forEach(item => {
-    const qnaQuestion = item.question.toLowerCase().trim();
-    
-    // Simple scoring mechanism:
-    // 3 points for exact match
-    // 2 points if the user's question includes the Q&A question
-    // 1 point if the Q&A question includes part of the user's question
-    
-    if (userQuestion === qnaQuestion) {
-        if (bestMatch.score < 3) {
-            bestMatch = { score: 3, answer: item.answer };
-        }
-    } else if (userQuestion.includes(qnaQuestion)) {
-        if (bestMatch.score < 2) {
-            bestMatch = { score: 2, answer: item.answer };
-        }
-    } else {
-        const userWords = new Set(userQuestion.split(' '));
-        const qnaWords = new Set(qnaQuestion.split(' '));
-        const intersection = new Set([...userWords].filter(x => qnaWords.has(x)));
-        const score = intersection.size / qnaWords.size;
-
-        if (score > bestMatch.score && score > 0.5) { // Require more than 50% word match
-             bestMatch = { score: score, answer: item.answer };
-        }
+const localSearch = (question: string) => {
+    const userQuestion = question.toLowerCase().trim();
+    if (!userQuestion) {
+        return null;
     }
-  });
-  
-  if (bestMatch.answer) {
-    return { answer: bestMatch.answer };
-  }
 
-  // Default fallback answer if no good match is found.
-  return { answer: "I'm sorry, I don't have information on that topic right now. I can help with vehicle maintenance, service, and general questions." };
+    let bestMatch: { score: number; answer: string } = { score: 0, answer: "" };
+
+    qnaData.forEach(item => {
+        const qnaQuestion = item.question.toLowerCase().trim();
+        let score = 0;
+        if (userQuestion === qnaQuestion) {
+            score = 3;
+        } else if (userQuestion.includes(qnaQuestion)) {
+            score = 2;
+        } else {
+            const userWords = new Set(userQuestion.split(' '));
+            const qnaWords = new Set(qnaQuestion.split(' '));
+            const intersection = new Set([...userWords].filter(x => qnaWords.has(x)));
+            score = intersection.size / qnaWords.size;
+        }
+
+        if (score > bestMatch.score) {
+            bestMatch = { score, answer: item.answer };
+        }
+    });
+
+    if (bestMatch.score > 0.7) { // Confidence threshold
+        return bestMatch.answer;
+    }
+    return null;
+}
+
+const qnaPrompt = ai.definePrompt({
+    name: 'vehicleQnaPrompt',
+    system: `You are a helpful AI assistant for VEDA-MOTRIX, specializing in vehicle maintenance and troubleshooting.
+    First, check the provided knowledge base. If a relevant answer exists, use it.
+    If the user's question is not in the knowledge base, use your general knowledge to provide a helpful, safe, and accurate answer.
+    Always prioritize user safety. If a user describes a critical issue (e.g., smoke, strange noises, brake failure), strongly advise them to stop driving and seek professional help immediately.
+    Keep your answers concise and easy to understand.
+
+    Knowledge Base:
+    ---
+    ${qnaData.map(item => `Q: ${item.question}\nA: ${item.answer}`).join('\n')}
+    ---
+    `,
+    input: { schema: AnswerQuestionInputSchema },
+    output: { schema: AnswerQuestionOutputSchema },
+});
+
+const answerQuestionFlow = ai.defineFlow({
+    name: 'answerQuestionFlow',
+    inputSchema: AnswerQuestionInputSchema,
+    outputSchema: Answer4nswerQuestionOutputSchema,
+}, async (input) => {
+    
+    // First, try a quick local search for a perfect match
+    const localAnswer = localSearch(input.question);
+    if (localAnswer) {
+        return { answer: localAnswer };
+    }
+
+    // If no good local match, proceed with the full AI prompt
+    const { output } = await qnaPrompt(input);
+    if (!output) {
+        return { answer: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment." };
+    }
+    return output;
+});
+
+export async function answerQuestion(input: AnswerQuestionInput): Promise<AnswerQuestionOutput> {
+  return await answerQuestionFlow(input);
 }

@@ -72,12 +72,13 @@ export function DocumentAnalysisView() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      if (selectedFile.type === 'application/pdf' || selectedFile.type === 'text/csv' || selectedFile.type === 'text/plain') {
+      const ALLOWED_TYPES = ['application/pdf', 'text/csv', 'text/plain', 'image/jpeg', 'image/png', 'image/webp'];
+      if (ALLOWED_TYPES.includes(selectedFile.type)) {
         setFile(selectedFile);
       } else {
         toast({
           title: "Invalid File Type",
-          description: "Please upload a PDF, CSV, or TXT file.",
+          description: "Please upload a supported file (PDF, CSV, TXT, JPG, PNG).",
           variant: "destructive",
         });
       }
@@ -103,7 +104,6 @@ export function DocumentAnalysisView() {
       reader.onload = async () => {
         const documentDataUri = reader.result as string;
         
-        // This call now hits your working AI flow
         const result = await analyzeDocument({ documentDataUri, prompt });
 
         setAnalysisResult(result.analysis);
@@ -133,12 +133,12 @@ export function DocumentAnalysisView() {
       <Card>
         <CardHeader>
           <CardTitle>Document Analysis Engine</CardTitle>
-          <CardDescription>Upload a CSV, PDF or TXT and use AI to get real-time insights.</CardDescription>
+          <CardDescription>Upload a document (PDF, CSV, TXT, JPG, PNG) and use AI to get real-time insights.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="file-upload">1. Upload Document</Label>
-            <Input id="file-upload" type="file" accept=".csv,.pdf,.txt" onChange={handleFileChange} />
+            <Input id="file-upload" type="file" accept=".csv,.pdf,.txt,.jpg,.jpeg,.png" onChange={handleFileChange} />
             {file && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
                 <FileIcon className="w-4 h-4" />
