@@ -1,7 +1,8 @@
 
 'use server';
 /**
- * @fileoverview A Genkit flow that analyzes a document (PDF, CSV, TXT, image) based on a user's prompt.
+ * @fileoverview A Genkit flow that analyzes a document (CSV, TXT, image) based on a user's prompt.
+ * PDF analysis has been temporarily removed due to an unstable dependency.
  */
 import {ai} from '@/ai/genkit';
 import {
@@ -11,7 +12,6 @@ import {
   AnalyzeDocumentOutputSchema,
 } from '@/ai/types';
 import {z} from 'zod';
-import pdf from 'pdf-parse';
 
 // Helper function to parse Data URI
 const parseDataUri = (dataUri: string) => {
@@ -42,7 +42,7 @@ const analysisPrompt = ai.definePrompt(
 
 Your task is to analyze the document based on their prompt.
 - If it's an image, describe the contents and answer the prompt.
-- If it's text (from a CSV, TXT, or PDF), analyze the content to answer the prompt.
+- If it's text (from a CSV or TXT file), analyze the content to answer the prompt.
 
 Provide a clear, well-structured analysis in Markdown format.
 
@@ -82,14 +82,16 @@ const analyzeDocumentFlow = ai.defineFlow(
       
       if (mimeType.startsWith('image/')) {
         promptInput.documentDataUri = input.documentDataUri;
-      } else if (mimeType === 'application/pdf') {
-        const pdfData = await pdf(buffer);
-        promptInput.textContent = pdfData.text;
       } else if (mimeType.startsWith('text/')) {
         promptInput.textContent = buffer.toString('utf-8');
-      } else {
+      } else if (mimeType === 'application/pdf') {
+         return {
+          analysis: `#### Error\nUnsupported file type: PDF processing is temporarily unavailable. Please try a standard image format (JPG, PNG), CSV, or a plain text file (.txt).`,
+        };
+      }
+      else {
         return {
-          analysis: `#### Error\nUnsupported file type: ${mimeType}. Please use a standard image format (JPG, PNG), PDF, CSV, or a plain text file (.txt).`,
+          analysis: `#### Error\nUnsupported file type: ${mimeType}. Please use a standard image format (JPG, PNG), CSV, or a plain text file (.txt).`,
         };
       }
       
@@ -99,19 +101,20 @@ const analyzeDocumentFlow = ai.defineFlow(
     } catch (error: any) {
       console.error('Error in document analysis flow:', error);
       
-      // Provide more specific error feedback
+      let errorMessage = `An unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${error.message}`;
+
       if (error.message?.includes('Invalid data URI')) {
-        return { analysis: '#### Error\nThe uploaded file could not be read. It might be corrupted.' };
+        errorMessage = 'The uploaded file could not be read. It might be corrupted or in a format the system cannot process.';
       }
       if (error.message?.includes('unsupported content type')) {
-        return { analysis: `#### Error\nUnsupported file type. The AI model cannot process this file. Please try a standard image format (JPG, PNG), PDF, CSV, or a plain text file (.txt).` };
+        errorMessage = `Unsupported file type. The AI model cannot process this file. Please try a standard image format (JPG, PNG), CSV, or a plain text file (.txt).`;
       }
       if (error.name === 'UnsupportedContentError') {
-        return { analysis: `#### Error\nContent Moderation: The document content was blocked by safety filters. Please try a different document.` };
+        errorMessage = `Content Moderation: The document content was blocked by safety filters. Please try a different document.`;
       }
       
       return {
-        analysis: `#### Error\nAn unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${error.message}`,
+        analysis: `#### Error\n${errorMessage}`,
       };
     }
   }
