@@ -51,22 +51,6 @@ const reliabilityChartConfig: ChartConfig = {
   '2024': { label: "2024", color: "hsl(var(--chart-1))" },
 }
 
-// Custom hook to simulate data updates
-function useSimulatedObjectData<T>(initialData: T, updater: (data: T) => T) {
-    const [data, setData] = useState(initialData);
-
-    const memoizedUpdater = useCallback(updater, []);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setData(prevData => memoizedUpdater(prevData));
-        }, 3000);
-        return () => clearInterval(interval);
-    }, [memoizedUpdater]);
-
-    return data;
-}
-
 const getStatusColor = (status: Vehicle['healthStatus']) => {
     switch (status) {
         case 'Good': return 'bg-green-500';
@@ -128,7 +112,28 @@ export function ManagerDashboard() {
             } else {
                 newHealthScore = Math.min(100, Math.max(0, v.healthScore + (Math.random() - 0.5) * 3));
             }
-            return {...v, healthStatus: newStatus, healthScore: newHealthScore }
+
+            // Also simulate DTC changes
+            let newDtcs = v.dtcs;
+            if (Math.random() < 0.05) { // Chance to add a new active DTC
+                const potentialDtcs: DiagnosticTroubleCode[] = [
+                    { code: 'P0171', description: 'System Too Lean', timestamp: new Date().toISOString(), status: 'Active' },
+                    { code: 'P0500', description: 'Vehicle Speed Sensor Malfunction', timestamp: new Date().toISOString(), status: 'Active' },
+                ];
+                const newDtc = potentialDtcs[Math.floor(Math.random()*potentialDtcs.length)];
+                if (!newDtcs.some(d => d.code === newDtc.code)) {
+                    newDtcs = [...newDtcs, newDtc];
+                }
+            }
+             if (Math.random() < 0.1 && newDtcs.some(d => d.status === 'Active')) { // Chance to resolve an active DTC
+                const activeDtcIndex = newDtcs.findIndex(d => d.status === 'Active');
+                if (activeDtcIndex !== -1) {
+                    newDtcs[activeDtcIndex] = {...newDtcs[activeDtcIndex], status: 'Stored'};
+                }
+            }
+
+
+            return {...v, healthStatus: newStatus, healthScore: newHealthScore, dtcs: newDtcs }
         }))
     }, 4000);
     return () => clearInterval(interval);
@@ -158,6 +163,21 @@ export function ManagerDashboard() {
     return () => clearInterval(interval);
   }, []);
   
+    const useSimulatedObjectData = <T extends object>(initialData: T, updater: (data: T) => T) => {
+        const [data, setData] = useState(initialData);
+
+        const memoizedUpdater = useCallback(updater, []);
+
+        useEffect(() => {
+            const interval = setInterval(() => {
+                setData(prevData => memoizedUpdater(prevData));
+            }, 3000);
+            return () => clearInterval(interval);
+        }, [memoizedUpdater]);
+
+        return data;
+    }
+
   const aiRoi = useSimulatedObjectData(executiveAnalyticsData.aiRoi, d => ({
     costSavings: d.costSavings + Math.random() * 10000,
     timeSavings: d.timeSavings + Math.random() * 0.1,
@@ -554,10 +574,4 @@ export function ManagerDashboard() {
       </div>
     </div>
   )
-
-    
-
-    
-
-    
-
+}
