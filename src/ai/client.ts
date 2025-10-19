@@ -1,15 +1,10 @@
-import {ai} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
+import OpenAI from 'openai';
 
-// Configure the AI and plugins.
-export const initGenkit = () => {
-  ai({
-    plugins: [
-      googleAI({
-        apiVersion: ['v1', 'v1beta'],
-      }),
-    ],
-    logLevel: 'debug',
-    enableTracingAndMetrics: true,
-  });
-};
+export const openai = new OpenAI({
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey: process.env.OPENROUTER_API_KEY,
+    defaultHeaders: {
+        "HTTP-Referer": "https://veda-motrix.ai", // Replace with your site URL
+        "X-Title": "VEDA-MOTRIX AI", // Replace with your site name
+    }
+});

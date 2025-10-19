@@ -46,7 +46,7 @@ export async function generateExecutiveSummary(
     The response should be a plain string, not a JSON object.`;
 
     const completion = await openai.chat.completions.create({
-        model: 'openai/gpt-4o',
+        model: 'openrouter/auto',
         messages: [{ role: 'user', content: prompt }],
     });
 

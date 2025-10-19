@@ -44,7 +44,7 @@ export async function handleCustomerEnquiry(
     `;
 
     const completion = await openai.chat.completions.create({
-        model: 'openai/gpt-4o',
+        model: 'openrouter/auto',
         messages: [{ role: 'user', content: prompt }],
     });
 

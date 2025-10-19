@@ -43,7 +43,7 @@ export async function analyzeVehicleData(input: AnalyzeVehicleDataInput): Promis
     }`;
 
     const completion = await openai.chat.completions.create({
-        model: 'openai/gpt-4o',
+        model: 'openrouter/auto',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' },
     });

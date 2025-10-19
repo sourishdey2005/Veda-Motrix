@@ -58,7 +58,7 @@ export async function analyzeCustomerFeedback(
     }`;
 
     const completion = await openai.chat.completions.create({
-        model: 'openai/gpt-4o',
+        model: 'openrouter/auto', // Using OpenRouter
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' },
     });
