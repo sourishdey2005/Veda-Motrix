@@ -8,7 +8,7 @@ import {
   AnswerQuestionOutput,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import {type Content} from 'genkit/model';
+import {type Content} from 'genkit/content';
 
 
 const localSearch = (question: string): string | null => {

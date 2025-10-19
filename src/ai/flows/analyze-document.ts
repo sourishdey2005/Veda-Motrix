@@ -8,6 +8,7 @@ import {
   AnalyzeDocumentOutput,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
+import {Part} from 'genkit/content';
 
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
@@ -20,11 +21,11 @@ export async function analyzeDocument(
     const mimeType = dataUriMatch[1];
     const base64Data = dataUriMatch[2];
     
-    let prompt;
-    const requestParts: (string | { inlineData: { mimeType: string; data: string } })[] = [];
+    let requestParts: Part[] = [];
+    let analysisPrompt = '';
 
     if (mimeType.startsWith('image/')) {
-        prompt = `You are an expert data analyst AI. A user has provided an image and a prompt. Describe the contents of the image and answer the user's prompt based on the image. Provide a clear, well-structured analysis in Markdown format.
+        analysisPrompt = `You are an expert data analyst AI. A user has provided an image and a prompt. Describe the contents of the image and answer the user's prompt based on the image. Provide a clear, well-structured analysis in Markdown format.
 
 User Prompt: "${input.prompt}"`;
         requestParts.push({
@@ -35,7 +36,7 @@ User Prompt: "${input.prompt}"`;
         });
     } else if (mimeType.startsWith('text/')) {
         const textContent = Buffer.from(base64Data, 'base64').toString('utf-8');
-        prompt = `You are an expert data analyst AI. A user has provided a document's text content and a prompt. Analyze the text content to answer the prompt. Provide a clear, well-structured analysis in Markdown format.
+        analysisPrompt = `You are an expert data analyst AI. A user has provided a document's text content and a prompt. Analyze the text content to answer the prompt. Provide a clear, well-structured analysis in Markdown format.
 
 User Prompt: "${input.prompt}"
 
@@ -50,11 +51,11 @@ ${textContent}
         };
     }
     
-    requestParts.unshift(prompt);
+    requestParts.unshift({text: analysisPrompt});
     
     const { output } = await ai.generate({
         model: 'googleai/gemini-pro',
-        prompt: requestParts,
+        prompt: { parts: requestParts },
     });
 
     if (!output || !output.text) {

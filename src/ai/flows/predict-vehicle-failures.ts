@@ -14,12 +14,10 @@ export async function predictVehicleFailure(
 ): Promise<PredictVehicleFailureOutput> {
   try {
     const prompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
-Analyze the provided sensor data and maintenance logs for vehicle ID ${input.vehicleId} to predict potential failures.
+Analyze the provided sensor data and maintenance logs for vehicle ID ${input.vehicleId} to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions.
 
 Sensor Data: ${input.sensorDataJson}
 Maintenance Logs: ${input.maintenanceLogs}
-
-Based on your analysis, predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions.
 
 Format each failure on a new line, using "||" as a separator between fields.
 Example:

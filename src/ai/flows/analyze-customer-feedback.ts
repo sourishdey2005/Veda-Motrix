@@ -19,7 +19,9 @@ Feedback: ${input.feedbackText}
 
 Provide your analysis in the following format, separating each section with '---':
 SENTIMENT: [Your sentiment analysis here (e.g., Very Positive, Negative, Neutral)]
+---
 KEY_AREAS: [Key topics mentioned here (e.g., Service Quality, Staff, Waiting Time)]
+---
 SUGGESTIONS: [Your improvement suggestions here]
 `;
 
