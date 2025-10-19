@@ -5,53 +5,42 @@
  */
 import {
   PredictVehicleFailureInput,
+  PredictVehicleFailureInputSchema,
   PredictVehicleFailureOutput,
   PredictVehicleFailureOutputSchema,
 } from '@/ai/types';
-import {openAiClient} from '@/ai/genkit';
+import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
 export async function predictVehicleFailure(
   input: PredictVehicleFailureInput
 ): Promise<PredictVehicleFailureOutput> {
-  try {
-    const systemPrompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
+  const predictionFlow = ai.defineFlow(
+    {
+      name: 'vehicleFailurePredictionFlow',
+      inputSchema: PredictVehicleFailureInputSchema,
+      outputSchema: PredictVehicleFailureOutputSchema,
+    },
+    async ({vehicleId, sensorDataJson, maintenanceLogs}) => {
+      const llmResponse = await ai.generate({
+        model: 'gemini-1.5-flash-latest',
+        prompt: `You are an AI diagnosis agent specializing in predicting vehicle failures.
 Analyze the provided sensor data and maintenance logs to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions.
 
-Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
-${JSON.stringify(PredictVehicleFailureOutputSchema.describe(), null, 2)}
-`;
-
-    const userPrompt = `Vehicle ID ${input.vehicleId}
-Sensor Data (JSON): ${input.sensorDataJson}
-Maintenance Logs: ${input.maintenanceLogs}
-`;
-
-    const messages = [
-      {role: 'system' as const, content: systemPrompt},
-      {role: 'user' as const, content: userPrompt},
-    ];
-
-    const rawResponse = await openAiClient(messages, true);
-
-    // Find the start and end of the JSON object
-    const jsonStart = rawResponse.indexOf('{');
-    const jsonEnd = rawResponse.lastIndexOf('}');
-    if (jsonStart === -1 || jsonEnd === -1) {
-        throw new Error("The AI did not return a valid JSON object.");
+Vehicle ID ${vehicleId}
+Sensor Data (JSON): ${sensorDataJson}
+Maintenance Logs: ${maintenanceLogs}
+`,
+        output: {
+          schema: PredictVehicleFailureOutputSchema,
+        },
+      });
+      return llmResponse.output()!;
     }
-    const jsonString = rawResponse.substring(jsonStart, jsonEnd + 1);
+  );
 
-    const parsedResponse = JSON.parse(jsonString);
-
-    const validation =
-      PredictVehicleFailureOutputSchema.safeParse(parsedResponse);
-    if (!validation.success) {
-      console.error('AI response validation failed:', validation.error);
-      throw new Error('The AI returned data in an unexpected format.');
-    }
-
-    return validation.data;
+  try {
+    return await predictionFlow(input);
   } catch (error) {
     console.error('Error in predictVehicleFailure:', error);
     return {

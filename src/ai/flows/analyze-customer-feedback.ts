@@ -5,49 +5,37 @@
  */
 import {
   AnalyzeCustomerFeedbackInput,
+  AnalyzeCustomerFeedbackInputSchema,
   AnalyzeCustomerFeedbackOutput,
   AnalyzeCustomerFeedbackOutputSchema,
 } from '@/ai/types';
-import {openAiClient} from '@/ai/genkit';
+import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
 export async function analyzeCustomerFeedback(
   input: AnalyzeCustomerFeedbackInput
 ): Promise<AnalyzeCustomerFeedbackOutput> {
+  const analysisFlow = ai.defineFlow(
+    {
+      name: 'analysisFlow',
+      inputSchema: AnalyzeCustomerFeedbackInputSchema,
+      outputSchema: AnalyzeCustomerFeedbackOutputSchema,
+    },
+    async ({feedbackText}) => {
+      const llmResponse = await ai.generate({
+        model: 'gemini-1.5-flash-latest',
+        prompt: `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements. Analyze the following customer feedback: "${feedbackText}"`,
+        output: {
+          schema: AnalyzeCustomerFeedbackOutputSchema,
+        },
+      });
+
+      return llmResponse.output()!;
+    }
+  );
+
   try {
-    const systemPrompt = `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements.
-Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
-${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.describe(), null, 2)}
-`;
-
-    const userPrompt = `Analyze the following customer feedback:
-Feedback: "${input.feedbackText}"`;
-
-    const messages = [
-      {role: 'system' as const, content: systemPrompt},
-      {role: 'user' as const, content: userPrompt},
-    ];
-
-    const rawResponse = await openAiClient(messages, true); // Enable JSON mode
-
-    // Find the start and end of the JSON object
-    const jsonStart = rawResponse.indexOf('{');
-    const jsonEnd = rawResponse.lastIndexOf('}');
-    if (jsonStart === -1 || jsonEnd === -1) {
-        throw new Error("The AI did not return a valid JSON object.");
-    }
-    const jsonString = rawResponse.substring(jsonStart, jsonEnd + 1);
-
-    const parsedResponse = JSON.parse(jsonString);
-
-    const validation =
-      AnalyzeCustomerFeedbackOutputSchema.safeParse(parsedResponse);
-    if (!validation.success) {
-      console.error('AI response validation failed:', validation.error);
-      throw new Error('The AI returned data in an unexpected format.');
-    }
-
-    return validation.data;
+    return await analysisFlow(input);
   } catch (error) {
     console.error('Error in analyzeCustomerFeedback:', error);
     return {

@@ -5,55 +5,41 @@
  */
 import {
   DetectAgentAnomaliesInput,
+  DetectAgentAnomaliesInputSchema,
   DetectAgentAnomaliesOutput,
   DetectAgentAnomaliesOutputSchema,
 } from '@/ai/types';
-import {openAiClient} from '@/ai/genkit';
+import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
 export async function detectAgentAnomalies(
   input: DetectAgentAnomaliesInput
 ): Promise<DetectAgentAnomaliesOutput> {
-  try {
-    const systemPrompt = `You are a UEBA (User and Entity Behavior Analytics) security agent. Analyze the provided agent actions and determine if the behavior is anomalous.
-Respond with a JSON object that strictly follows this Zod schema, providing a boolean for isAnomalous, a score from 0.0 to 1.0, and a brief explanation:
-${JSON.stringify(DetectAgentAnomaliesOutputSchema.describe(), null, 2)}
-`;
+  const detectionFlow = ai.defineFlow(
+    {
+      name: 'agentAnomalyDetectionFlow',
+      inputSchema: DetectAgentAnomaliesInputSchema,
+      outputSchema: DetectAgentAnomaliesOutputSchema,
+    },
+    async ({agentId, agentActions, anomalyThreshold}) => {
+      const llmResponse = await ai.generate({
+        model: 'gemini-1.5-flash-latest',
+        prompt: `You are a UEBA (User and Entity Behavior Analytics) security agent. Analyze the provided agent actions and determine if the behavior is anomalous based on a threshold of ${anomalyThreshold}.
 
-    const userPrompt = `Analyze based on an anomaly threshold of ${
-      input.anomalyThreshold
-    }.
-
-Agent ID: ${input.agentId}
+Agent ID: ${agentId}
 Agent Actions:
-${input.agentActions.map(action => `- ${action}`).join('\n')}
-`;
-
-    const messages = [
-      {role: 'system' as const, content: systemPrompt},
-      {role: 'user' as const, content: userPrompt},
-    ];
-
-    const rawResponse = await openAiClient(messages, true);
-    
-    // Find the start and end of the JSON object
-    const jsonStart = rawResponse.indexOf('{');
-    const jsonEnd = rawResponse.lastIndexOf('}');
-    if (jsonStart === -1 || jsonEnd === -1) {
-        throw new Error("The AI did not return a valid JSON object.");
+${agentActions.map(action => `- ${action}`).join('\n')}
+`,
+        output: {
+          schema: DetectAgentAnomaliesOutputSchema,
+        },
+      });
+      return llmResponse.output()!;
     }
-    const jsonString = rawResponse.substring(jsonStart, jsonEnd + 1);
-    
-    const parsedResponse = JSON.parse(jsonString);
+  );
 
-    const validation =
-      DetectAgentAnomaliesOutputSchema.safeParse(parsedResponse);
-    if (!validation.success) {
-      console.error('AI response validation failed:', validation.error);
-      throw new Error('The AI returned data in an unexpected format.');
-    }
-
-    return validation.data;
+  try {
+    return await detectionFlow(input);
   } catch (error) {
     console.error('Error in detectAgentAnomalies:', error);
     return {

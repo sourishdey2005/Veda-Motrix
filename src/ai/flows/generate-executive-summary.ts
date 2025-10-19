@@ -5,29 +5,39 @@
  */
 import {
   GenerateExecutiveSummaryInput,
+  GenerateExecutiveSummaryInputSchema,
   GenerateExecutiveSummaryOutput,
+  GenerateExecutiveSummaryOutputSchema,
 } from '@/ai/types';
-import {openAiClient} from '@/ai/genkit';
+import {ai} from '@/ai/genkit';
+import {z} from 'zod';
 
 export async function generateExecutiveSummary(
   input: GenerateExecutiveSummaryInput
 ): Promise<GenerateExecutiveSummaryOutput> {
-  try {
-    const userPrompt = `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Analyze the provided JSON data and generate a clear, concise, and insightful summary in plain text for a management audience.
+  const summaryFlow = ai.defineFlow(
+    {
+      name: 'executiveSummaryFlow',
+      inputSchema: GenerateExecutiveSummaryInputSchema,
+      outputSchema: GenerateExecutiveSummaryOutputSchema,
+    },
+    async ({reportData}) => {
+      const llmResponse = await ai.generate({
+        model: 'gemini-1.5-flash-latest',
+        prompt: `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Analyze the provided JSON data and generate a clear, concise, and insightful summary in plain text for a management audience.
 Focus on key takeaways, trends, and significant metrics.
 
 Analyze the following data:
-${input.reportData}
+${reportData}
 
-Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
-`;
+Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).`,
+      });
+      return {summary: llmResponse.text()};
+    }
+  );
 
-    const messages = [
-      {role: 'user' as const, content: userPrompt},
-    ];
-
-    const summary = await openAiClient(messages);
-    return {summary};
+  try {
+    return await summaryFlow(input);
   } catch (error) {
     console.error('Error in generateExecutiveSummary:', error);
     return {

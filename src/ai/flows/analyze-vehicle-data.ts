@@ -5,56 +5,40 @@
  */
 import {
   AnalyzeVehicleDataInput,
+  AnalyzeVehicleDataInputSchema,
   AnalyzeVehicleDataOutput,
   AnalyzeVehicleDataOutputSchema,
 } from '@/ai/types';
-import {openAiClient} from '@/ai/genkit';
+import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
 export async function analyzeVehicleData(
   input: AnalyzeVehicleDataInput
 ): Promise<AnalyzeVehicleDataOutput> {
+  const analysisFlow = ai.defineFlow(
+    {
+      name: 'vehicleDataAnalysisFlow',
+      inputSchema: AnalyzeVehicleDataInputSchema,
+      outputSchema: AnalyzeVehicleDataOutputSchema,
+    },
+    async ({vehicleId, sensorDataJson, maintenanceLogs}) => {
+      const llmResponse = await ai.generate({
+        model: 'gemini-1.5-flash-latest',
+        prompt: `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs. Analyze the provided sensor data and logs to identify potential issues. If none are found, return empty arrays.
+
+Vehicle ID: ${vehicleId}
+Sensor Data (JSON): ${sensorDataJson}
+Maintenance Logs: ${maintenanceLogs}`,
+        output: {
+          schema: AnalyzeVehicleDataOutputSchema,
+        },
+      });
+      return llmResponse.output()!;
+    }
+  );
+
   try {
-    const systemPrompt = `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs.
-Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
-${JSON.stringify(AnalyzeVehicleDataOutputSchema.describe(), null, 2)}
-
-Your response should contain a list of detected anomalies and a list of suggested maintenance needs. If none are found, return empty arrays.
-`;
-
-    const userPrompt = `Analyze the provided sensor data and logs to identify potential issues.
-
-Vehicle ID: ${input.vehicleId}
-Sensor Data (JSON): ${input.sensorDataJson}
-Maintenance Logs: ${input.maintenanceLogs}
-`;
-
-    const messages = [
-      {role: 'system' as const, content: systemPrompt},
-      {role: 'user' as const, content: userPrompt},
-    ];
-
-    const rawResponse = await openAiClient(messages, true);
-    
-    // Find the start and end of the JSON object
-    const jsonStart = rawResponse.indexOf('{');
-    const jsonEnd = rawResponse.lastIndexOf('}');
-    if (jsonStart === -1 || jsonEnd === -1) {
-        throw new Error("The AI did not return a valid JSON object.");
-    }
-    const jsonString = rawResponse.substring(jsonStart, jsonEnd + 1);
-
-    const parsedResponse = JSON.parse(jsonString);
-
-    const validation =
-      AnalyzeVehicleDataOutputSchema.safeParse(parsedResponse);
-    if (!validation.success) {
-      console.error('AI response validation failed:', validation.error);
-      throw new Error('The AI returned data in an unexpected format.');
-    }
-
-    const result = validation.data;
-
+    const result = await analysisFlow(input);
     return {
       anomalies:
         result.anomalies.length > 0
