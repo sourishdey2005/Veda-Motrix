@@ -55,7 +55,7 @@ Do not mention the knowledge base in your answer. Just answer the question.
 
   try {
     const {output} = await ai.generate({
-      model: 'googleai/gemini-1.5-flash',
+      model: 'googleai/gemini-pro',
       history: input.conversationHistory,
       prompt: input.question,
       system: `${systemInstruction}\n${knowledgeBase}`,

@@ -32,7 +32,7 @@ Generate a summary that highlights the most important findings. Structure it wit
     async input => {
       const {output} = await ai.generate({
         prompt: input,
-        model: 'googleai/gemini-1.5-flash',
+        model: 'googleai/gemini-pro',
         config: {
           output: {
             format: 'json',
