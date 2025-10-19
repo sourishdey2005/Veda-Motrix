@@ -41,7 +41,7 @@ ${qnaData
     // We construct the prompt this way to include the system message and knowledge base without it being part of the conversational history.
     const fullPrompt = `${systemInstruction}\n${knowledgeBase}\n\n[Conversation History Begins]\n${input.conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n')}\n[Conversation History Ends]\n\nUser Question: ${input.question}`;
 
-    const answer = await geminiClient(fullPrompt);
+    const answer = await geminiClient(fullPrompt, history);
 
     return { answer };
   } catch (error) {

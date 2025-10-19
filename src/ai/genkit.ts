@@ -94,7 +94,6 @@ export async function geminiClient(
             return data.candidates[0].content.parts[0].text;
         }
 
-        // Handle cases where the model might return no content (e.g., safety blocks)
         if (data.candidates && data.candidates.length > 0) {
             return "The model returned a response with no text content.";
         }
@@ -102,6 +101,6 @@ export async function geminiClient(
         throw new Error('No response content returned from the API.');
     } catch (error) {
         console.error('Error in geminiClient:', error);
-        throw error; // Re-throw the error to be caught by the calling flow
+        throw error; 
     }
 }
