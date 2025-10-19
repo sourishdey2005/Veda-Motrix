@@ -6,10 +6,8 @@
 import {
   HandleCustomerEnquiryInput,
   HandleCustomerEnquiryOutput,
-  HandleCustomerEnquiryOutputSchema,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
 
 export async function handleCustomerEnquiry(
   input: HandleCustomerEnquiryInput
@@ -29,23 +27,18 @@ Owner: [Owner's response]
 Agent: [Offer assistance with scheduling]
 Owner: [Owner's reply]
 
-Output a JSON object that conforms to the following Zod schema:
-${JSON.stringify(HandleCustomerEnquiryOutputSchema.shape)}
+Provide the final conversation script as a single block of plain text.
 `;
 
     const { output } = await ai.generate({
       model: 'googleai/gemini-pro',
       prompt: prompt,
-      output: {
-        format: 'json',
-        schema: HandleCustomerEnquiryOutputSchema,
-      },
     });
     
-    if (!output) {
+    if (!output || !output.text) {
       throw new Error('No output from AI');
     }
-    return output;
+    return { conversationSummary: output.text };
   } catch (error) {
     console.error("Error in handleCustomerEnquiry:", error);
     return {

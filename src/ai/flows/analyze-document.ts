@@ -7,10 +7,9 @@
 import {
   AnalyzeDocumentInput,
   AnalyzeDocumentOutput,
-  AnalyzeDocumentOutputSchema,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
+import {Part} from '@google/genai';
 
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
@@ -21,22 +20,23 @@ export async function analyzeDocument(
       throw new Error('Invalid data URI');
     }
     const mimeType = dataUriMatch[1];
+    const base64Data = dataUriMatch[2];
     
     let prompt;
-    const parts: any[] = [];
+    const requestParts: Part[] = [];
 
     if (mimeType.startsWith('image/')) {
         prompt = `You are an expert data analyst AI. A user has provided an image and a prompt. Describe the contents of the image and answer the user's prompt based on the image. Provide a clear, well-structured analysis in Markdown format.
 
 User Prompt: "${input.prompt}"`;
-        parts.push({
+        requestParts.push({
             inlineData: {
                 mimeType: mimeType,
-                data: dataUriMatch[2],
+                data: base64Data,
             }
         });
     } else if (mimeType.startsWith('text/')) {
-        const textContent = Buffer.from(dataUriMatch[2], 'base64').toString('utf-8');
+        const textContent = Buffer.from(base64Data, 'base64').toString('utf-8');
         prompt = `You are an expert data analyst AI. A user has provided a document's text content and a prompt. Analyze the text content to answer the prompt. Provide a clear, well-structured analysis in Markdown format.
 
 User Prompt: "${input.prompt}"
@@ -52,22 +52,18 @@ ${textContent}
         };
     }
     
+    requestParts.unshift({ text: prompt });
+    
     const { output } = await ai.generate({
         model: 'googleai/gemini-pro',
-        prompt: {
-            text: prompt,
-            media: parts,
-        },
-        output: {
-            format: 'json',
-            schema: AnalyzeDocumentOutputSchema,
-        },
+        prompt: requestParts,
     });
 
-    if (!output) {
-      throw new Error('No output from AI');
+    if (!output || !output.text) {
+      throw new Error('No text output from AI');
     }
-    return output;
+
+    return { analysis: output.text };
 
   } catch (error: any) {
       console.error('Error in document analysis flow:', error);

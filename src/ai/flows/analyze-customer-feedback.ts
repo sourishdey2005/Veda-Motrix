@@ -20,23 +20,32 @@ export async function analyzeCustomerFeedback(
 Analyze the following customer feedback:
 Feedback: ${input.feedbackText}
 
-Output a JSON object that conforms to the following Zod schema:
-${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.shape)}
+Provide your analysis in the following format, separating each section with '---':
+SENTIMENT: [Your sentiment analysis here (e.g., Very Positive, Negative, Neutral)]
+KEY_AREAS: [Key topics mentioned here (e.g., Service Quality, Staff, Waiting Time)]
+SUGGESTIONS: [Your improvement suggestions here]
 `;
 
     const { output } = await ai.generate({
       model: 'googleai/gemini-pro',
       prompt: prompt,
-      output: {
-        format: 'json',
-        schema: AnalyzeCustomerFeedbackOutputSchema,
-      },
     });
 
-    if (!output) {
-      throw new Error('No output from AI');
+    if (!output || !output.text) {
+      throw new Error('No text output from AI');
     }
-    return output;
+
+    const parts = output.text.split('---');
+    const sentimentPart = parts.find(p => p.startsWith('SENTIMENT:'))?.replace('SENTIMENT:', '').trim() || 'Could not determine sentiment.';
+    const keyAreasPart = parts.find(p => p.startsWith('KEY_AREAS:'))?.replace('KEY_AREAS:', '').trim() || 'Could not identify key areas.';
+    const suggestionsPart = parts.find(p => p.startsWith('SUGGESTIONS:'))?.replace('SUGGESTIONS:', '').trim() || 'No suggestions generated.';
+
+    return {
+      sentiment: sentimentPart,
+      keyAreas: keyAreasPart,
+      suggestions: suggestionsPart,
+    };
+
   } catch (error) {
     console.error("Error in analyzeCustomerFeedback:", error);
     return {

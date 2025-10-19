@@ -6,10 +6,9 @@
 import {
   PredictVehicleFailureInput,
   PredictVehicleFailureOutput,
-  PredictVehicleFailureOutputSchema,
+  PredictedFailure,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
 
 export async function predictVehicleFailure(
   input: PredictVehicleFailureInput
@@ -21,25 +20,37 @@ Analyze the provided sensor data and maintenance logs for vehicle ID ${input.veh
 Sensor Data: ${input.sensorDataJson}
 Maintenance Logs: ${input.maintenanceLogs}
 
-Based on your analysis, predict potential failures, assign a priority (HIGH, MEDIUM, LOW) to each, and suggest actions to mitigate the failures. Include a confidence score (0-1) for each prediction.
+Based on your analysis, predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions.
 
-Output a JSON object that conforms to the following Zod schema:
-${JSON.stringify(PredictVehicleFailureOutputSchema.shape)}
+Format each failure on a new line, using "||" as a separator between fields.
+Example:
+Brake Pads||Wear and Tear||HIGH||0.95||Replace front brake pads within 2 weeks.
+Battery||Degradation||MEDIUM||0.80||Voltage dropping. Test and replacement recommended at next service.
 `;
 
     const { output } = await ai.generate({
       model: 'googleai/gemini-pro',
       prompt: prompt,
-      output: {
-        format: 'json',
-        schema: PredictVehicleFailureOutputSchema,
-      },
     });
 
-    if (!output) {
+    if (!output || !output.text) {
       throw new Error('No output from AI');
     }
-    return output;
+    
+    const lines = output.text.split('\n').filter(Boolean);
+    const predictedFailures: PredictedFailure[] = lines.map(line => {
+        const parts = line.split('||');
+        return {
+            component: parts[0]?.trim() || "Unknown Component",
+            failureType: parts[1]?.trim() || "Unknown Failure",
+            priority: (parts[2]?.trim() as 'HIGH' | 'MEDIUM' | 'LOW') || 'LOW',
+            confidence: parseFloat(parts[3]?.trim() || '0'),
+            suggestedActions: parts[4]?.trim() || "No actions suggested.",
+        };
+    });
+
+    return { predictedFailures };
+
   } catch (error) {
     console.error("Error in predictVehicleFailure:", error);
     return {

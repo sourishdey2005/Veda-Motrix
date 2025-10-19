@@ -6,46 +6,41 @@
 import {
   DetectAgentAnomaliesInput,
   DetectAgentAnomaliesOutput,
-  DetectAgentAnomaliesOutputSchema,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
 
 export async function detectAgentAnomalies(
   input: DetectAgentAnomaliesInput
 ): Promise<DetectAgentAnomaliesOutput> {
   try {
-    const prompt = `You are a UEBA (User and Entity Behavior Analytics) security agent responsible for detecting unauthorized or abnormal behavior from other AI agents.
-You will receive the ID of the agent to monitor, a list of recent actions performed by the agent, and an anomaly threshold.
-Based on this information, you will determine whether the agent's behavior is anomalous and provide an anomaly score and explanation.
+    const prompt = `You are a UEBA (User and Entity Behavior Analytics) security agent. Analyze the provided agent actions and determine if the behavior is anomalous based on an anomaly threshold of ${input.anomalyThreshold}.
 
 Agent ID: ${input.agentId}
-Agent Actions: ${input.agentActions.map(action => `- ${action}`).join('\n')}
-Anomaly Threshold: ${input.anomalyThreshold}
+Agent Actions:
+${input.agentActions.map(action => `- ${action}`).join('\n')}
 
-Consider factors such as:
-- Deviation from the agent's typical behavior pattern.
-- Unauthorized actions.
-- Actions that violate security policies.
-- Unusual frequency of actions.
-
-Output a JSON object that conforms to the following Zod schema:
-${JSON.stringify(DetectAgentAnomaliesOutputSchema.shape)}
+Respond in the following format on separate lines:
+IS_ANOMALOUS: [true or false]
+ANOMALY_SCORE: [A score from 0.0 to 1.0]
+EXPLANATION: [A brief explanation of your reasoning]
 `;
 
     const { output } = await ai.generate({
       model: 'googleai/gemini-pro',
       prompt: prompt,
-      output: {
-        format: 'json',
-        schema: DetectAgentAnomaliesOutputSchema,
-      },
     });
     
-    if (!output) {
+    if (!output || !output.text) {
       throw new Error('No output from AI');
     }
-    return output;
+
+    const lines = output.text.split('\n');
+    const isAnomalous = lines.find(l => l.startsWith('IS_ANOMALOUS:'))?.split(':')[1].trim() === 'true';
+    const anomalyScore = parseFloat(lines.find(l => l.startsWith('ANOMALY_SCORE:'))?.split(':')[1].trim() || '0');
+    const explanation = lines.find(l => l.startsWith('EXPLANATION:'))?.split(':')[1].trim() || 'No explanation provided.';
+
+    return { isAnomalous, anomalyScore, explanation };
+
   } catch (error) {
     console.error("Error in detectAgentAnomalies:", error);
     return {

@@ -6,39 +6,30 @@
 import {
   GenerateExecutiveSummaryInput,
   GenerateExecutiveSummaryOutput,
-  GenerateExecutiveSummaryOutputSchema,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
 
 export async function generateExecutiveSummary(
   input: GenerateExecutiveSummaryInput
 ): Promise<GenerateExecutiveSummaryOutput> {
   try {
-    const prompt = `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Your task is to analyze the provided JSON data and generate a clear, concise, and insightful summary for a management audience.
+    const prompt = `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Analyze the provided JSON data and generate a clear, concise, and insightful summary in plain text for a management audience.
 Focus on key takeaways, trends, and significant metrics.
 
 Analyze the following data:
 ${input.reportData}
 
-Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
-
-Output a JSON object that conforms to the following Zod schema:
-${JSON.stringify(GenerateExecutiveSummaryOutputSchema.shape)}
+Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction). Do not wrap the output in JSON or Markdown.
 `;
     const { output } = await ai.generate({
       model: 'googleai/gemini-pro',
       prompt: prompt,
-      output: {
-        format: 'json',
-        schema: GenerateExecutiveSummaryOutputSchema,
-      },
     });
 
-    if (!output) {
+    if (!output || !output.text) {
       throw new Error('No output from AI');
     }
-    return output;
+    return { summary: output.text };
   } catch (error) {
     console.error("Error in generateExecutiveSummary:", error);
     return {
