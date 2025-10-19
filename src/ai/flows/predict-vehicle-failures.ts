@@ -19,11 +19,7 @@ export async function predictVehicleFailure(
 Analyze the provided sensor data and maintenance logs to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions.
 
 Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
-${JSON.stringify(
-  PredictVehicleFailureOutputSchema.describe(),
-  null,
-  2
-)}
+${JSON.stringify(PredictVehicleFailureOutputSchema.describe(), null, 2)}
 `;
 
     const userPrompt = `Vehicle ID ${input.vehicleId}
@@ -37,7 +33,16 @@ Maintenance Logs: ${input.maintenanceLogs}
     ];
 
     const rawResponse = await openAiClient(messages, true);
-    const parsedResponse = JSON.parse(rawResponse);
+
+    // Find the start and end of the JSON object
+    const jsonStart = rawResponse.indexOf('{');
+    const jsonEnd = rawResponse.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error("The AI did not return a valid JSON object.");
+    }
+    const jsonString = rawResponse.substring(jsonStart, jsonEnd + 1);
+
+    const parsedResponse = JSON.parse(jsonString);
 
     const validation =
       PredictVehicleFailureOutputSchema.safeParse(parsedResponse);

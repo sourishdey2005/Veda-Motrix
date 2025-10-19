@@ -17,11 +17,7 @@ export async function analyzeCustomerFeedback(
   try {
     const systemPrompt = `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements.
 Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
-${JSON.stringify(
-  AnalyzeCustomerFeedbackOutputSchema.describe(),
-  null,
-  2
-)}
+${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.describe(), null, 2)}
 `;
 
     const userPrompt = `Analyze the following customer feedback:
@@ -34,7 +30,15 @@ Feedback: "${input.feedbackText}"`;
 
     const rawResponse = await openAiClient(messages, true); // Enable JSON mode
 
-    const parsedResponse = JSON.parse(rawResponse);
+    // Find the start and end of the JSON object
+    const jsonStart = rawResponse.indexOf('{');
+    const jsonEnd = rawResponse.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error("The AI did not return a valid JSON object.");
+    }
+    const jsonString = rawResponse.substring(jsonStart, jsonEnd + 1);
+
+    const parsedResponse = JSON.parse(jsonString);
 
     const validation =
       AnalyzeCustomerFeedbackOutputSchema.safeParse(parsedResponse);

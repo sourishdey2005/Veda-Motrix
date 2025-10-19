@@ -17,11 +17,7 @@ export async function detectAgentAnomalies(
   try {
     const systemPrompt = `You are a UEBA (User and Entity Behavior Analytics) security agent. Analyze the provided agent actions and determine if the behavior is anomalous.
 Respond with a JSON object that strictly follows this Zod schema, providing a boolean for isAnomalous, a score from 0.0 to 1.0, and a brief explanation:
-${JSON.stringify(
-  DetectAgentAnomaliesOutputSchema.describe(),
-  null,
-  2
-)}
+${JSON.stringify(DetectAgentAnomaliesOutputSchema.describe(), null, 2)}
 `;
 
     const userPrompt = `Analyze based on an anomaly threshold of ${
@@ -30,7 +26,7 @@ ${JSON.stringify(
 
 Agent ID: ${input.agentId}
 Agent Actions:
-${input.agentActions.map((action) => `- ${action}`).join('\n')}
+${input.agentActions.map(action => `- ${action}`).join('\n')}
 `;
 
     const messages = [
@@ -39,7 +35,16 @@ ${input.agentActions.map((action) => `- ${action}`).join('\n')}
     ];
 
     const rawResponse = await openAiClient(messages, true);
-    const parsedResponse = JSON.parse(rawResponse);
+    
+    // Find the start and end of the JSON object
+    const jsonStart = rawResponse.indexOf('{');
+    const jsonEnd = rawResponse.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error("The AI did not return a valid JSON object.");
+    }
+    const jsonString = rawResponse.substring(jsonStart, jsonEnd + 1);
+    
+    const parsedResponse = JSON.parse(jsonString);
 
     const validation =
       DetectAgentAnomaliesOutputSchema.safeParse(parsedResponse);

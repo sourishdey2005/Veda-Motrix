@@ -17,11 +17,7 @@ export async function analyzeVehicleData(
   try {
     const systemPrompt = `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs.
 Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
-${JSON.stringify(
-  AnalyzeVehicleDataOutputSchema.describe(),
-  null,
-  2
-)}
+${JSON.stringify(AnalyzeVehicleDataOutputSchema.describe(), null, 2)}
 
 Your response should contain a list of detected anomalies and a list of suggested maintenance needs. If none are found, return empty arrays.
 `;
@@ -39,7 +35,16 @@ Maintenance Logs: ${input.maintenanceLogs}
     ];
 
     const rawResponse = await openAiClient(messages, true);
-    const parsedResponse = JSON.parse(rawResponse);
+    
+    // Find the start and end of the JSON object
+    const jsonStart = rawResponse.indexOf('{');
+    const jsonEnd = rawResponse.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error("The AI did not return a valid JSON object.");
+    }
+    const jsonString = rawResponse.substring(jsonStart, jsonEnd + 1);
+
+    const parsedResponse = JSON.parse(jsonString);
 
     const validation =
       AnalyzeVehicleDataOutputSchema.safeParse(parsedResponse);

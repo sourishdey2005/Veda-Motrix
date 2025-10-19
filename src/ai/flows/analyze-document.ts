@@ -6,7 +6,7 @@
 import {AnalyzeDocumentInput, AnalyzeDocumentOutput} from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
 
-const CHUNK_SIZE = 4000; // Reduced chunk size for the new model
+const CHUNK_SIZE = 4000; // Keep chunk size conservative
 
 async function summarizeChunk(
   chunk: string,
@@ -40,9 +40,7 @@ ${chunk}
 \`\`\`
 `;
 
-  const messages = [
-    {role: 'system' as const, content: systemPrompt},
-  ];
+  const messages = [{role: 'system' as const, content: systemPrompt}];
   return openAiClient(messages, false, false);
 }
 
@@ -61,9 +59,7 @@ ${summaries.join('\n\n---\n\n')}
 
 Based on these summaries, provide a clear, well-structured, and final analysis in Markdown format that answers the user's prompt. Do not mention the chunking or summarization process in your final output.
 `;
-  const messages = [
-    {role: 'user' as const, content: userPrompt},
-  ];
+  const messages = [{role: 'user' as const, content: userPrompt}];
   const rawResponse = await openAiClient(messages, false, false);
   return rawResponse;
 }
@@ -117,12 +113,10 @@ Document Content:
 ${documentContent}
 \`\`\`
 `;
-        const messages = [
-          {role: 'user' as const, content: userPrompt},
-        ];
+        const messages = [{role: 'user' as const, content: userPrompt}];
         analysis = await openAiClient(messages, false, false);
       } else {
-        // Document is large, use map-reduce sequentially to avoid rate limits
+        // Document is large, use map-reduce sequentially
         const chunks: string[] = [];
         for (let i = 0; i < documentContent.length; i += CHUNK_SIZE) {
           chunks.push(documentContent.substring(i, i + CHUNK_SIZE));
@@ -141,7 +135,7 @@ ${documentContent}
           // Add a small delay to be respectful of free-tier rate limits
           await new Promise(resolve => setTimeout(resolve, 500));
         }
-        
+
         analysis = await synthesizeSummaries(summaries, input.prompt);
       }
     }
@@ -150,13 +144,13 @@ ${documentContent}
   } catch (error: any) {
     console.error('Error in document analysis flow:', error);
     let errorMessage = `An unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${error.message}`;
-    if (error.message?.includes('429')) {
+     if (error.message?.includes('429')) {
       errorMessage = `The document analysis process is being rate-limited by the AI provider. Please wait a moment and try again.\n\nDetails: ${error.message}`;
     }
     if (error.message?.includes('Invalid data URI')) {
       errorMessage = 'The uploaded file could not be read. It might be corrupted or in a format the system cannot process.';
     }
-    if (error.message?.includes('context length')) {
+     if (error.message?.includes('context length')) {
       errorMessage = `The document is too large to be analyzed, even after attempting to split it into smaller parts. Please try with a smaller document. \n\nDetails: ${error.message}`;
     }
     return {

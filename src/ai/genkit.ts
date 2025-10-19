@@ -1,19 +1,29 @@
 
 'use server';
 
+import OpenAI from 'openai';
+import {z} from 'zod';
+import {AnalyzeCustomerFeedbackOutputSchema} from './types';
+
 if (!process.env.HF_TOKEN) {
   console.warn(
     'HF_TOKEN environment variable not set. AI features may not work.'
   );
 }
 
-interface Message {
-  role: 'system' | 'user' | 'assistant';
-  content: any;
-}
+const client = new OpenAI({
+  baseURL: 'https://router.huggingface.co/v1',
+  apiKey: process.env.HF_TOKEN,
+});
 
-const TEXT_MODEL = "Qwen/Qwen3-0.6B:fireworks-ai";
-const VISION_MODEL = "NousResearch/Nous-Hermes-2-Vision-GGUF/Nous-Hermes-2-Vision-7B-GGUF:free";
+type Message =
+  | OpenAI.Chat.Completions.ChatCompletionSystemMessageParam
+  | OpenAI.Chat.Completions.ChatCompletionUserMessageParam
+  | OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam;
+
+const TEXT_MODEL = 'Qwen/Qwen3-0.6B:fireworks-ai';
+const VISION_MODEL =
+  'NousResearch/Nous-Hermes-2-Vision-GGUF/Nous-Hermes-2-Vision-7B-GGUF:free';
 
 export async function openAiClient(
   messages: Message[],
@@ -22,39 +32,27 @@ export async function openAiClient(
 ): Promise<string> {
   try {
     const model = isVision ? VISION_MODEL : TEXT_MODEL;
-    
-    // The HuggingFace API doesn't have a dedicated JSON mode,
-    // so we instruct the model to output JSON in the prompt for text models.
+
     if (isJsonMode && !isVision) {
       const lastMessage = messages.pop();
-      if(lastMessage) {
-        messages.push({ ...lastMessage, content: `${lastMessage.content}\n\nRespond with a JSON object.`})
+      if (lastMessage && lastMessage.role === 'user') {
+        const content = Array.isArray(lastMessage.content)
+          ? lastMessage.content.join('\n')
+          : lastMessage.content;
+        messages.push({
+          ...lastMessage,
+          content: `${content}\n\nRespond with a valid JSON object.`,
+        });
       }
     }
-    
-    const body = {
+
+    const chatCompletion = await client.chat.completions.create({
       model: model,
       messages: messages,
       // The HF endpoint doesn't support response_format, we rely on prompting for JSON.
-    };
-
-    const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${process.env.HF_TOKEN}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
     });
 
-    if (!response.ok) {
-        const errorBody = await response.text();
-        console.error("API request failed with status", response.status, "Body:", errorBody);
-        throw new Error(`API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+    const content = chatCompletion.choices[0].message.content;
 
     if (content) {
       return content;

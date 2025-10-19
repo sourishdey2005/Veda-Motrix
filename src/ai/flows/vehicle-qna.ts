@@ -12,7 +12,7 @@ export async function answerQuestion(
 ): Promise<AnswerQuestionOutput> {
   try {
     const localAnswer = qnaData.find(
-      (item) =>
+      item =>
         item.question.toLowerCase().trim() === input.question.toLowerCase().trim()
     );
     if (localAnswer) {
@@ -24,7 +24,7 @@ export async function answerQuestion(
 Knowledge Base:
 ---
 ${qnaData
-  .map((item) => `Q: ${item.question}\nA: ${item.answer}`)
+  .map(item => `Q: ${item.question}\nA: ${item.answer}`)
   .join('\n\n')}
 ---
 `;
@@ -32,7 +32,10 @@ ${qnaData
     const messages = [
       {role: 'system' as const, content: systemPrompt},
       // Assuming input.conversationHistory is compatible with ChatCompletionMessageParam
-      ...input.conversationHistory.map(m => ({role: m.role as 'user' | 'assistant', content: m.content})),
+      ...input.conversationHistory.map(m => ({
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+      })),
       {role: 'user' as const, content: input.question},
     ];
 
