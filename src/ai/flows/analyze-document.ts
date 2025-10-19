@@ -24,7 +24,7 @@ This is chunk ${
   } of ${totalChunks} total chunks.
 ${
   isFirstChunk
-    ? "Focus on extracting the main topics, headers, and the overall structure."
+    ? 'Focus on extracting the main topics, headers, and the overall structure.'
     : ''
 }
 ${
@@ -122,23 +122,25 @@ ${documentContent}
         ];
         analysis = await openAiClient(messages);
       } else {
-        // Document is large, use map-reduce
+        // Document is large, use map-reduce sequentially to avoid rate limits
         const chunks: string[] = [];
         for (let i = 0; i < documentContent.length; i += CHUNK_SIZE) {
           chunks.push(documentContent.substring(i, i + CHUNK_SIZE));
         }
 
-        const summaryPromises = chunks.map((chunk, index) => {
-          return summarizeChunk(
+        const summaries: string[] = [];
+        for (let i = 0; i < chunks.length; i++) {
+          const chunk = chunks[i];
+          const summary = await summarizeChunk(
             chunk,
             input.prompt,
-            index === 0,
-            index === chunks.length - 1,
+            i === 0,
+            i === chunks.length - 1,
             chunks.length
           );
-        });
-
-        const summaries = await Promise.all(summaryPromises);
+          summaries.push(summary);
+        }
+        
         analysis = await synthesizeSummaries(summaries, input.prompt);
       }
     }
@@ -147,6 +149,12 @@ ${documentContent}
   } catch (error: any) {
     console.error('Error in document analysis flow:', error);
     let errorMessage = `An unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${error.message}`;
+    if (error.code) { // OpenRouter often includes a 'code' in the error object
+        errorMessage += `\n\nError Code: ${error.code}`;
+    }
+     if (error.message?.includes('429')) {
+      errorMessage = `The document analysis process is being rate-limited by the AI provider. Please wait a moment and try again.\n\nDetails: ${error.message}`;
+    }
     if (error.message?.includes('Invalid data URI')) {
       errorMessage =
         'The uploaded file could not be read. It might be corrupted or in a format the system cannot process.';
