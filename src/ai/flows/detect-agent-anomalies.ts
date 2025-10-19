@@ -11,23 +11,29 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-const DetectAgentAnomaliesInputSchema = z.object({
+export const DetectAgentAnomaliesInputSchema = z.object({
   agentId: z.string().describe('The ID of the agent to monitor.'),
   agentActions: z.array(z.string()).describe('The recent actions performed by the agent.'),
   anomalyThreshold: z.number().describe('The threshold above which an action is considered anomalous.'),
 });
 export type DetectAgentAnomaliesInput = z.infer<typeof DetectAgentAnomaliesInputSchema>;
 
-const DetectAgentAnomaliesOutputSchema = z.object({
+export const DetectAgentAnomaliesOutputSchema = z.object({
   isAnomalous: z.boolean().describe('Whether the agent behavior is anomalous.'),
   anomalyScore: z.number().describe('A score indicating the degree of anomaly.'),
   explanation: z.string().describe('An explanation of why the behavior is considered anomalous.'),
 });
 export type DetectAgentAnomaliesOutput = z.infer<typeof DetectAgentAnomaliesOutputSchema>;
 
+const detectAgentAnomaliesPromptInputSchema = z.object({
+    agentId: z.string(), 
+    agentActions: z.string(), 
+    anomalyThreshold: z.number()
+});
+
 const uebaPrompt = ai.definePrompt({
     name: 'detectAgentAnomaliesPrompt',
-    input: { schema: z.object({ agentId: z.string(), agentActions: z.string(), anomalyThreshold: z.number() }) },
+    input: { schema: detectAgentAnomaliesPromptInputSchema },
     output: { schema: DetectAgentAnomaliesOutputSchema },
     prompt: `You are a UEBA (User and Entity Behavior Analytics) security agent responsible for detecting unauthorized or abnormal behavior from other AI agents.
 

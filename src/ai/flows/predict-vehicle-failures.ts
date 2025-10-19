@@ -11,14 +11,14 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-const PredictVehicleFailureInputSchema = z.object({
+export const PredictVehicleFailureInputSchema = z.object({
   vehicleId: z.string().describe('The ID of the vehicle to analyze.'),
   sensorData: z.record(z.number()).describe('A record of sensor readings for the vehicle.'),
   maintenanceLogs: z.string().describe('Maintenance history for the vehicle'),
 });
 export type PredictVehicleFailureInput = z.infer<typeof PredictVehicleFailureInputSchema>;
 
-const PredictVehicleFailureOutputSchema = z.object({
+export const PredictVehicleFailureOutputSchema = z.object({
   predictedFailures: z.array(
     z.object({
       component: z.string().describe('The component predicted to fail.'),
@@ -31,9 +31,15 @@ const PredictVehicleFailureOutputSchema = z.object({
 });
 export type PredictVehicleFailureOutput = z.infer<typeof PredictVehicleFailureOutputSchema>;
 
+const predictVehicleFailurePromptInputSchema = z.object({
+    vehicleId: z.string(),
+    sensorDataJson: z.string(),
+    maintenanceLogs: z.string()
+});
+
 const failurePredictionPrompt = ai.definePrompt({
     name: 'predictVehicleFailurePrompt',
-    input: { schema: z.object({ vehicleId: z.string(), sensorDataJson: z.string(), maintenanceLogs: z.string() }) },
+    input: { schema: predictVehicleFailurePromptInputSchema },
     output: { schema: PredictVehicleFailureOutputSchema },
     prompt: `You are an AI diagnosis agent specializing in predicting vehicle failures.
 
@@ -52,7 +58,7 @@ const predictVehicleFailureFlow = ai.defineFlow({
 }, async (input) => {
     const { output } = await failurePredictionPrompt({
         vehicleId: input.vehicleId,
-        sensorDataJson: JSON.stringify(input.sensorData),
+        sensorDataJson: JSON.stringify(input.sensorData, null, 2),
         maintenanceLogs: input.maintenanceLogs
     });
     if (!output) {

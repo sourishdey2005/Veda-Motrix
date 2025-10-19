@@ -11,22 +11,28 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-const AnalyzeVehicleDataInputSchema = z.object({
+export const AnalyzeVehicleDataInputSchema = z.object({
   vehicleId: z.string().describe('The ID of the vehicle to analyze.'),
   sensorData: z.record(z.number()).describe('A record of sensor readings for the vehicle.'),
   maintenanceLogs: z.string().describe('Maintenance logs for the vehicle.'),
 });
 export type AnalyzeVehicleDataInput = z.infer<typeof AnalyzeVehicleDataInputSchema>;
 
-const AnalyzeVehicleDataOutputSchema = z.object({
+export const AnalyzeVehicleDataOutputSchema = z.object({
   anomalies: z.array(z.string()).describe('A list of detected anomalies in the sensor data.'),
   maintenanceNeeds: z.array(z.string()).describe('A list of potential maintenance needs based on the analysis.'),
 });
 export type AnalyzeVehicleDataOutput = z.infer<typeof AnalyzeVehicleDataOutputSchema>;
 
+const analyzeVehicleDataPromptInputSchema = z.object({ 
+    vehicleId: z.string(), 
+    sensorDataJson: z.string(), 
+    maintenanceLogs: z.string() 
+});
+
 const vehicleDataPrompt = ai.definePrompt({
     name: 'analyzeVehicleDataPrompt',
-    input: { schema: z.object({ vehicleId: z.string(), sensorDataJson: z.string(), maintenanceLogs: z.string() }) },
+    input: { schema: analyzeVehicleDataPromptInputSchema },
     output: { schema: AnalyzeVehicleDataOutputSchema },
     prompt: `You are a master agent responsible for analyzing vehicle sensor data and detecting anomalies.
 
@@ -49,7 +55,7 @@ const analyzeVehicleDataFlow = ai.defineFlow(
   async (input) => {
     const { output } = await vehicleDataPrompt({
         vehicleId: input.vehicleId,
-        sensorDataJson: JSON.stringify(input.sensorData),
+        sensorDataJson: JSON.stringify(input.sensorData, null, 2),
         maintenanceLogs: input.maintenanceLogs
     });
     if (!output) {

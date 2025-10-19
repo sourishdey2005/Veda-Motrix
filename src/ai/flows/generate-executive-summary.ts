@@ -11,7 +11,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-const GenerateExecutiveSummaryInputSchema = z.object({
+export const GenerateExecutiveSummaryInputSchema = z.object({
   reportData: z
     .string()
     .describe('A JSON string containing the data to be summarized.'),
@@ -20,7 +20,7 @@ export type GenerateExecutiveSummaryInput = z.infer<
   typeof GenerateExecutiveSummaryInputSchema
 >;
 
-const GenerateExecutiveSummaryOutputSchema = z.object({
+export const GenerateExecutiveSummaryOutputSchema = z.object({
   summary: z
     .string()
     .describe(

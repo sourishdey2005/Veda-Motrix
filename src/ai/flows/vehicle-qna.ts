@@ -11,7 +11,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { qnaData } from '@/lib/chatbot-qna';
 
-const AnswerQuestionInputSchema = z.object({
+export const AnswerQuestionInputSchema = z.object({
   question: z.string().describe("The user's question about their vehicle."),
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'model']),
@@ -20,7 +20,7 @@ const AnswerQuestionInputSchema = z.object({
 });
 export type AnswerQuestionInput = z.infer<typeof AnswerQuestionInputSchema>;
 
-const AnswerQuestionOutputSchema = z.object({
+export const AnswerQuestionOutputSchema = z.object({
   answer: z.string().describe("The AI's answer to the user's question."),
 });
 export type AnswerQuestionOutput = z.infer<typeof AnswerQuestionOutputSchema>;

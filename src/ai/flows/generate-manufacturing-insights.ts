@@ -14,7 +14,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-const GenerateManufacturingInsightsInputSchema = z.object({
+export const GenerateManufacturingInsightsInputSchema = z.object({
   serviceData: z
     .string()
     .describe('Service data including failure reports, component issues, and service history.'),
@@ -23,7 +23,7 @@ export type GenerateManufacturingInsightsInput = z.infer<
   typeof GenerateManufacturingInsightsInputSchema
 >;
 
-const GenerateManufacturingInsightsOutputSchema = z.object({
+export const GenerateManufacturingInsightsOutputSchema = z.object({
   improvementSuggestions: z
     .string()
     .describe(

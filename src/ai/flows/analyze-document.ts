@@ -36,7 +36,7 @@ export type AnalyzeDocumentOutput = z.infer<
 const documentAnalysisPrompt = ai.definePrompt(
     {
         name: 'documentAnalysisPrompt',
-        input: { schema: z.object({ documentDataUri: z.string(), prompt: z.string() }) },
+        input: { schema: AnalyzeDocumentInputSchema },
         output: { schema: AnalyzeDocumentOutputSchema },
         prompt: `You are a professional document analysis AI. Analyze the document provided based on the user's request.
 

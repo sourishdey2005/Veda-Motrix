@@ -11,14 +11,14 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-const HandleCustomerEnquiryInputSchema = z.object({
+export const HandleCustomerEnquiryInputSchema = z.object({
   vehicleIssue: z.string().describe('Description of the vehicle issue.'),
   recommendedMaintenance: z.string().describe('Recommended maintenance actions.'),
   userName: z.string().describe('Name of the vehicle owner.'),
 });
 export type HandleCustomerEnquiryInput = z.infer<typeof HandleCustomerEnquiryInputSchema>;
 
-const HandleCustomerEnquiryOutputSchema = z.object({
+export const HandleCustomerEnquiryOutputSchema = z.object({
   conversationSummary: z.string().describe('A summary of the simulated conversation.'),
 });
 export type HandleCustomerEnquiryOutput = z.infer<typeof HandleCustomerEnquiryOutputSchema>;
