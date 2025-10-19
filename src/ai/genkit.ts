@@ -27,13 +27,13 @@ export async function openAiClient(
     isJsonMode: boolean = false
 ): Promise<string> {
     try {
-        const apiKey = process.env.OPENROUTER_API_KEY || 'YOUR_OPENROUTER_API_KEY_PLACEHOLDER';
+        const apiKey = process.env.OPENROUTER_API_KEY || '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';
         if (apiKey === 'YOUR_OPENROUTER_API_KEY_PLACEHOLDER') {
              throw new Error("OpenRouter API key is not configured.");
         }
 
         const body: any = {
-            model: 'nousresearch/nous-hermes-2-mixtral-8x7b-dpo:free',
+            model: 'alibaba/tongyi-deepresearch-30b-a3b:free',
             messages: messages,
         };
 
