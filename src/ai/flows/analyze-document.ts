@@ -8,16 +8,7 @@ import {
   AnalyzeDocumentOutput,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import { Part } from '@google/genai';
-
-function fileToGenerativePart(data: string, mimeType: string): Part {
-  return {
-    inlineData: {
-      data,
-      mimeType,
-    },
-  };
-}
+import { Part } from 'genkit/content';
 
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
@@ -30,8 +21,6 @@ export async function analyzeDocument(
     const mimeType = dataUriMatch[1];
     const base64Data = dataUriMatch[2];
 
-    const model = ai.getGenerativeModel({ model: 'gemini-pro-vision' });
-
     let promptParts: Part[] = [];
 
     if (mimeType.startsWith('image/')) {
@@ -40,7 +29,7 @@ export async function analyzeDocument(
 User Prompt: "${input.prompt}"`;
       promptParts = [
         { text: analysisPrompt },
-        fileToGenerativePart(base64Data, mimeType),
+        { inlineData: { mimeType, data: base64Data } },
       ];
     } else if (mimeType.startsWith('text/')) {
       const textContent = Buffer.from(base64Data, 'base64').toString('utf-8');
@@ -60,11 +49,12 @@ ${textContent}
       };
     }
 
-    const { response } = await model.generateContent({
-        contents: [{ role: 'user', parts: promptParts }]
+    const { output } = await ai.generate({
+        model: 'googleai/gemini-pro-vision',
+        prompt: promptParts,
     });
-
-    const analysis = response.candidates[0]?.content.parts[0]?.text;
+    
+    const analysis = output?.text;
 
     if (!analysis) {
       throw new Error('No text output from AI');
