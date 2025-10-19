@@ -1,14 +1,11 @@
 
 'use server';
 
-if (!process.env.OPENROUTER_API_KEY) {
+if (!process.env.OPENAI_API_KEY) {
   console.warn(
-    'OPENROUTER_API_KEY environment variable not set. AI features may not work.'
+    'OPENAI_API_KEY environment variable not set. AI features may not work.'
   );
 }
-
-const YOUR_SITE_URL = process.env.YOUR_SITE_URL || 'http://localhost:3000';
-const YOUR_SITE_NAME = process.env.YOUR_SITE_NAME || 'VEDA-MOTRIX';
 
 interface Message {
   role: 'system' | 'user' | 'assistant';
@@ -20,20 +17,16 @@ export async function openAiClient(
   isJsonMode: boolean = false
 ): Promise<string> {
   try {
-    const isVisionRequest = messages.some(m => Array.isArray(m.content) && m.content.some(c => c.type === 'image_url'));
-
     const body = {
-      model: isVisionRequest ? 'openai/gpt-4o-mini:free' : 'mistralai/mistral-7b-instruct:free',
+      model: 'gpt-4o-mini',
       messages: messages,
       response_format: isJsonMode ? { type: 'json_object' } : { type: 'text' },
     };
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
-            "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-            "HTTP-Referer": YOUR_SITE_URL,
-            "X-Title": YOUR_SITE_NAME,
+            "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify(body)

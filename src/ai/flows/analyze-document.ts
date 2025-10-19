@@ -121,7 +121,7 @@ ${documentContent}
         ];
         analysis = await openAiClient(messages);
       } else {
-        // Document is large, use map-reduce sequentially to avoid rate limits
+        // Document is large, use map-reduce sequentially
         const chunks: string[] = [];
         for (let i = 0; i < documentContent.length; i += CHUNK_SIZE) {
           chunks.push(documentContent.substring(i, i + CHUNK_SIZE));
