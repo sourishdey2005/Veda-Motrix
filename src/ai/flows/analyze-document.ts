@@ -12,95 +12,62 @@ import {
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-const DocumentAnalysisInputInternalSchema = z.object({
-  prompt: z.string(),
-  textContent: z.string().optional(),
-  documentDataUri: z.string().optional(),
-});
-
-const analysisPrompt = ai.definePrompt(
-  {
-    name: 'documentAnalysis',
-    input: { schema: DocumentAnalysisInputInternalSchema },
-    output: { schema: AnalyzeDocumentOutputSchema },
-    system: `You are an expert data analyst AI. A user has provided a document and a prompt.
-
-Your task is to analyze the document based on their prompt.
-- If it's an image, describe the contents and answer the prompt.
-- If it's text (from a CSV or TXT file), analyze the content to answer the prompt.
-
-Provide a clear, well-structured analysis in Markdown format.
----`,
-    prompt: `User Prompt: "{{prompt}}"
-
-{{#if textContent}}
-Document Content:
-\`\`\`
-{{textContent}}
-\`\`\`
-{{/if}}
-
-{{#if documentDataUri}}
-{{media url=documentDataUri}}
-{{/if}}
-`,
-  },
-);
-
-const documentAnalysisFlow = ai.defineFlow({
-    name: 'documentAnalysisFlow',
-    inputSchema: DocumentAnalysisInputInternalSchema,
-    outputSchema: AnalyzeDocumentOutputSchema,
-}, async (input) => {
-    const result = await analysisPrompt(input);
-    return result;
-});
-
-
-// Helper function to parse Data URI
-const parseDataUri = (dataUri: string) => {
-  const match = dataUri.match(/^data:(.+?);base64,(.*)$/);
-  if (!match) {
-    throw new Error('Invalid data URI');
-  }
-  return {
-    mimeType: match[1],
-    content: match[2],
-  };
-};
-
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
 ): Promise<AnalyzeDocumentOutput> {
   try {
-    const { mimeType, content } = parseDataUri(input.documentDataUri);
-    const buffer = Buffer.from(content, 'base64');
+    const dataUriMatch = input.documentDataUri.match(/^data:(.+?);base64,(.*)$/);
+    if (!dataUriMatch) {
+      throw new Error('Invalid data URI');
+    }
+    const mimeType = dataUriMatch[1];
     
-    let flowInput: z.infer<typeof DocumentAnalysisInputInternalSchema>;
+    let prompt;
+    const parts: any[] = [];
 
     if (mimeType.startsWith('image/')) {
-        flowInput = {
-            prompt: input.prompt,
-            documentDataUri: input.documentDataUri,
-        };
+        prompt = `You are an expert data analyst AI. A user has provided an image and a prompt. Describe the contents of the image and answer the user's prompt based on the image. Provide a clear, well-structured analysis in Markdown format.
+
+User Prompt: "${input.prompt}"`;
+        parts.push({
+            inlineData: {
+                mimeType: mimeType,
+                data: dataUriMatch[2],
+            }
+        });
     } else if (mimeType.startsWith('text/')) {
-        const textContent = buffer.toString('utf-8');
-        flowInput = {
-            prompt: input.prompt,
-            textContent: textContent,
-        };
-    } else if (mimeType === 'application/pdf') {
-        return {
-          analysis: `#### Error\nUnsupported file type: PDF processing is temporarily unavailable. Please try a standard image format (JPG, PNG), CSV, or a plain text file (.txt).`,
-        };
+        const textContent = Buffer.from(dataUriMatch[2], 'base64').toString('utf-8');
+        prompt = `You are an expert data analyst AI. A user has provided a document's text content and a prompt. Analyze the text content to answer the prompt. Provide a clear, well-structured analysis in Markdown format.
+
+User Prompt: "${input.prompt}"
+
+Document Content:
+\`\`\`
+${textContent}
+\`\`\`
+`;
     } else {
-        return {
-          analysis: `#### Error\nUnsupported file type: ${mimeType}. Please use a standard image format (JPG, PNG), CSV, or a plain text file (.txt).`,
+       return {
+          analysis: `#### Error\nUnsupported file type: ${mimeType}. Please use a standard image format (JPG, PNG), CSV, or a plain text file (.txt). PDF analysis is temporarily unavailable.`,
         };
     }
     
-    const result = await documentAnalysisFlow(flowInput);
-    return result;
+    const { output } = await ai.generate({
+        model: 'googleai/gemini-pro',
+        prompt: {
+            text: prompt,
+            media: parts,
+        },
+        output: {
+            format: 'json',
+            schema: AnalyzeDocumentOutputSchema,
+        },
+    });
+
+    if (!output) {
+      throw new Error('No output from AI');
+    }
+    return output;
 
   } catch (error: any) {
       console.error('Error in document analysis flow:', error);

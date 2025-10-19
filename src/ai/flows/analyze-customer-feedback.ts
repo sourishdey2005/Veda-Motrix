@@ -5,48 +5,40 @@
  */
 import {
   AnalyzeCustomerFeedbackInput,
-  AnalyzeCustomerFeedbackInputSchema,
   AnalyzeCustomerFeedbackOutput,
   AnalyzeCustomerFeedbackOutputSchema,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-
-const analysisPrompt = ai.definePrompt(
-  {
-    name: 'customerFeedbackAnalysis',
-    input: { schema: AnalyzeCustomerFeedbackInputSchema },
-    output: { schema: AnalyzeCustomerFeedbackOutputSchema },
-    prompt: `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements.
-
-Analyze the following customer feedback:
-Feedback: {{feedbackText}}
-
-Output a JSON object that conforms to the schema.`,
-  },
-);
-
-const analysisFlow = ai.defineFlow(
-  {
-    name: 'analysisFlow',
-    inputSchema: AnalyzeCustomerFeedbackInputSchema,
-    outputSchema: AnalyzeCustomerFeedbackOutputSchema,
-  },
-  async (input) => {
-    const result = await analysisPrompt(input);
-    return result;
-  }
-);
-
+import { z } from 'zod';
 
 export async function analyzeCustomerFeedback(
   input: AnalyzeCustomerFeedbackInput
 ): Promise<AnalyzeCustomerFeedbackOutput> {
   try {
-    const result = await analysisFlow(input);
-    return result;
+    const prompt = `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements.
+
+Analyze the following customer feedback:
+Feedback: ${input.feedbackText}
+
+Output a JSON object that conforms to the following Zod schema:
+${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.shape)}
+`;
+
+    const { output } = await ai.generate({
+      model: 'googleai/gemini-pro',
+      prompt: prompt,
+      output: {
+        format: 'json',
+        schema: AnalyzeCustomerFeedbackOutputSchema,
+      },
+    });
+
+    if (!output) {
+      throw new Error('No output from AI');
+    }
+    return output;
   } catch (error) {
     console.error("Error in analyzeCustomerFeedback:", error);
-    // Provide a more structured error output
     return {
       sentiment: "Error",
       keyAreas: "Could not analyze feedback.",
