@@ -6,7 +6,7 @@ import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 if (!process.env.OPENROUTER_API_KEY) {
   console.warn(
-    'OPENROUTER_API_KEY environment variable not set. Using placeholder. AI features will not work.'
+    'OPENROUTER_API_KEY environment variable not set. AI features may not work.'
   );
 }
 
