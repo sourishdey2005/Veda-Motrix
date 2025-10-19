@@ -8,7 +8,7 @@ import {
   DetectAgentAnomaliesOutput,
   DetectAgentAnomaliesOutputSchema,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import { geminiClient } from '@/ai/genkit';
 import { z } from 'zod';
 
 export async function detectAgentAnomalies(
@@ -21,14 +21,13 @@ Agent ID: ${input.agentId}
 Agent Actions:
 ${input.agentActions.map(action => `- ${action}`).join('\n')}
 
-Respond with a JSON object that matches this Zod schema, providing a boolean for isAnomalous, a score from 0.0 to 1.0, and a brief explanation:
+Respond with a JSON object that strictly follows this Zod schema, providing a boolean for isAnomalous, a score from 0.0 to 1.0, and a brief explanation:
 ${JSON.stringify(DetectAgentAnomaliesOutputSchema.shape, null, 2)}
 `;
     
-    const rawResponse = await openAiClient(prompt, [], true);
+    const rawResponse = await geminiClient(prompt, [], true);
     const parsedResponse = JSON.parse(rawResponse);
     
-    // Validate the response against the schema
     const validation = DetectAgentAnomaliesOutputSchema.safeParse(parsedResponse);
     if (!validation.success) {
         console.error("AI response validation failed:", validation.error);

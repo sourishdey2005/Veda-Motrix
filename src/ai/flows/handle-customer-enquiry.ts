@@ -7,7 +7,7 @@ import {
   HandleCustomerEnquiryInput,
   HandleCustomerEnquiryOutput,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import { geminiClient } from '@/ai/genkit';
 
 export async function handleCustomerEnquiry(
   input: HandleCustomerEnquiryInput
@@ -30,7 +30,7 @@ Owner: [Owner's reply]
 Provide the final conversation script as a single block of text.
 `;
 
-    const conversationSummary = await openAiClient(prompt);
+    const conversationSummary = await geminiClient(prompt);
     return { conversationSummary };
 
   } catch (error) {

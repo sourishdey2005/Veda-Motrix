@@ -8,7 +8,7 @@ import {
   AnalyzeCustomerFeedbackOutput,
   AnalyzeCustomerFeedbackOutputSchema,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import { geminiClient } from '@/ai/genkit';
 import { z } from 'zod';
 
 export async function analyzeCustomerFeedback(
@@ -20,14 +20,13 @@ export async function analyzeCustomerFeedback(
 Analyze the following customer feedback:
 Feedback: "${input.feedbackText}"
 
-Respond with a JSON object that matches this Zod schema:
+Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
 ${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.shape, null, 2)}
 `;
 
-    const rawResponse = await openAiClient(prompt, [], true);
+    const rawResponse = await geminiClient(prompt, [], true);
     const parsedResponse = JSON.parse(rawResponse);
     
-    // Validate the response against the schema
     const validation = AnalyzeCustomerFeedbackOutputSchema.safeParse(parsedResponse);
     if (!validation.success) {
         console.error("AI response validation failed:", validation.error);

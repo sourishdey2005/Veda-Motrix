@@ -7,7 +7,7 @@ import {
   GenerateExecutiveSummaryInput,
   GenerateExecutiveSummaryOutput,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import { geminiClient } from '@/ai/genkit';
 
 export async function generateExecutiveSummary(
   input: GenerateExecutiveSummaryInput
@@ -22,7 +22,7 @@ ${input.reportData}
 Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
 `;
 
-    const summary = await openAiClient(prompt);
+    const summary = await geminiClient(prompt);
     return { summary };
 
   } catch (error) {

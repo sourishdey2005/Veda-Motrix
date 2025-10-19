@@ -7,7 +7,7 @@ import {
   GenerateManufacturingInsightsInput,
   GenerateManufacturingInsightsOutput,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import { geminiClient } from '@/ai/genkit';
 
 export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
@@ -18,7 +18,7 @@ export async function generateManufacturingInsights(
 Service Data: ${input.serviceData}
 `;
 
-    const improvementSuggestions = await openAiClient(prompt);
+    const improvementSuggestions = await geminiClient(prompt);
     return { improvementSuggestions };
 
   } catch (error) {

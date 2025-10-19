@@ -7,8 +7,9 @@ import { qnaData } from '@/lib/chatbot-qna';
 import {
   AnswerQuestionInput,
   AnswerQuestionOutput,
+  Message
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import { geminiClient } from '@/ai/genkit';
 import { z } from 'zod';
 
 export async function answerQuestion(
@@ -22,7 +23,7 @@ export async function answerQuestion(
       return { answer: localAnswer.answer };
     }
 
-    const systemInstruction = `You are a helpful AI assistant for VEDA-MOTRIX, specializing in vehicle maintenance and troubleshooting. Your conversation history with the user is provided. The user's latest question is at the end. First, check the provided knowledge base. If the user's question is answered there, use that answer. If the user's question is not in the knowledge base, use your general vehicle knowledge to provide a helpful, safe, and accurate answer. Always prioritize user safety. If a user describes a critical issue (e.g., smoke, strange noises, brake failure), strongly advise them to stop driving and seek professional help immediately. Keep your answers concise and easy to understand. Do not mention the knowledge base in your answer. Just answer the question.
+    const knowledgeBase = `
 Knowledge Base:
 ---
 ${qnaData
@@ -30,13 +31,17 @@ ${qnaData
   .join('\n\n')}
 ---`;
 
-    // The openAiClient can take a history. We'll prepend the system message.
-    const history = [
-        { role: 'system', content: systemInstruction },
-        ...input.conversationHistory.map(msg => ({ role: msg.role === 'model' ? 'assistant' as const : 'user' as const, content: msg.content }))
-    ];
+    const systemInstruction = `You are a helpful AI assistant for VEDA-MOTRIX, specializing in vehicle maintenance and troubleshooting. Your conversation history with the user is provided. The user's latest question is at the end. First, check the provided knowledge base. If the user's question is answered there, use that answer. If the user's question is not in the knowledge base, use your general vehicle knowledge to provide a helpful, safe, and accurate answer. Always prioritize user safety. If a user describes a critical issue (e.g., smoke, strange noises, brake failure), strongly advise them to stop driving and seek professional help immediately. Keep your answers concise and easy to understand. Do not mention the knowledge base in your answer. Just answer the question.`;
     
-    const answer = await openAiClient(input.question, history);
+    const history: any = input.conversationHistory.map(msg => ({
+        role: msg.role,
+        parts: [{ text: msg.content }]
+    }));
+    
+    // We construct the prompt this way to include the system message and knowledge base without it being part of the conversational history.
+    const fullPrompt = `${systemInstruction}\n${knowledgeBase}\n\n[Conversation History Begins]\n${input.conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n')}\n[Conversation History Ends]\n\nUser Question: ${input.question}`;
+
+    const answer = await geminiClient(fullPrompt);
 
     return { answer };
   } catch (error) {

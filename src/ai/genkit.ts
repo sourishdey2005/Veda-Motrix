@@ -1,73 +1,100 @@
 
 'use server';
 
-if (!process.env.OPENROUTER_API_KEY) {
-    throw new Error("OPENROUTER_API_KEY environment variable not set.");
+if (!process.env.GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY environment variable not set.");
 }
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+interface TextPart {
+    text: string;
+}
+
+interface InlineDataPart {
+    inline_data: {
+        mime_type: string;
+        data: string;
+    };
+}
+
+type Part = TextPart | InlineDataPart;
 
 interface Message {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
+    role: 'user' | 'model';
+    parts: Part[];
 }
 
-interface ChatCompletionResponse {
-    id: string;
-    model: string;
-    choices: {
-        message: {
-            role: string;
-            content: string;
+interface GeminiResponse {
+    candidates: {
+        content: {
+            parts: {
+                text: string;
+            }[];
         };
-        finish_reason: string;
     }[];
 }
 
-export async function openAiClient(
+export async function geminiClient(
     prompt: string,
     history: Message[] = [],
-    isJsonMode: boolean = false
+    isJsonMode: boolean = false,
+    imageDataUri?: string
 ): Promise<string> {
     try {
-        const messages = [...history];
-        if (prompt) {
-            messages.push({ role: 'user', content: prompt });
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent`;
+
+        const userParts: Part[] = [{ text: prompt }];
+
+        if (imageDataUri) {
+            const dataUriMatch = imageDataUri.match(/^data:(.+?);base64,(.*)$/);
+            if (!dataUriMatch) {
+                throw new Error('Invalid data URI for image.');
+            }
+            const mimeType = dataUriMatch[1];
+            const base64Data = dataUriMatch[2];
+            userParts.push({
+                inline_data: {
+                    mime_type: mimeType,
+                    data: base64Data,
+                },
+            });
         }
         
-        const body: Record<string, any> = {
-            model: 'openai/gpt-4o',
-            messages,
-        };
+        const contents: Message[] = [...history, { role: 'user', parts: userParts }];
+
+        const payload: Record<string, any> = { contents };
 
         if (isJsonMode) {
-            body.response_format = { type: 'json_object' };
+             payload.generationConfig = {
+                response_mime_type: "application/json",
+            };
         }
-
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
-                Authorization: `Bearer ${OPENROUTER_API_KEY}`,
                 'Content-Type': 'application/json',
+                'x-goog-api-key': GEMINI_API_KEY,
             },
-            body: JSON.stringify(body),
+            body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
             const errorBody = await response.text();
-            console.error('OpenRouter API Error:', errorBody);
+            console.error('Google AI API Error:', errorBody);
             throw new Error(`API request failed with status ${response.status}: ${response.statusText}. Body: ${errorBody}`);
         }
 
-        const data: ChatCompletionResponse = await response.json();
+        const data: GeminiResponse = await response.json();
         
-        if (data.choices && data.choices.length > 0) {
-            return data.choices[0].message.content;
+        if (data.candidates && data.candidates.length > 0 && data.candidates[0].content.parts.length > 0) {
+            return data.candidates[0].content.parts[0].text;
         }
 
-        throw new Error('No response choices returned from the API.');
+        throw new Error('No response content returned from the API.');
     } catch (error) {
-        console.error('Error in openAiClient:', error);
+        console.error('Error in geminiClient:', error);
         throw error; // Re-throw the error to be caught by the calling flow
     }
 }
