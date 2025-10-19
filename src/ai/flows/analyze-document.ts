@@ -6,7 +6,7 @@
 import {AnalyzeDocumentInput, AnalyzeDocumentOutput} from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
 
-const CHUNK_SIZE = 16000; // Max characters per chunk, safely below token limit
+const CHUNK_SIZE = 4000; // Reduced chunk size for the new model
 
 async function summarizeChunk(
   chunk: string,
@@ -15,7 +15,7 @@ async function summarizeChunk(
   isLastChunk: boolean,
   totalChunks: number
 ): Promise<string> {
-  const systemPrompt = `You are a part of a multi-stage document analysis pipeline. Your task is to process a single chunk of a larger document and extract key information relevant to the user's overall goal.
+  const systemPrompt = `You are part of a multi-stage document analysis pipeline. Your task is to process a single chunk of a larger document and extract key information relevant to the user's overall goal.
 The user's final prompt is: "${prompt}"
 
 This is chunk ${
@@ -43,7 +43,7 @@ ${chunk}
   const messages = [
     {role: 'system' as const, content: systemPrompt},
   ];
-  return openAiClient(messages);
+  return openAiClient(messages, false, false);
 }
 
 async function synthesizeSummaries(
@@ -64,7 +64,7 @@ Based on these summaries, provide a clear, well-structured, and final analysis i
   const messages = [
     {role: 'user' as const, content: userPrompt},
   ];
-  const rawResponse = await openAiClient(messages);
+  const rawResponse = await openAiClient(messages, false, false);
   return rawResponse;
 }
 
@@ -99,7 +99,8 @@ User Prompt: "${input.prompt}"`,
           ],
         },
       ];
-      analysis = await openAiClient(messages);
+      // Use the vision-capable model
+      analysis = await openAiClient(messages, false, true);
     } else {
       const documentContent = Buffer.from(base64Data, 'base64').toString(
         'utf8'
@@ -119,7 +120,7 @@ ${documentContent}
         const messages = [
           {role: 'user' as const, content: userPrompt},
         ];
-        analysis = await openAiClient(messages);
+        analysis = await openAiClient(messages, false, false);
       } else {
         // Document is large, use map-reduce sequentially to avoid rate limits
         const chunks: string[] = [];
