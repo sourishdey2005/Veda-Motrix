@@ -11,6 +11,19 @@ import {
   AnalyzeDocumentOutputSchema,
 } from '@/ai/types';
 import {z} from 'zod';
+import pdf from 'pdf-parse';
+
+// Helper function to parse Data URI
+const parseDataUri = (dataUri: string) => {
+  const match = dataUri.match(/^data:(.+?);base64,(.*)$/);
+  if (!match) {
+    throw new Error('Invalid data URI');
+  }
+  return {
+    mimeType: match[1],
+    content: match[2],
+  };
+};
 
 const analysisPrompt = ai.definePrompt(
   {
@@ -18,17 +31,18 @@ const analysisPrompt = ai.definePrompt(
     input: {
       schema: z.object({
         prompt: z.string(),
-        documentDataUri: z.string(),
+        documentDataUri: z.string().optional(),
+        textContent: z.string().optional(),
       }),
     },
     output: {
       schema: AnalyzeDocumentOutputSchema,
     },
-    prompt: `You are an expert data analyst AI. A user has uploaded a document and a prompt.
+    prompt: `You are an expert data analyst AI. A user has provided a document and a prompt.
 
 Your task is to analyze the document based on their prompt.
-- If the document is an image, describe the contents of the image and answer the user's prompt.
-- If the document is text-based (like CSV, TXT, or extracted text from a PDF), analyze the text content to answer the prompt.
+- If it's an image, describe the contents and answer the prompt.
+- If it's text (from a CSV, TXT, or PDF), analyze the content to answer the prompt.
 
 Provide a clear, well-structured analysis in Markdown format.
 
@@ -36,26 +50,18 @@ Provide a clear, well-structured analysis in Markdown format.
 User Prompt: "{{prompt}}"
 ---
 Document Content:
-{{media url=documentDataUri}}
+{{#if documentDataUri}}
+  {{media url=documentDataUri}}
+{{else}}
+  \`\`\`
+  {{textContent}}
+  \`\`\`
+{{/if}}
 ---
 
 Your analysis:`,
   },
-  async (input) => {
-    const {output} = await ai.generate({
-      prompt: input,
-      model: 'googleai/gemini-pro',
-      config: {
-        output: {
-          format: 'json',
-          schema: AnalyzeDocumentOutputSchema,
-        },
-      },
-    });
-    return output!;
-  }
 );
-
 
 const analyzeDocumentFlow = ai.defineFlow(
   {
@@ -63,17 +69,47 @@ const analyzeDocumentFlow = ai.defineFlow(
     inputSchema: AnalyzeDocumentInputSchema,
     outputSchema: AnalyzeDocumentOutputSchema,
   },
-  async (input) => {
+  async (input: AnalyzeDocumentInput): Promise<AnalyzeDocumentOutput> => {
     try {
-      const result = await analysisPrompt(input);
-      return result;
-    } catch (error: any) {
-      console.error('Error in document analysis flow:', error);
-      if (error.message?.includes('unsupported content type')) {
+      const { mimeType, content } = parseDataUri(input.documentDataUri);
+      const buffer = Buffer.from(content, 'base64');
+      
+      let promptInput: {
+        prompt: string;
+        documentDataUri?: string;
+        textContent?: string;
+      } = { prompt: input.prompt };
+      
+      if (mimeType.startsWith('image/')) {
+        promptInput.documentDataUri = input.documentDataUri;
+      } else if (mimeType === 'application/pdf') {
+        const pdfData = await pdf(buffer);
+        promptInput.textContent = pdfData.text;
+      } else if (mimeType.startsWith('text/')) {
+        promptInput.textContent = buffer.toString('utf-8');
+      } else {
         return {
-          analysis: `#### Error\nUnsupported file type. The AI model cannot process this file. Please try a standard image format (JPG, PNG), PDF, CSV, or a plain text file (.txt).`,
+          analysis: `#### Error\nUnsupported file type: ${mimeType}. Please use a standard image format (JPG, PNG), PDF, CSV, or a plain text file (.txt).`,
         };
       }
+      
+      const { output } = await analysisPrompt(promptInput);
+      return output || { analysis: 'Analysis could not be generated.'};
+
+    } catch (error: any) {
+      console.error('Error in document analysis flow:', error);
+      
+      // Provide more specific error feedback
+      if (error.message?.includes('Invalid data URI')) {
+        return { analysis: '#### Error\nThe uploaded file could not be read. It might be corrupted.' };
+      }
+      if (error.message?.includes('unsupported content type')) {
+        return { analysis: `#### Error\nUnsupported file type. The AI model cannot process this file. Please try a standard image format (JPG, PNG), PDF, CSV, or a plain text file (.txt).` };
+      }
+      if (error.name === 'UnsupportedContentError') {
+        return { analysis: `#### Error\nContent Moderation: The document content was blocked by safety filters. Please try a different document.` };
+      }
+      
       return {
         analysis: `#### Error\nAn unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${error.message}`,
       };
