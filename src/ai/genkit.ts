@@ -33,7 +33,7 @@ export async function openAiClient(
         }
 
         const body: any = {
-            model: 'openai/gpt-4o',
+            model: 'nousresearch/nous-hermes-2-mixtral-8x7b-dpo:free',
             messages: messages,
         };
 
