@@ -1,21 +1,18 @@
 
-import {genkit, configureGenkit} from 'genkit';
+import {genkit} from 'genkit';
 import {googleAI} from '@genkit-ai/google-genai';
-import { next } from '@genkit-ai/next';
+import { nextPlugin } from '@genkit-ai/next';
 
 if (!process.env.GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY environment variable not set.");
 }
 
-export const ai = configureGenkit({
+export const ai = genkit({
   plugins: [
     googleAI({ apiKey: process.env.GEMINI_API_KEY }),
-    next({
-        // The Next.js plugin is required for this app.
-    }),
+    nextPlugin(),
   ],
   flowStateStore: 'firebase',
   traceStore: 'firebase',
   enableTracingAndMetrics: true,
-  logLevel: 'debug',
 });
