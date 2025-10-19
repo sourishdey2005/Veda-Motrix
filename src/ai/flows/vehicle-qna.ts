@@ -25,50 +25,29 @@ export const AnswerQuestionOutputSchema = z.object({
 });
 export type AnswerQuestionOutput = z.infer<typeof AnswerQuestionOutputSchema>;
 
-const localSearch = (question: string) => {
+const localSearch = (question: string): string | null => {
     const userQuestion = question.toLowerCase().trim();
-    if (!userQuestion) {
-        return null;
-    }
+    if (!userQuestion) return null;
 
-    let bestMatch: { score: number; answer: string } = { score: 0, answer: "" };
-
-    qnaData.forEach(item => {
-        const qnaQuestion = item.question.toLowerCase().trim();
-        let score = 0;
-        if (userQuestion === qnaQuestion) {
-            score = 3;
-        } else if (userQuestion.includes(qnaQuestion)) {
-            score = 2;
-        } else {
-            const userWords = new Set(userQuestion.split(' '));
-            const qnaWords = new Set(qnaQuestion.split(' '));
-            const intersection = new Set([...userWords].filter(x => qnaWords.has(x)));
-            score = intersection.size / qnaWords.size;
+    for (const item of qnaData) {
+        if (item.question.toLowerCase().trim() === userQuestion) {
+            return item.answer;
         }
-
-        if (score > bestMatch.score) {
-            bestMatch = { score, answer: item.answer };
-        }
-    });
-
-    if (bestMatch.score > 0.7) { // Confidence threshold
-        return bestMatch.answer;
     }
     return null;
-}
+};
 
 const qnaPrompt = ai.definePrompt({
     name: 'vehicleQnaPrompt',
     system: `You are a helpful AI assistant for VEDA-MOTRIX, specializing in vehicle maintenance and troubleshooting.
-    First, check the provided knowledge base. If a relevant answer exists, use it.
-    If the user's question is not in the knowledge base, use your general knowledge to provide a helpful, safe, and accurate answer.
+    First, I will provide a knowledge base. If the user's question is answered there, use that answer.
+    If the user's question is not in the knowledge base, use your general vehicle knowledge to provide a helpful, safe, and accurate answer.
     Always prioritize user safety. If a user describes a critical issue (e.g., smoke, strange noises, brake failure), strongly advise them to stop driving and seek professional help immediately.
     Keep your answers concise and easy to understand.
 
     Knowledge Base:
     ---
-    ${qnaData.map(item => `Q: ${item.question}\nA: ${item.answer}`).join('\n')}
+    ${qnaData.map(item => `Q: ${item.question}\nA: ${item.answer}`).join('\n\n')}
     ---
     `,
     input: { schema: AnswerQuestionInputSchema },
@@ -80,14 +59,12 @@ const answerQuestionFlow = ai.defineFlow({
     inputSchema: AnswerQuestionInputSchema,
     outputSchema: AnswerQuestionOutputSchema,
 }, async (input) => {
-    
-    // First, try a quick local search for a perfect match
+
     const localAnswer = localSearch(input.question);
     if (localAnswer) {
         return { answer: localAnswer };
     }
 
-    // If no good local match, proceed with the full AI prompt
     const { output } = await qnaPrompt(input);
     if (!output) {
         return { answer: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment." };

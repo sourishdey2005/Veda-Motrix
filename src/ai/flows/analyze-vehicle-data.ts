@@ -24,10 +24,10 @@ export const AnalyzeVehicleDataOutputSchema = z.object({
 });
 export type AnalyzeVehicleDataOutput = z.infer<typeof AnalyzeVehicleDataOutputSchema>;
 
-const analyzeVehicleDataPromptInputSchema = z.object({ 
-    vehicleId: z.string(), 
-    sensorDataJson: z.string(), 
-    maintenanceLogs: z.string() 
+const analyzeVehicleDataPromptInputSchema = z.object({
+    vehicleId: z.string(),
+    sensorDataJson: z.string(),
+    maintenanceLogs: z.string()
 });
 
 const vehicleDataPrompt = ai.definePrompt({

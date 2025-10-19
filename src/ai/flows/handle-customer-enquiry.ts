@@ -19,7 +19,7 @@ export const HandleCustomerEnquiryInputSchema = z.object({
 export type HandleCustomerEnquiryInput = z.infer<typeof HandleCustomerEnquiryInputSchema>;
 
 export const HandleCustomerEnquiryOutputSchema = z.object({
-  conversationSummary: z.string().describe('A summary of the simulated conversation.'),
+  conversationSummary: z.string().describe('A summary of the simulated conversation, formatted as a script.'),
 });
 export type HandleCustomerEnquiryOutput = z.infer<typeof HandleCustomerEnquiryOutputSchema>;
 
@@ -33,14 +33,13 @@ const enquiryPrompt = ai.definePrompt({
     Vehicle Issue: {{{vehicleIssue}}}
     Recommended Maintenance: {{{recommendedMaintenance}}}
 
-    Generate a short conversation (around 5-6 lines) between you and the vehicle owner. Start with a greeting, explain the issue and the recommended maintenance, and offer assistance with scheduling a service appointment. The response should be in the format of a conversation.
+    Generate a short, simulated conversation script (5-6 lines) between the AI Agent and the Owner. The script should start with a greeting, explain the issue and the recommended maintenance, offer assistance with scheduling, and end after the owner replies.
 
-    Agent: (Your greeting and explanation)
-    Owner: (Owner's response)
-    Agent: (Offer assistance with scheduling)
-    Owner: (Owner's reply)
-
-    End the conversation after the owner replies to the scheduling offer.
+    Example Format:
+    Agent: [Your greeting and explanation]
+    Owner: [Owner's response]
+    Agent: [Offer assistance with scheduling]
+    Owner: [Owner's reply]
     `
 });
 
