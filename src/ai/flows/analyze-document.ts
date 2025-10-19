@@ -22,19 +22,19 @@ export async function analyzeDocument(
     const mimeType = dataUriMatch[1];
     const base64Data = dataUriMatch[2];
 
-    let promptParts: Part[] = [];
+    let prompt: string | Part[];
 
     if (mimeType.startsWith('image/')) {
       const analysisPrompt = `You are an expert data analyst AI. A user has provided an image and a prompt. Describe the contents of the image and answer the user's prompt based on the image. Provide a clear, well-structured analysis in Markdown format.
 
 User Prompt: "${input.prompt}"`;
-      promptParts = [
+      prompt = [
         { text: analysisPrompt },
         { inlineData: { mimeType, data: base64Data } },
       ];
     } else if (mimeType.startsWith('text/')) {
       const textContent = Buffer.from(base64Data, 'base64').toString('utf-8');
-      const analysisPrompt = `You are an expert data analyst AI. A user has provided a document's text content and a prompt. Analyze the text content to answer the prompt. Provide a clear, well-structured analysis in Markdown format.
+      prompt = `You are an expert data analyst AI. A user has provided a document's text content and a prompt. Analyze the text content to answer the prompt. Provide a clear, well-structured analysis in Markdown format.
 
 User Prompt: "${input.prompt}"
 
@@ -43,7 +43,6 @@ Document Content:
 ${textContent}
 \`\`\`
 `;
-      promptParts = [{ text: analysisPrompt }];
     } else {
       return {
         analysis: `#### Error\nUnsupported file type: ${mimeType}. Please use a standard image format (JPG, PNG), CSV, or a plain text file (.txt). PDF analysis is temporarily unavailable.`,
@@ -52,7 +51,7 @@ ${textContent}
 
     const { output } = await ai.generate({
         model: 'googleai/gemini-1.5-flash-latest',
-        prompt: promptParts,
+        prompt: prompt,
     });
     
     const analysis = output?.text;
