@@ -139,7 +139,7 @@ export function DocumentAnalysisView() {
       <Card>
         <CardHeader>
           <CardTitle>Document Analysis Engine</CardTitle>
-          <CardDescription>Upload a document (PDF, CSV, TXT, JPG, PNG) and use AI to get real-time insights.</CardDescription>
+          <CardDescription>Upload a document (CSV, TXT, JPG, PNG) and use AI to get real-time insights.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
