@@ -42,7 +42,8 @@ export async function geminiClient(
     imageDataUri?: string
 ): Promise<string> {
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent`;
+        const modelName = 'gemini-1.5-flash'; // Corrected stable model name
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
 
         const userParts: Part[] = [{ text: prompt }];
 
