@@ -1,11 +1,17 @@
 
 'use server';
 
-import { genAI } from "@/ai/google-ai";
+import { GoogleGenAI } from "@google/genai";
 import {
   type AnalyzeDocumentInput,
   type AnalyzeDocumentOutput,
 } from '@/ai/types';
+
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+    throw new Error("GEMINI_API_KEY environment variable not set.");
+}
+const genAI = new GoogleGenAI(apiKey);
 
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -39,8 +45,13 @@ export async function analyzeDocument(
         const result = await model.generateContent({ contents: [{ role: 'user', parts: prompt.map(p => typeof p === 'string' ? { text: p } : p) }]});
         const response = result.response;
         return { analysis: response.text() };
-    } catch(e) {
+    } catch(e: any) {
         console.error("Error analyzing image document:", e);
+        if (e.message?.includes('unsupported content type')) {
+           return {
+                analysis: `#### Error\nUnsupported file type: \`${mimeType}\`. The AI model cannot process this file. Please try a standard image format like JPG or PNG.`,
+            };
+        }
         return {
           analysis: "#### Error\nAn unexpected error occurred while analyzing the image. It might be corrupted or in an unsupported format.",
         };
