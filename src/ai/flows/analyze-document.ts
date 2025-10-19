@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileoverview A Genkit flow that analyzes a document (CSV, TXT, image).
@@ -50,7 +51,7 @@ ${textContent}
     }
 
     const { output } = await ai.generate({
-        model: 'googleai/gemini-pro-vision',
+        model: 'googleai/gemini-1.5-flash-latest',
         prompt: promptParts,
     });
     

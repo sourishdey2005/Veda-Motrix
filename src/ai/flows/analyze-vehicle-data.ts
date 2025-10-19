@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileoverview A Genkit flow that analyzes vehicle sensor data for anomalies and maintenance needs.
@@ -25,7 +26,7 @@ ANOMALIES: [List detected anomalies, one per line]
 MAINTENANCE: [List suggested maintenance needs, one per line]
 `;
     const { output } = await ai.generate({
-      model: 'googleai/gemini-pro',
+      model: 'googleai/gemini-1.5-flash-latest',
       prompt: prompt,
     });
 

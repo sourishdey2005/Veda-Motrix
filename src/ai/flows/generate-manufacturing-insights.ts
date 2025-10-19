@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileoverview A Genkit flow that generates manufacturing insights from service data.
@@ -18,7 +19,7 @@ Service Data: ${input.serviceData}
 `;
 
     const { output } = await ai.generate({
-      model: 'googleai/gemini-pro',
+      model: 'googleai/gemini-1.5-flash-latest',
       prompt: prompt,
     });
     

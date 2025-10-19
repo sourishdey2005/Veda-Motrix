@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileoverview A Genkit flow that predicts vehicle failures from sensor data and maintenance logs.
@@ -26,7 +27,7 @@ Battery||Degradation||MEDIUM||0.80||Voltage dropping. Test and replacement recom
 `;
 
     const { output } = await ai.generate({
-      model: 'googleai/gemini-pro',
+      model: 'googleai/gemini-1.5-flash-latest',
       prompt: prompt,
     });
 

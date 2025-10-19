@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileoverview A Genkit flow that analyzes customer feedback for sentiment and actionable insights.
@@ -26,7 +27,7 @@ SUGGESTIONS: [Your improvement suggestions here]
 `;
 
     const { output } = await ai.generate({
-      model: 'googleai/gemini-pro',
+      model: 'googleai/gemini-1.5-flash-latest',
       prompt: prompt,
     });
 

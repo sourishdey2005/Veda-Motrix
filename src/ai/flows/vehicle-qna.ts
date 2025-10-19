@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileoverview A Genkit flow that answers user questions about vehicles, using a knowledge base and conversation history.
@@ -46,7 +47,7 @@ ${qnaData
     }));
 
     const { output } = await ai.generate({
-        model: 'googleai/gemini-pro',
+        model: 'googleai/gemini-1.5-flash-latest',
         prompt: input.question,
         history,
         config: {

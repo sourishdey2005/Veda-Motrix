@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileoverview A Genkit flow that detects anomalous behavior from other AI agents.
@@ -25,7 +26,7 @@ EXPLANATION: [A brief explanation of your reasoning]
 `;
 
     const { output } = await ai.generate({
-      model: 'googleai/gemini-pro',
+      model: 'googleai/gemini-1.5-flash-latest',
       prompt: prompt,
     });
     
