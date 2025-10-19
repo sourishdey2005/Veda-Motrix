@@ -43,7 +43,8 @@ export async function geminiClient(
 ): Promise<string> {
     try {
         const isVision = !!imageDataUri;
-        const modelName = isVision ? 'gemini-pro-vision' : 'gemini-pro';
+        // Use stable, versioned model names to avoid 404 errors
+        const modelName = isVision ? 'gemini-1.0-pro-vision' : 'gemini-1.0-pro';
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
 
         const userParts: Part[] = [{ text: prompt }];
@@ -94,8 +95,10 @@ export async function geminiClient(
             return data.candidates[0].content.parts[0].text;
         }
 
+        // Handle cases where the API returns a candidate but with no text parts (e.g., safety block)
         if (data.candidates && data.candidates.length > 0) {
-            return "The model returned a response with no text content.";
+            // A more detailed check could be added here for specific finishReasons like "SAFETY"
+            return "The model returned a response with no text content. This might be due to safety filters blocking the response.";
         }
 
         throw new Error('No response content returned from the API.');
