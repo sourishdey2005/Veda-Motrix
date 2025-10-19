@@ -1,56 +1,45 @@
 
 'use server';
 /**
- * @fileoverview A Genkit flow that analyzes vehicle sensor data for anomalies and maintenance needs.
+ * @fileoverview An AI flow that analyzes vehicle sensor data for anomalies and maintenance needs.
  */
 import {
   AnalyzeVehicleDataInput,
-  AnalyzeVehicleDataInputSchema,
   AnalyzeVehicleDataOutput,
   AnalyzeVehicleDataOutputSchema,
 } from '@/ai/types';
-import { ai } from '@/ai/genkit';
+import { openAiClient } from '@/ai/genkit';
 import { z } from 'zod';
-
-const analyzeVehicleDataPrompt = ai.definePrompt(
-  {
-    name: 'analyzeVehicleDataPrompt',
-    input: { schema: AnalyzeVehicleDataInputSchema },
-    output: { schema: AnalyzeVehicleDataOutputSchema },
-    model: 'googleai/gemini-1.5-flash-latest',
-    prompt: `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs.
-Analyze the provided sensor data and logs to identify potential issues.
-
-Vehicle ID: {{{vehicleId}}}
-Sensor Data: {{{sensorDataJson}}}
-Maintenance Logs: {{{maintenanceLogs}}}
-
-Respond with a list of detected anomalies and a list of suggested maintenance needs, in the format defined by the output schema.
-`,
-  },
-);
-
-const analyzeVehicleDataFlow = ai.defineFlow(
-  {
-    name: 'analyzeVehicleDataFlow',
-    inputSchema: AnalyzeVehicleDataInputSchema,
-    outputSchema: AnalyzeVehicleDataOutputSchema,
-  },
-  async (input) => {
-    const { output } = await analyzeVehicleDataPrompt(input);
-    if (!output) {
-      throw new Error('Analysis failed: AI did not return a structured response.');
-    }
-    return output;
-  }
-);
-
 
 export async function analyzeVehicleData(
   input: AnalyzeVehicleDataInput
 ): Promise<AnalyzeVehicleDataOutput> {
   try {
-    const result = await analyzeVehicleDataFlow(input);
+    const prompt = `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs.
+Analyze the provided sensor data and logs to identify potential issues.
+
+Vehicle ID: ${input.vehicleId}
+Sensor Data (JSON): ${input.sensorDataJson}
+Maintenance Logs: ${input.maintenanceLogs}
+
+Respond with a JSON object that matches this Zod schema:
+${JSON.stringify(AnalyzeVehicleDataOutputSchema.shape, null, 2)}
+
+Your response should contain a list of detected anomalies and a list of suggested maintenance needs. If none are found, return empty arrays.
+`;
+
+    const rawResponse = await openAiClient(prompt, [], true);
+    const parsedResponse = JSON.parse(rawResponse);
+
+    // Validate the response against the schema
+    const validation = AnalyzeVehicleDataOutputSchema.safeParse(parsedResponse);
+    if (!validation.success) {
+        console.error("AI response validation failed:", validation.error);
+        throw new Error("The AI returned data in an unexpected format.");
+    }
+    
+    const result = validation.data;
+    
     return {
         anomalies: result.anomalies.length > 0 ? result.anomalies : ["No anomalies detected."],
         maintenanceNeeds: result.maintenanceNeeds.length > 0 ? result.maintenanceNeeds : ["No immediate maintenance needs identified."],

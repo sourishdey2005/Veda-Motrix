@@ -1,18 +1,15 @@
 
 'use server';
 /**
- * @fileoverview A Genkit flow that answers user questions about vehicles, using a knowledge base and conversation history.
+ * @fileoverview An AI flow that answers user questions about vehicles, using a knowledge base and conversation history.
  */
 import { qnaData } from '@/lib/chatbot-qna';
 import {
   AnswerQuestionInput,
-  AnswerQuestionInputSchema,
   AnswerQuestionOutput,
-  AnswerQuestionOutputSchema,
 } from '@/ai/types';
-import { ai } from '@/ai/genkit';
+import { openAiClient } from '@/ai/genkit';
 import { z } from 'zod';
-import { content, part } from 'genkit/content';
 
 export async function answerQuestion(
   input: AnswerQuestionInput
@@ -33,20 +30,15 @@ ${qnaData
   .join('\n\n')}
 ---`;
 
-    const { output } = await ai.generate({
-      model: 'googleai/gemini-1.5-flash-latest',
-      prompt: input.question,
-      history: input.conversationHistory.map((msg) => content(msg.role, msg.content)),
-      config: {
-        systemInstruction,
-      },
-    });
+    // The openAiClient can take a history. We'll prepend the system message.
+    const history = [
+        { role: 'system', content: systemInstruction },
+        ...input.conversationHistory.map(msg => ({ role: msg.role === 'model' ? 'assistant' as const : 'user' as const, content: msg.content }))
+    ];
+    
+    const answer = await openAiClient(input.question, history);
 
-    if (!output || !output.text) {
-      throw new Error('No text output from AI');
-    }
-
-    return { answer: output.text };
+    return { answer };
   } catch (error) {
     console.error('Error in answerQuestion:', error);
     return {
