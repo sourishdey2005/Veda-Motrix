@@ -2,7 +2,7 @@
 'use server';
 
 import {genkit, configureGenkit} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
+import {googleAI} from '@genkit-ai/google-genai';
 
 configureGenkit({
   plugins: [

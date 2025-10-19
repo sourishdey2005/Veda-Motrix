@@ -51,8 +51,9 @@ Maintenance Logs: ${maintenanceLogs}`,
     };
   } catch (error) {
     console.error('Error in analyzeVehicleData:', error);
+    // Return a valid AnalyzeVehicleDataOutput structure in case of an error
     return {
-      anomalies: ['Error processing data'],
+      anomalies: ['Error: Analysis Failed'],
       maintenanceNeeds: [
         `An unexpected error occurred: ${
           error instanceof Error ? error.message : String(error)
