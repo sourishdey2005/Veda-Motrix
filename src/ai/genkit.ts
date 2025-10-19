@@ -28,7 +28,7 @@ export async function openAiClient(
 ): Promise<string> {
   try {
     const completion = await openai.chat.completions.create({
-      model: 'alibaba/tongyi-deepresearch-30b-a3b:free',
+      model: 'openai/gpt-4o-mini:free',
       messages: messages,
       response_format: isJsonMode ? {type: 'json_object'} : {type: 'text'},
     });
