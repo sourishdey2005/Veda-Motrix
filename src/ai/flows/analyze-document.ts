@@ -8,7 +8,16 @@ import {
   AnalyzeDocumentOutput,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import {Part} from 'genkit/content';
+import { Part } from '@google/genai';
+
+function fileToGenerativePart(data: string, mimeType: string): Part {
+  return {
+    inlineData: {
+      data,
+      mimeType,
+    },
+  };
+}
 
 export async function analyzeDocument(
   input: AnalyzeDocumentInput
@@ -20,23 +29,22 @@ export async function analyzeDocument(
     }
     const mimeType = dataUriMatch[1];
     const base64Data = dataUriMatch[2];
-    
-    let requestParts: Part[] = [];
-    let analysisPrompt = '';
+
+    const model = ai.getGenerativeModel({ model: 'gemini-pro-vision' });
+
+    let promptParts: Part[] = [];
 
     if (mimeType.startsWith('image/')) {
-        analysisPrompt = `You are an expert data analyst AI. A user has provided an image and a prompt. Describe the contents of the image and answer the user's prompt based on the image. Provide a clear, well-structured analysis in Markdown format.
+      const analysisPrompt = `You are an expert data analyst AI. A user has provided an image and a prompt. Describe the contents of the image and answer the user's prompt based on the image. Provide a clear, well-structured analysis in Markdown format.
 
 User Prompt: "${input.prompt}"`;
-        requestParts.push({
-            inlineData: {
-                mimeType: mimeType,
-                data: base64Data,
-            }
-        });
+      promptParts = [
+        { text: analysisPrompt },
+        fileToGenerativePart(base64Data, mimeType),
+      ];
     } else if (mimeType.startsWith('text/')) {
-        const textContent = Buffer.from(base64Data, 'base64').toString('utf-8');
-        analysisPrompt = `You are an expert data analyst AI. A user has provided a document's text content and a prompt. Analyze the text content to answer the prompt. Provide a clear, well-structured analysis in Markdown format.
+      const textContent = Buffer.from(base64Data, 'base64').toString('utf-8');
+      const analysisPrompt = `You are an expert data analyst AI. A user has provided a document's text content and a prompt. Analyze the text content to answer the prompt. Provide a clear, well-structured analysis in Markdown format.
 
 User Prompt: "${input.prompt}"
 
@@ -45,33 +53,33 @@ Document Content:
 ${textContent}
 \`\`\`
 `;
+      promptParts = [{ text: analysisPrompt }];
     } else {
-       return {
-          analysis: `#### Error\nUnsupported file type: ${mimeType}. Please use a standard image format (JPG, PNG), CSV, or a plain text file (.txt). PDF analysis is temporarily unavailable.`,
-        };
+      return {
+        analysis: `#### Error\nUnsupported file type: ${mimeType}. Please use a standard image format (JPG, PNG), CSV, or a plain text file (.txt). PDF analysis is temporarily unavailable.`,
+      };
     }
-    
-    requestParts.unshift({text: analysisPrompt});
-    
-    const { output } = await ai.generate({
-        model: 'googleai/gemini-pro',
-        prompt: { parts: requestParts },
+
+    const { response } = await model.generateContent({
+        contents: [{ role: 'user', parts: promptParts }]
     });
 
-    if (!output || !output.text) {
+    const analysis = response.candidates[0]?.content.parts[0]?.text;
+
+    if (!analysis) {
       throw new Error('No text output from AI');
     }
 
-    return { analysis: output.text };
-
+    return { analysis };
   } catch (error: any) {
-      console.error('Error in document analysis flow:', error);
-      let errorMessage = `An unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${error.message}`;
-      if (error.message?.includes('Invalid data URI')) {
-        errorMessage = 'The uploaded file could not be read. It might be corrupted or in a format the system cannot process.';
-      }
-      return {
-        analysis: `#### Error\n${errorMessage}`,
-      };
+    console.error('Error in document analysis flow:', error);
+    let errorMessage = `An unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${error.message}`;
+    if (error.message?.includes('Invalid data URI')) {
+      errorMessage =
+        'The uploaded file could not be read. It might be corrupted or in a format the system cannot process.';
+    }
+    return {
+      analysis: `#### Error\n${errorMessage}`,
+    };
   }
 }
