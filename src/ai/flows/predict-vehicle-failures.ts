@@ -1,33 +1,11 @@
-
 'use server';
 
 import {ai} from '@/ai/genkit';
-import {z} from 'zod';
-
-export const PredictVehicleFailureInputSchema = z.object({
-  vehicleId: z.string(),
-  sensorDataJson: z.string(),
-  maintenanceLogs: z.string(),
-});
-export type PredictVehicleFailureInput = z.infer<
-  typeof PredictVehicleFailureInputSchema
->;
-
-export const PredictedFailureSchema = z.object({
-  component: z.string(),
-  failureType: z.string(),
-  priority: z.enum(['HIGH', 'MEDIUM', 'LOW']),
-  confidence: z.number().min(0).max(1),
-  suggestedActions: z.string(),
-});
-export type PredictedFailure = z.infer<typeof PredictedFailureSchema>;
-
-export const PredictVehicleFailureOutputSchema = z.object({
-  predictedFailures: z.array(PredictedFailureSchema),
-});
-export type PredictVehicleFailureOutput = z.infer<
-  typeof PredictVehicleFailureOutputSchema
->;
+import {
+  PredictVehicleFailureInputSchema,
+  PredictVehicleFailureOutputSchema,
+  type PredictVehicleFailureOutput,
+} from '@/ai/types';
 
 const prompt = ai.definePrompt(
   {
@@ -53,7 +31,7 @@ const prompt = ai.definePrompt(
   }
 );
 
-export const predictVehicleFailureFlow = ai.defineFlow(
+const predictVehicleFailureFlow = ai.defineFlow(
   {
     name: 'predictVehicleFailureFlow',
     inputSchema: PredictVehicleFailureInputSchema,

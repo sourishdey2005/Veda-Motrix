@@ -1,22 +1,12 @@
-
 'use server';
 
 import {ai} from '@/ai/genkit';
-import {z} from 'zod';
-
-export const GenerateManufacturingInsightsInputSchema = z.object({
-  serviceData: z.string(),
-});
-export type GenerateManufacturingInsightsInput = z.infer<
-  typeof GenerateManufacturingInsightsInputSchema
->;
-
-export const GenerateManufacturingInsightsOutputSchema = z.object({
-  improvementSuggestions: z.string(),
-});
-export type GenerateManufacturingInsightsOutput = z.infer<
-  typeof GenerateManufacturingInsightsOutputSchema
->;
+import {
+  GenerateManufacturingInsightsInputSchema,
+  GenerateManufacturingInsightsOutputSchema,
+  type GenerateManufacturingInsightsInput,
+  type GenerateManufacturingInsightsOutput,
+} from '@/ai/types';
 
 const prompt = ai.definePrompt(
   {
@@ -40,7 +30,7 @@ const prompt = ai.definePrompt(
   }
 );
 
-export const generateManufacturingInsightsFlow = ai.defineFlow(
+const generateManufacturingInsightsFlow = ai.defineFlow(
   {
     name: 'generateManufacturingInsightsFlow',
     inputSchema: GenerateManufacturingInsightsInputSchema,

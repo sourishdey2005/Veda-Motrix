@@ -1,26 +1,12 @@
-
 'use server';
 
 import {ai} from '@/ai/genkit';
-import {z} from 'zod';
-
-export const GenerateExecutiveSummaryInputSchema = z.object({
-  reportData: z.string(),
-});
-export type GenerateExecutiveSummaryInput = z.infer<
-  typeof GenerateExecutiveSummaryInputSchema
->;
-
-export const GenerateExecutiveSummaryOutputSchema = z.object({
-  summary: z
-    .string()
-    .describe(
-      'A concise, well-structured executive summary of the provided data, formatted for a business audience.'
-    ),
-});
-export type GenerateExecutiveSummaryOutput = z.infer<
-  typeof GenerateExecutiveSummaryOutputSchema
->;
+import {
+  GenerateExecutiveSummaryInputSchema,
+  GenerateExecutiveSummaryOutputSchema,
+  type GenerateExecutiveSummaryInput,
+  type GenerateExecutiveSummaryOutput,
+} from '@/ai/types';
 
 const prompt = ai.definePrompt(
   {
@@ -46,7 +32,7 @@ const prompt = ai.definePrompt(
   }
 );
 
-export const generateExecutiveSummaryFlow = ai.defineFlow(
+const generateExecutiveSummaryFlow = ai.defineFlow(
   {
     name: 'generateExecutiveSummaryFlow',
     inputSchema: GenerateExecutiveSummaryInputSchema,

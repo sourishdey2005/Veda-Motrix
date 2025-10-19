@@ -1,19 +1,12 @@
-
 'use server';
 
 import {ai} from '@/ai/genkit';
-import {z} from 'zod';
-
-export const AnalyzeDocumentInputSchema = z.object({
-  documentDataUri: z.string(),
-  prompt: z.string(),
-});
-export type AnalyzeDocumentInput = z.infer<typeof AnalyzeDocumentInputSchema>;
-
-export const AnalyzeDocumentOutputSchema = z.object({
-  analysis: z.string(),
-});
-export type AnalyzeDocumentOutput = z.infer<typeof AnalyzeDocumentOutputSchema>;
+import {
+  AnalyzeDocumentInputSchema,
+  AnalyzeDocumentOutputSchema,
+  type AnalyzeDocumentInput,
+  type AnalyzeDocumentOutput,
+} from '@/ai/types';
 
 const prompt = ai.definePrompt(
   {
@@ -36,7 +29,7 @@ User Prompt: "{{prompt}}"
   }
 );
 
-export const analyzeDocumentFlow = ai.defineFlow(
+const analyzeDocumentFlow = ai.defineFlow(
   {
     name: 'analyzeDocumentFlow',
     inputSchema: AnalyzeDocumentInputSchema,
@@ -55,18 +48,12 @@ export const analyzeDocumentFlow = ai.defineFlow(
 
     if (
       !mimeType.startsWith('image/') &&
-      !mimeType.startsWith('text/') &&
-      mimeType !== 'application/pdf'
+      !mimeType.startsWith('text/')
     ) {
       return {
-        analysis: `#### Error\nUnsupported file type: \`${mimeType}\`. Please upload a supported document format like an image (JPG, PNG), PDF, or plain text file (.txt).`,
+        analysis: `#### Error\nUnsupported file type: \`${mimeType}\`. Please upload a supported document format like an image (JPG, PNG) or plain text file (.txt).\n\nPDF analysis is not currently supported.`,
       };
     }
-    
-    // As PDF text extraction is complex on the server without robust libraries,
-    // we'll let Gemini handle it directly. However, for a production app,
-    // a dedicated library before the AI call might be better.
-    // For now, we accept PDF but inform the user if the AI can't handle it.
 
     try {
         const {output} = await prompt(input);

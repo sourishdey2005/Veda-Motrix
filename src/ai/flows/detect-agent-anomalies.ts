@@ -1,26 +1,12 @@
-
 'use server';
 
 import {ai} from '@/ai/genkit';
-import {z} from 'zod';
-
-export const DetectAgentAnomaliesInputSchema = z.object({
-  agentId: z.string(),
-  agentActions: z.array(z.string()),
-  anomalyThreshold: z.number(),
-});
-export type DetectAgentAnomaliesInput = z.infer<
-  typeof DetectAgentAnomaliesInputSchema
->;
-
-export const DetectAgentAnomaliesOutputSchema = z.object({
-  isAnomalous: z.boolean(),
-  anomalyScore: z.number(),
-  explanation: z.string(),
-});
-export type DetectAgentAnomaliesOutput = z.infer<
-  typeof DetectAgentAnomaliesOutputSchema
->;
+import {
+  DetectAgentAnomaliesInputSchema,
+  DetectAgentAnomaliesOutputSchema,
+  type DetectAgentAnomaliesInput,
+  type DetectAgentAnomaliesOutput,
+} from '@/ai/types';
 
 const prompt = ai.definePrompt(
   {
@@ -52,7 +38,7 @@ const prompt = ai.definePrompt(
   }
 );
 
-export const detectAgentAnomaliesFlow = ai.defineFlow(
+const detectAgentAnomaliesFlow = ai.defineFlow(
   {
     name: 'detectAgentAnomaliesFlow',
     inputSchema: DetectAgentAnomaliesInputSchema,

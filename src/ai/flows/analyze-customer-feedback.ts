@@ -1,34 +1,12 @@
-
 'use server';
 
 import {ai} from '@/ai/genkit';
-import {z} from 'zod';
-
-export const AnalyzeCustomerFeedbackInputSchema = z.object({
-  feedbackText: z.string(),
-});
-export type AnalyzeCustomerFeedbackInput = z.infer<
-  typeof AnalyzeCustomerFeedbackInputSchema
->;
-
-export const AnalyzeCustomerFeedbackOutputSchema = z.object({
-  sentiment: z
-    .string()
-    .describe(
-      'The sentiment of the customer feedback (e.g., positive, negative, neutral). Also include degree of sentiment (very positive, slightly negative, etc.).'
-    ),
-  keyAreas: z
-    .string()
-    .describe(
-      'Key areas or topics mentioned in the feedback (e.g., service quality, staff friendliness, waiting time). Separate multiple areas with commas.'
-    ),
-  suggestions: z
-    .string()
-    .describe('Suggestions for improvement based on the customer feedback.'),
-});
-export type AnalyzeCustomerFeedbackOutput = z.infer<
-  typeof AnalyzeCustomerFeedbackOutputSchema
->;
+import {
+  AnalyzeCustomerFeedbackInputSchema,
+  AnalyzeCustomerFeedbackOutputSchema,
+  type AnalyzeCustomerFeedbackInput,
+  type AnalyzeCustomerFeedbackOutput,
+} from '@/ai/types';
 
 const prompt = ai.definePrompt(
   {
@@ -51,7 +29,7 @@ const prompt = ai.definePrompt(
   }
 );
 
-export const analyzeCustomerFeedbackFlow = ai.defineFlow(
+const analyzeCustomerFeedbackFlow = ai.defineFlow(
   {
     name: 'analyzeCustomerFeedbackFlow',
     inputSchema: AnalyzeCustomerFeedbackInputSchema,

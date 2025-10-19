@@ -1,25 +1,12 @@
-
 'use server';
 
 import {ai} from '@/ai/genkit';
-import {z} from 'zod';
-
-export const AnalyzeVehicleDataInputSchema = z.object({
-  vehicleId: z.string(),
-  sensorDataJson: z.string(),
-  maintenanceLogs: z.string(),
-});
-export type AnalyzeVehicleDataInput = z.infer<
-  typeof AnalyzeVehicleDataInputSchema
->;
-
-export const AnalyzeVehicleDataOutputSchema = z.object({
-  anomalies: z.array(z.string()),
-  maintenanceNeeds: z.array(z.string()),
-});
-export type AnalyzeVehicleDataOutput = z.infer<
-  typeof AnalyzeVehicleDataOutputSchema
->;
+import {
+  AnalyzeVehicleDataInputSchema,
+  AnalyzeVehicleDataOutputSchema,
+  type AnalyzeVehicleDataInput,
+  type AnalyzeVehicleDataOutput,
+} from '@/ai/types';
 
 const prompt = ai.definePrompt(
   {
@@ -45,7 +32,7 @@ const prompt = ai.definePrompt(
   }
 );
 
-export const analyzeVehicleDataFlow = ai.defineFlow(
+const analyzeVehicleDataFlow = ai.defineFlow(
   {
     name: 'analyzeVehicleDataFlow',
     inputSchema: AnalyzeVehicleDataInputSchema,

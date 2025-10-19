@@ -1,26 +1,13 @@
-
 'use server';
 
 import {ai} from '@/ai/genkit';
 import {qnaData} from '@/lib/chatbot-qna';
-import {z} from 'zod';
-
-const MessageSchema = z.object({
-  role: z.enum(['user', 'model']),
-  content: z.string(),
-});
-export type Message = z.infer<typeof MessageSchema>;
-
-export const AnswerQuestionInputSchema = z.object({
-  question: z.string(),
-  conversationHistory: z.array(MessageSchema),
-});
-export type AnswerQuestionInput = z.infer<typeof AnswerQuestionInputSchema>;
-
-export const AnswerQuestionOutputSchema = z.object({
-  answer: z.string(),
-});
-export type AnswerQuestionOutput = z.infer<typeof AnswerQuestionOutputSchema>;
+import {
+  AnswerQuestionInputSchema,
+  AnswerQuestionOutputSchema,
+  type AnswerQuestionInput,
+  type AnswerQuestionOutput,
+} from '@/ai/types';
 
 const localSearch = (question: string): string | null => {
   const userQuestion = question.toLowerCase().trim();
@@ -74,7 +61,7 @@ const prompt = ai.definePrompt(
   }
 );
 
-export const answerQuestionFlow = ai.defineFlow(
+const answerQuestionFlow = ai.defineFlow(
   {
     name: 'answerQuestionFlow',
     inputSchema: AnswerQuestionInputSchema,

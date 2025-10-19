@@ -1,24 +1,12 @@
-
 'use server';
 
 import {ai} from '@/ai/genkit';
-import {z} from 'zod';
-
-export const HandleCustomerEnquiryInputSchema = z.object({
-  vehicleIssue: z.string(),
-  recommendedMaintenance: z.string(),
-  userName: z.string(),
-});
-export type HandleCustomerEnquiryInput = z.infer<
-  typeof HandleCustomerEnquiryInputSchema
->;
-
-export const HandleCustomerEnquiryOutputSchema = z.object({
-  conversationSummary: z.string(),
-});
-export type HandleCustomerEnquiryOutput = z.infer<
-  typeof HandleCustomerEnquiryOutputSchema
->;
+import {
+  HandleCustomerEnquiryInputSchema,
+  HandleCustomerEnquiryOutputSchema,
+  type HandleCustomerEnquiryInput,
+  type HandleCustomerEnquiryOutput,
+} from '@/ai/types';
 
 const prompt = ai.definePrompt(
   {
@@ -50,7 +38,7 @@ const prompt = ai.definePrompt(
   }
 );
 
-export const handleCustomerEnquiryFlow = ai.defineFlow(
+const handleCustomerEnquiryFlow = ai.defineFlow(
   {
     name: 'handleCustomerEnquiryFlow',
     inputSchema: HandleCustomerEnquiryInputSchema,
