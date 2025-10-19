@@ -78,7 +78,7 @@ const qnaPrompt = ai.definePrompt({
 const answerQuestionFlow = ai.defineFlow({
     name: 'answerQuestionFlow',
     inputSchema: AnswerQuestionInputSchema,
-    outputSchema: Answer4nswerQuestionOutputSchema,
+    outputSchema: AnswerQuestionOutputSchema,
 }, async (input) => {
     
     // First, try a quick local search for a perfect match

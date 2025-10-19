@@ -21,7 +21,7 @@ export type HandleCustomerEnquiryInput = z.infer<typeof HandleCustomerEnquiryInp
 const HandleCustomerEnquiryOutputSchema = z.object({
   conversationSummary: z.string().describe('A summary of the simulated conversation.'),
 });
-export type HandleCustomerEnquiryOutput = zinfer<typeof HandleCustomerEnquiryOutputSchema>;
+export type HandleCustomerEnquiryOutput = z.infer<typeof HandleCustomerEnquiryOutputSchema>;
 
 const enquiryPrompt = ai.definePrompt({
     name: 'handleCustomerEnquiryPrompt',
