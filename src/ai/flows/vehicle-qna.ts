@@ -6,15 +6,12 @@
 import { qnaData } from '@/lib/chatbot-qna';
 import {
   AnswerQuestionInput,
+  AnswerQuestionInputSchema,
   AnswerQuestionOutput,
+  AnswerQuestionOutputSchema,
 } from '@/ai/types';
-import { GoogleGenerativeAI, Content } from "@google/genai";
-
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
-}
-const genAI = new GoogleGenerativeAI(apiKey);
+import { ai } from '@/ai/genkit';
+import { Message } from "genkit";
 
 const localSearch = (question: string): string | null => {
   const userQuestion = question.toLowerCase().trim();
@@ -28,6 +25,23 @@ const localSearch = (question: string): string | null => {
   return null;
 };
 
+const qnaPrompt = ai.definePrompt(
+  {
+    name: 'vehicleQnA',
+    input: { schema: z.object({ question: z.string() }) },
+    output: { schema: z.string() },
+    system: `You are a helpful AI assistant for VEDA-MOTRIX, specializing in vehicle maintenance and troubleshooting. Your conversation history with the user is provided. The user's latest question is at the end. First, check the provided knowledge base. If the user's question is answered there, use that answer. If the user's question is not in the knowledge base, use your general vehicle knowledge to provide a helpful, safe, and accurate answer. Always prioritize user safety. If a user describes a critical issue (e.g., smoke, strange noises, brake failure), strongly advise them to stop driving and seek professional help immediately. Keep your answers concise and easy to understand. Do not mention the knowledge base in your answer. Just answer the question.
+Knowledge Base:
+---
+${qnaData
+  .map(item => `Q: ${item.question}\nA: ${item.answer}`)
+  .join('\n\n')}
+---`,
+    prompt: `{{question}}`
+  },
+);
+
+
 export async function answerQuestion(
   input: AnswerQuestionInput
 ): Promise<AnswerQuestionOutput> {
@@ -36,36 +50,15 @@ export async function answerQuestion(
     return {answer: localAnswer};
   }
   
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-  const knowledgeBase = `
-    Knowledge Base:
-    ---
-    ${qnaData
-      .map(item => `Q: ${item.question}\nA: ${item.answer}`)
-      .join('\n\n')}
-    ---
-  `;
-
-  const systemInstruction = `You are a helpful AI assistant for VEDA-MOTRIX, specializing in vehicle maintenance and troubleshooting. Your conversation history with the user is provided. The user's latest question is at the end. First, check the provided knowledge base. If the user's question is answered there, use that answer. If the user's question is not in the knowledge base, use your general vehicle knowledge to provide a helpful, safe, and accurate answer. Always prioritize user safety. If a user describes a critical issue (e.g., smoke, strange noises, brake failure), strongly advise them to stop driving and seek professional help immediately. Keep your answers concise and easy to understand. Do not mention the knowledge base in your answer. Just answer the question.
-  ${knowledgeBase}`;
-
   try {
-    const chat = model.startChat({
-        history: input.conversationHistory.map(msg => ({
-            role: msg.role,
-            parts: [{ text: msg.content }]
-        })),
-        generationConfig: {
-            maxOutputTokens: 1000,
-        },
-    });
+    const history: Message[] = input.conversationHistory.map(msg => ({
+      role: msg.role,
+      content: [{ text: msg.content }]
+    }));
     
-    const result = await chat.sendMessage(input.question);
-    const response = await result.response;
-    const text = response.text();
+    const result = await ai.run(qnaPrompt, { question: input.question }, { history });
 
-    return {answer: text};
+    return {answer: result};
     
   } catch (error) {
     console.error('Error in answerQuestion:', error);

@@ -9,13 +9,44 @@ import {
   AnalyzeDocumentOutput,
   AnalyzeDocumentOutputSchema,
 } from '@/ai/types';
-import { GoogleGenerativeAI, Part } from "@google/genai";
+import { ai } from '@/ai/genkit';
+import { z } from 'zod';
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  throw new Error("GEMINI_API_KEY environment variable not set.");
-}
-const genAI = new GoogleGenerativeAI(apiKey);
+const DocumentAnalysisInputInternalSchema = z.object({
+  prompt: z.string(),
+  textContent: z.string().optional(),
+  documentDataUri: z.string().optional(),
+});
+
+const analysisPrompt = ai.definePrompt(
+  {
+    name: 'documentAnalysis',
+    input: { schema: DocumentAnalysisInputInternalSchema },
+    output: { schema: AnalyzeDocumentOutputSchema },
+    system: `You are an expert data analyst AI. A user has provided a document and a prompt.
+
+Your task is to analyze the document based on their prompt.
+- If it's an image, describe the contents and answer the prompt.
+- If it's text (from a CSV or TXT file), analyze the content to answer the prompt.
+
+Provide a clear, well-structured analysis in Markdown format.
+---`,
+    prompt: `User Prompt: "{{prompt}}"
+
+{{#if textContent}}
+Document Content:
+\`\`\`
+{{textContent}}
+\`\`\`
+{{/if}}
+
+{{#if documentDataUri}}
+{{media url=documentDataUri}}
+{{/if}}
+`,
+  },
+);
+
 
 // Helper function to parse Data URI
 const parseDataUri = (dataUri: string) => {
@@ -36,19 +67,19 @@ export async function analyzeDocument(
     const { mimeType, content } = parseDataUri(input.documentDataUri);
     const buffer = Buffer.from(content, 'base64');
     
-    let parts: Part[] = [];
-    
+    let flowInput: z.infer<typeof DocumentAnalysisInputInternalSchema>;
+
     if (mimeType.startsWith('image/')) {
-        parts = [
-            { inlineData: { mimeType, data: content } },
-            { text: `User Prompt: "${input.prompt}"` },
-        ];
+        flowInput = {
+            prompt: input.prompt,
+            documentDataUri: input.documentDataUri,
+        };
     } else if (mimeType.startsWith('text/')) {
         const textContent = buffer.toString('utf-8');
-        parts = [
-             { text: `Document Content:\n\`\`\`\n${textContent}\n\`\`\`` },
-             { text: `User Prompt: "${input.prompt}"` },
-        ];
+        flowInput = {
+            prompt: input.prompt,
+            textContent: textContent,
+        };
     } else if (mimeType === 'application/pdf') {
         return {
           analysis: `#### Error\nUnsupported file type: PDF processing is temporarily unavailable. Please try a standard image format (JPG, PNG), CSV, or a plain text file (.txt).`,
@@ -59,23 +90,8 @@ export async function analyzeDocument(
         };
     }
     
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
-
-    const systemInstruction = `You are an expert data analyst AI. A user has provided a document and a prompt.
-
-Your task is to analyze the document based on their prompt.
-- If it's an image, describe the contents and answer the prompt.
-- If it's text (from a CSV or TXT file), analyze the content to answer the prompt.
-
-Provide a clear, well-structured analysis in Markdown format.
----
-`;
-
-    const result = await model.generateContent([systemInstruction, ...parts]);
-    const response = await result.response;
-    const analysis = response.text();
-
-    return { analysis };
+    const result = await ai.run(analysisPrompt, flowInput);
+    return result;
 
   } catch (error: any) {
       console.error('Error in document analysis flow:', error);

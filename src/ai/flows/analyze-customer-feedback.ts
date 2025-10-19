@@ -5,41 +5,32 @@
  */
 import {
   AnalyzeCustomerFeedbackInput,
+  AnalyzeCustomerFeedbackInputSchema,
   AnalyzeCustomerFeedbackOutput,
   AnalyzeCustomerFeedbackOutputSchema,
 } from '@/ai/types';
-import { GoogleGenerativeAI } from "@google/genai";
+import { ai } from '@/ai/genkit';
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
-}
-const genAI = new GoogleGenerativeAI(apiKey);
+const analysisPrompt = ai.definePrompt(
+  {
+    name: 'customerFeedbackAnalysis',
+    input: { schema: AnalyzeCustomerFeedbackInputSchema },
+    output: { schema: AnalyzeCustomerFeedbackOutputSchema },
+    prompt: `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements.
+
+Analyze the following customer feedback:
+Feedback: {{feedbackText}}
+
+Output a JSON object that conforms to the schema.`,
+  },
+);
 
 export async function analyzeCustomerFeedback(
   input: AnalyzeCustomerFeedbackInput
 ): Promise<AnalyzeCustomerFeedbackOutput> {
   try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-pro",
-      generationConfig: { responseMimeType: "application/json" },
-    });
-
-    const prompt = `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements.
-
-Analyze the following customer feedback:
-Feedback: ${input.feedbackText}
-
-Output a JSON object that conforms to this schema:
-${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.jsonSchema, null, 2)}
-`;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    const parsed = JSON.parse(text);
-    return AnalyzeCustomerFeedbackOutputSchema.parse(parsed);
-
+    const result = await ai.run(analysisPrompt, input);
+    return result;
   } catch (error) {
     console.error("Error in analyzeCustomerFeedback:", error);
     // Provide a more structured error output

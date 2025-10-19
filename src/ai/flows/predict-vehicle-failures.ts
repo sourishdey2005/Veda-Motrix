@@ -5,44 +5,35 @@
  */
 import {
   PredictVehicleFailureInput,
+  PredictVehicleFailureInputSchema,
   PredictVehicleFailureOutput,
   PredictVehicleFailureOutputSchema,
 } from '@/ai/types';
-import { GoogleGenerativeAI } from "@google/genai";
+import { ai } from '@/ai/genkit';
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
-}
-const genAI = new GoogleGenerativeAI(apiKey);
+const predictionPrompt = ai.definePrompt(
+  {
+    name: 'predictVehicleFailure',
+    input: { schema: PredictVehicleFailureInputSchema },
+    output: { schema: PredictVehicleFailureOutputSchema },
+    prompt: `You are an AI diagnosis agent specializing in predicting vehicle failures.
+Analyze the provided sensor data and maintenance logs for vehicle ID {{vehicleId}} to predict potential failures.
+
+Sensor Data: {{sensorDataJson}}
+Maintenance Logs: {{maintenanceLogs}}
+
+Based on your analysis, predict potential failures, assign a priority (HIGH, MEDIUM, LOW) to each, and suggest actions to mitigate the failures. Include a confidence score (0-1) for each prediction.
+
+Output a JSON object that conforms to the schema.`,
+  },
+);
 
 export async function predictVehicleFailure(
   input: PredictVehicleFailureInput
 ): Promise<PredictVehicleFailureOutput> {
   try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-pro",
-      generationConfig: { responseMimeType: "application/json" },
-    });
-
-    const prompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
-Analyze the provided sensor data and maintenance logs for vehicle ID ${input.vehicleId} to predict potential failures.
-
-Sensor Data: ${input.sensorDataJson}
-Maintenance Logs: ${input.maintenanceLogs}
-
-Based on your analysis, predict potential failures, assign a priority (HIGH, MEDIUM, LOW) to each, and suggest actions to mitigate the failures. Include a confidence score (0-1) for each prediction.
-
-Output a JSON object that conforms to this schema:
-${JSON.stringify(PredictVehicleFailureOutputSchema.jsonSchema, null, 2)}
-`;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    const parsed = JSON.parse(text);
-    return PredictVehicleFailureOutputSchema.parse(parsed);
-
+    const result = await ai.run(predictionPrompt, input);
+    return result;
   } catch (error) {
     console.error("Error in predictVehicleFailure:", error);
     return {
