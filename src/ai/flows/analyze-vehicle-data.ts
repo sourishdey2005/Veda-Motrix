@@ -1,48 +1,72 @@
 
 'use server';
 
-/**
- * @fileOverview An AI agent to analyze vehicle sensor data and detect anomalies.
- */
-import openai from '@/ai/client';
+import {ai} from '@/ai/genkit';
+import {z} from 'zod';
 
-export interface AnalyzeVehicleDataInput {
-  vehicleId: string;
-  sensorData: Record<string, number>;
-  maintenanceLogs: string;
-}
+export const AnalyzeVehicleDataInputSchema = z.object({
+  vehicleId: z.string(),
+  sensorDataJson: z.string(),
+  maintenanceLogs: z.string(),
+});
+export type AnalyzeVehicleDataInput = z.infer<
+  typeof AnalyzeVehicleDataInputSchema
+>;
 
-export interface AnalyzeVehicleDataOutput {
-  anomalies: string[];
-  maintenanceNeeds: string[];
-}
+export const AnalyzeVehicleDataOutputSchema = z.object({
+  anomalies: z.array(z.string()),
+  maintenanceNeeds: z.array(z.string()),
+});
+export type AnalyzeVehicleDataOutput = z.infer<
+  typeof AnalyzeVehicleDataOutputSchema
+>;
 
-export async function analyzeVehicleData(input: AnalyzeVehicleDataInput): Promise<AnalyzeVehicleDataOutput> {
-  const prompt = `You are a master agent responsible for analyzing vehicle sensor data and detecting anomalies.
+const prompt = ai.definePrompt(
+  {
+    name: 'vehicleDataPrompt',
+    input: {schema: AnalyzeVehicleDataInputSchema},
+    output: {schema: AnalyzeVehicleDataOutputSchema},
+    prompt: `You are a master agent responsible for analyzing vehicle sensor data and detecting anomalies.
     You are provided with sensor data, maintenance logs, and the vehicle ID.
     Analyze the sensor data for any anomalies or unusual patterns. Compare the current sensor data with historical data and maintenance logs to identify potential maintenance needs.
 
-    Vehicle ID: ${input.vehicleId}
-    Sensor Data: ${JSON.stringify(input.sensorData, null, 2)}
-    Maintenance Logs: ${input.maintenanceLogs}
+    Vehicle ID: {{{vehicleId}}}
+    Sensor Data: {{{sensorDataJson}}}
+    Maintenance Logs: {{{maintenanceLogs}}}
+  `,
+  },
+  async (input) => {
+    return {
+      model: 'googleai/gemini-1.5-flash',
+      output: {
+        format: 'json',
+      },
+    };
+  }
+);
 
-    Return a JSON object with the following structure: { "anomalies": ["string"], "maintenanceNeeds": ["string"] }.
-  `;
-  
-  try {
-    const completion = await openai.chat.completions.create({
-      model: 'openai/gpt-4o',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
-    });
-
-    const responseJson = completion.choices[0].message?.content;
-    if (!responseJson) {
+export const analyzeVehicleDataFlow = ai.defineFlow(
+  {
+    name: 'analyzeVehicleDataFlow',
+    inputSchema: AnalyzeVehicleDataInputSchema,
+    outputSchema: AnalyzeVehicleDataOutputSchema,
+  },
+  async (input) => {
+    const {output} = await prompt(input);
+    if (!output) {
       throw new Error('AI failed to generate a response.');
     }
-    return JSON.parse(responseJson) as AnalyzeVehicleDataOutput;
-  } catch (error) {
-    console.error('Error in analyzeVehicleData:', error);
-    throw new Error('Failed to analyze vehicle data.');
+    return output;
   }
+);
+
+export async function analyzeVehicleData(input: {
+  vehicleId: string;
+  sensorData: Record<string, number>;
+  maintenanceLogs: string;
+}): Promise<AnalyzeVehicleDataOutput> {
+  return analyzeVehicleDataFlow({
+    ...input,
+    sensorDataJson: JSON.stringify(input.sensorData, null, 2),
+  });
 }

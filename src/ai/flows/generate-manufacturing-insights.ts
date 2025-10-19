@@ -1,44 +1,62 @@
 
 'use server';
 
-/**
- * @fileOverview Manufacturing Insights Agent Flow.
- */
-import openai from '@/ai/client';
+import {ai} from '@/ai/genkit';
+import {z} from 'zod';
 
-export interface GenerateManufacturingInsightsInput {
-  serviceData: string;
-}
+export const GenerateManufacturingInsightsInputSchema = z.object({
+  serviceData: z.string(),
+});
+export type GenerateManufacturingInsightsInput = z.infer<
+  typeof GenerateManufacturingInsightsInputSchema
+>;
 
-export interface GenerateManufacturingInsightsOutput {
-  improvementSuggestions: string;
-}
+export const GenerateManufacturingInsightsOutputSchema = z.object({
+  improvementSuggestions: z.string(),
+});
+export type GenerateManufacturingInsightsOutput = z.infer<
+  typeof GenerateManufacturingInsightsOutputSchema
+>;
+
+const prompt = ai.definePrompt(
+  {
+    name: 'manufacturingInsightsPrompt',
+    input: {schema: GenerateManufacturingInsightsInputSchema},
+    output: {schema: GenerateManufacturingInsightsOutputSchema},
+    prompt: `You are a manufacturing insights expert. Analyze the following service data and generate improvement suggestions for RCA/CAPA.
+
+    Service Data: {{{serviceData}}}
+
+    Provide clear, actionable improvement suggestions.
+  `,
+  },
+  async (input) => {
+    return {
+      model: 'googleai/gemini-1.5-flash',
+      output: {
+        format: 'json',
+      },
+    };
+  }
+);
+
+export const generateManufacturingInsightsFlow = ai.defineFlow(
+  {
+    name: 'generateManufacturingInsightsFlow',
+    inputSchema: GenerateManufacturingInsightsInputSchema,
+    outputSchema: GenerateManufacturingInsightsOutputSchema,
+  },
+  async (input) => {
+    const {output} = await prompt(input);
+    if (!output) {
+      throw new Error('AI failed to generate a response.');
+    }
+    return output;
+  }
+);
 
 export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
 ): Promise<GenerateManufacturingInsightsOutput> {
-  const prompt = `You are a manufacturing insights expert. Analyze the following service data and generate improvement suggestions for RCA/CAPA.
-
-    Service Data: ${input.serviceData}
-
-    Provide clear, actionable improvement suggestions.
-    Return a JSON object with the following structure: { "improvementSuggestions": "string" }.
-  `;
-
-  try {
-    const completion = await openai.chat.completions.create({
-      model: 'openai/gpt-4o',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
-    });
-
-    const responseJson = completion.choices[0].message?.content;
-    if (!responseJson) {
-      throw new Error('AI failed to generate a response.');
-    }
-    return JSON.parse(responseJson) as GenerateManufacturingInsightsOutput;
-  } catch (error) {
-    console.error('Error in generateManufacturingInsights:', error);
-    throw new Error('Failed to generate manufacturing insights.');
-  }
+  return generateManufacturingInsightsFlow(input);
 }

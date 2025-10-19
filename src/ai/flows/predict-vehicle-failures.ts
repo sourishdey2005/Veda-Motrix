@@ -1,54 +1,80 @@
 
 'use server';
 
-/**
- * @fileOverview AI agent for predicting potential vehicle failures and assigning priority levels.
- */
-import openai from '@/ai/client';
+import {ai} from '@/ai/genkit';
+import {z} from 'zod';
 
-export interface PredictVehicleFailureInput {
+export const PredictVehicleFailureInputSchema = z.object({
+  vehicleId: z.string(),
+  sensorDataJson: z.string(),
+  maintenanceLogs: z.string(),
+});
+export type PredictVehicleFailureInput = z.infer<
+  typeof PredictVehicleFailureInputSchema
+>;
+
+export const PredictedFailureSchema = z.object({
+  component: z.string(),
+  failureType: z.string(),
+  priority: z.enum(['HIGH', 'MEDIUM', 'LOW']),
+  confidence: z.number().min(0).max(1),
+  suggestedActions: z.string(),
+});
+export type PredictedFailure = z.infer<typeof PredictedFailureSchema>;
+
+export const PredictVehicleFailureOutputSchema = z.object({
+  predictedFailures: z.array(PredictedFailureSchema),
+});
+export type PredictVehicleFailureOutput = z.infer<
+  typeof PredictVehicleFailureOutputSchema
+>;
+
+const prompt = ai.definePrompt(
+  {
+    name: 'vehicleFailurePrompt',
+    input: {schema: PredictVehicleFailureInputSchema},
+    output: {schema: PredictVehicleFailureOutputSchema},
+    prompt: `You are an AI diagnosis agent specializing in predicting vehicle failures.
+    Analyze the provided sensor data and maintenance logs for vehicle ID {{{vehicleId}}} to predict potential failures.
+
+    Sensor Data: {{{sensorDataJson}}}
+    Maintenance Logs: {{{maintenanceLogs}}}
+
+    Based on your analysis, predict potential failures, assign a priority (HIGH, MEDIUM, LOW) to each, and suggest actions to mitigate the failures. Include a confidence score (0-1) for each prediction.
+  `,
+  },
+  async (input) => {
+    return {
+      model: 'googleai/gemini-1.5-flash',
+      output: {
+        format: 'json',
+      },
+    };
+  }
+);
+
+export const predictVehicleFailureFlow = ai.defineFlow(
+  {
+    name: 'predictVehicleFailureFlow',
+    inputSchema: PredictVehicleFailureInputSchema,
+    outputSchema: PredictVehicleFailureOutputSchema,
+  },
+  async (input) => {
+    const {output} = await prompt(input);
+    if (!output) {
+      throw new Error('AI failed to generate a response.');
+    }
+    return output;
+  }
+);
+
+export async function predictVehicleFailure(input: {
   vehicleId: string;
   sensorData: Record<string, number>;
   maintenanceLogs: string;
-}
-
-export interface PredictedFailure {
-    component: string;
-    failureType: string;
-    priority: 'HIGH' | 'MEDIUM' | 'LOW';
-    confidence: number;
-    suggestedActions: string;
-}
-
-export interface PredictVehicleFailureOutput {
-  predictedFailures: PredictedFailure[];
-}
-
-export async function predictVehicleFailure(input: PredictVehicleFailureInput): Promise<PredictVehicleFailureOutput> {
-  const prompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
-    Analyze the provided sensor data and maintenance logs for vehicle ID ${input.vehicleId} to predict potential failures.
-
-    Sensor Data: ${JSON.stringify(input.sensorData, null, 2)}
-    Maintenance Logs: ${input.maintenanceLogs}
-
-    Based on your analysis, predict potential failures, assign a priority (HIGH, MEDIUM, LOW) to each, and suggest actions to mitigate the failures. Include a confidence score (0-1) for each prediction.
-    Return a JSON object with the following structure: { "predictedFailures": [{ "component": "string", "failureType": "string", "priority": "HIGH" | "MEDIUM" | "LOW", "confidence": number, "suggestedActions": "string" }] }.
-  `;
-
-  try {
-    const completion = await openai.chat.completions.create({
-      model: 'openai/gpt-4o',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
-    });
-
-    const responseJson = completion.choices[0].message?.content;
-    if (!responseJson) {
-      throw new Error('AI failed to generate a response.');
-    }
-    return JSON.parse(responseJson) as PredictVehicleFailureOutput;
-  } catch (error) {
-    console.error('Error in predictVehicleFailure:', error);
-    throw new Error('Failed to predict vehicle failure.');
-  }
+}): Promise<PredictVehicleFailureOutput> {
+  return predictVehicleFailureFlow({
+    ...input,
+    sensorDataJson: JSON.stringify(input.sensorData, null, 2),
+  });
 }
