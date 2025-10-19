@@ -1,46 +1,47 @@
 
 'use server';
-
-import { GoogleGenAI } from "@google/genai";
+/**
+ * @fileoverview A Genkit flow that generates an executive summary from business intelligence data.
+ */
+import {ai} from '@/ai/genkit';
 import {
-  type GenerateExecutiveSummaryInput,
-  type GenerateExecutiveSummaryOutput,
+  GenerateExecutiveSummaryInput,
+  GenerateExecutiveSummaryInputSchema,
+  GenerateExecutiveSummaryOutput,
+  GenerateExecutiveSummaryOutputSchema,
 } from '@/ai/types';
-
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
-}
-const genAI = new GoogleGenAI(apiKey);
+import {z} from 'zod';
 
 export async function generateExecutiveSummary(
   input: GenerateExecutiveSummaryInput
 ): Promise<GenerateExecutiveSummaryOutput> {
-
-  const prompt = `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Your task is to analyze the provided JSON data and generate a clear, concise, and insightful summary for a management audience.
-    Focus on key takeaways, trends, and significant metrics.
-
-    Analyze the following data:
-    ${input.reportData}
-
-    Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
-    
-    Return a JSON object with the following structure:
+  const prompt = ai.definePrompt(
     {
-      "summary": "A concise, well-structured executive summary of the provided data, formatted for a business audience."
-    }`;
+      name: 'executiveSummaryPrompt',
+      input: {schema: GenerateExecutiveSummaryInputSchema},
+      output: {schema: GenerateExecutiveSummaryOutputSchema},
+      prompt: `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Your task is to analyze the provided JSON data and generate a clear, concise, and insightful summary for a management audience.
+Focus on key takeaways, trends, and significant metrics.
 
-  try {
-    const result = await genAI.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json" },
-    });
-    const response = result.response;
-    const jsonString = response.text();
-    return JSON.parse(jsonString) as GenerateExecutiveSummaryOutput;
-  } catch (error) {
-    console.error("Error generating executive summary:", error);
-    throw new Error("Failed to generate executive summary.");
-  }
+Analyze the following data:
+{{reportData}}
+
+Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
+`,
+    },
+    async input => {
+      const {output} = await ai.generate({
+        prompt: input,
+        model: 'googleai/gemini-1.5-flash',
+        config: {
+          output: {
+            format: 'json',
+            schema: GenerateExecutiveSummaryOutputSchema,
+          },
+        },
+      });
+      return output!;
+    }
+  );
+  return prompt(input);
 }

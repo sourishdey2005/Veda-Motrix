@@ -1,4 +1,5 @@
 
+'use server';
 import {z} from 'zod';
 
 // analyze-customer-feedback
@@ -30,7 +31,7 @@ export type AnalyzeCustomerFeedbackOutput = z.infer<
 
 // analyze-document
 export const AnalyzeDocumentInputSchema = z.object({
-  documentDataUri: z.string(),
+  documentDataUri: z.string().describe("A data URI of the document to analyze. Must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
   prompt: z.string(),
 });
 export type AnalyzeDocumentInput = z.infer<typeof AnalyzeDocumentInputSchema>;
@@ -132,7 +133,7 @@ export type HandleCustomerEnquiryOutput = z.infer<
 export const PredictVehicleFailureInputSchema = z.object({
   vehicleId: z.string(),
   sensorDataJson: z.string(),
-  maintenanceLogs: z.string(),
+  maintenanceLogs: z-string(),
 });
 export type PredictVehicleFailureInput = z.infer<
   typeof PredictVehicleFailureInputSchema

@@ -1,56 +1,47 @@
 
 'use server';
-
-import { GoogleGenAI } from "@google/genai";
+/**
+ * @fileoverview A Genkit flow that predicts vehicle failures from sensor data and maintenance logs.
+ */
+import {ai} from '@/ai/genkit';
 import {
-  type PredictVehicleFailureInput,
-  type PredictVehicleFailureOutput,
-  PredictedFailureSchema,
+  PredictVehicleFailureInput,
+  PredictVehicleFailureInputSchema,
+  PredictVehicleFailureOutput,
+  PredictVehicleFailureOutputSchema,
 } from '@/ai/types';
-
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
-}
-const genAI = new GoogleGenAI(apiKey);
-
+import {z} from 'zod';
 
 export async function predictVehicleFailure(
   input: PredictVehicleFailureInput
 ): Promise<PredictVehicleFailureOutput> {
-
-    const prompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
-    Analyze the provided sensor data and maintenance logs for vehicle ID ${input.vehicleId} to predict potential failures.
-
-    Sensor Data: ${input.sensorDataJson}
-    Maintenance Logs: ${input.maintenanceLogs}
-
-    Based on your analysis, predict potential failures, assign a priority (HIGH, MEDIUM, LOW) to each, and suggest actions to mitigate the failures. Include a confidence score (0-1) for each prediction.
-
-    Return a JSON object with the following structure:
+  const prompt = ai.definePrompt(
     {
-      "predictedFailures": [
-        {
-          "component": "string",
-          "failureType": "string",
-          "priority": "HIGH" | "MEDIUM" | "LOW",
-          "confidence": number (0-1),
-          "suggestedActions": "string"
-        }
-      ]
-    }`;
+      name: 'vehicleFailurePrompt',
+      input: {schema: PredictVehicleFailureInputSchema},
+      output: {schema: PredictVehicleFailureOutputSchema},
+      prompt: `You are an AI diagnosis agent specializing in predicting vehicle failures.
+Analyze the provided sensor data and maintenance logs for vehicle ID {{vehicleId}} to predict potential failures.
 
-  try {
-    const result = await genAI.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json" },
-    });
-    const response = result.response;
-    const jsonString = response.text();
-    return JSON.parse(jsonString) as PredictVehicleFailureOutput;
-  } catch (error) {
-    console.error("Error predicting vehicle failure:", error);
-    throw new Error("Failed to predict vehicle failure.");
-  }
+Sensor Data: {{sensorDataJson}}
+Maintenance Logs: {{maintenanceLogs}}
+
+Based on your analysis, predict potential failures, assign a priority (HIGH, MEDIUM, LOW) to each, and suggest actions to mitigate the failures. Include a confidence score (0-1) for each prediction.
+`,
+    },
+    async input => {
+      const {output} = await ai.generate({
+        prompt: input,
+        model: 'googleai/gemini-1.5-flash',
+        config: {
+          output: {
+            format: 'json',
+            schema: PredictVehicleFailureOutputSchema,
+          },
+        },
+      });
+      return output!;
+    }
+  );
+  return prompt(input);
 }

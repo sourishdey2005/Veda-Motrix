@@ -1,45 +1,47 @@
 
 'use server';
-
-import { GoogleGenAI } from "@google/genai";
+/**
+ * @fileoverview A Genkit flow that analyzes vehicle sensor data for anomalies and maintenance needs.
+ */
+import {ai} from '@/ai/genkit';
 import {
-  type AnalyzeVehicleDataInput,
-  type AnalyzeVehicleDataOutput,
+  AnalyzeVehicleDataInput,
+  AnalyzeVehicleDataInputSchema,
+  AnalyzeVehicleDataOutput,
+  AnalyzeVehicleDataOutputSchema,
 } from '@/ai/types';
+import {z} from 'zod';
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
-}
-const genAI = new GoogleGenAI(apiKey);
-
-export async function analyzeVehicleData(input: AnalyzeVehicleDataInput): Promise<AnalyzeVehicleDataOutput> {
-
-    const prompt = `You are a master agent responsible for analyzing vehicle sensor data and detecting anomalies.
-    You are provided with sensor data, maintenance logs, and the vehicle ID.
-    Analyze the sensor data for any anomalies or unusual patterns. Compare the current sensor data with historical data and maintenance logs to identify potential maintenance needs.
-
-    Vehicle ID: ${input.vehicleId}
-    Sensor Data: ${input.sensorDataJson}
-    Maintenance Logs: ${input.maintenanceLogs}
-    
-    Return a JSON object with the following structure:
+export async function analyzeVehicleData(
+  input: AnalyzeVehicleDataInput
+): Promise<AnalyzeVehicleDataOutput> {
+  const prompt = ai.definePrompt(
     {
-      "anomalies": ["list of detected anomalies"],
-      "maintenanceNeeds": ["list of potential maintenance needs"]
-    }`;
+      name: 'vehicleDataPrompt',
+      input: {schema: AnalyzeVehicleDataInputSchema},
+      output: {schema: AnalyzeVehicleDataOutputSchema},
+      prompt: `You are a master agent responsible for analyzing vehicle sensor data and detecting anomalies.
+You are provided with sensor data, maintenance logs, and the vehicle ID.
+Analyze the sensor data for any anomalies or unusual patterns. Compare the current sensor data with historical data and maintenance logs to identify potential maintenance needs.
 
-  try {
-    const result = await genAI.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json" },
-    });
-    const response = result.response;
-    const jsonString = response.text();
-    return JSON.parse(jsonString) as AnalyzeVehicleDataOutput;
-  } catch (error) {
-    console.error("Error analyzing vehicle data:", error);
-    throw new Error("Failed to analyze vehicle data.");
-  }
+Vehicle ID: {{vehicleId}}
+Sensor Data: {{sensorDataJson}}
+Maintenance Logs: {{maintenanceLogs}}
+`,
+    },
+    async input => {
+      const {output} = await ai.generate({
+        prompt: input,
+        model: 'googleai/gemini-1.5-flash',
+        config: {
+          output: {
+            format: 'json',
+            schema: AnalyzeVehicleDataOutputSchema,
+          },
+        },
+      });
+      return output!;
+    }
+  );
+  return prompt(input);
 }

@@ -155,7 +155,9 @@ export function DocumentAnalysisView() {
             </div>
           )}
           {analysisResult ? (
-            <MarkdownRenderer content={analysisResult} />
+            <div className="p-4 bg-muted rounded-lg h-full min-h-[300px] overflow-y-auto">
+              <MarkdownRenderer content={analysisResult} />
+            </div>
           ) : (
             !isLoading && <p className="text-sm text-muted-foreground text-center h-64 flex items-center justify-center">Awaiting analysis...</p>
           )}

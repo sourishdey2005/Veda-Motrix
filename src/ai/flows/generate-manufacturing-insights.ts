@@ -1,44 +1,45 @@
 
 'use server';
-
-import { GoogleGenAI } from "@google/genai";
+/**
+ * @fileoverview A Genkit flow that generates manufacturing insights from service data.
+ */
+import {ai} from '@/ai/genkit';
 import {
-  type GenerateManufacturingInsightsInput,
-  type GenerateManufacturingInsightsOutput,
+  GenerateManufacturingInsightsInput,
+  GenerateManufacturingInsightsInputSchema,
+  GenerateManufacturingInsightsOutput,
+  GenerateManufacturingInsightsOutputSchema,
 } from '@/ai/types';
-
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
-}
-const genAI = new GoogleGenAI(apiKey);
+import {z} from 'zod';
 
 export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
 ): Promise<GenerateManufacturingInsightsOutput> {
-
-  const prompt = `You are a manufacturing insights expert. Analyze the following service data and generate improvement suggestions for RCA/CAPA.
-
-    Service Data: ${input.serviceData}
-
-    Provide clear, actionable improvement suggestions.
-    
-    Return a JSON object with the following structure:
+  const prompt = ai.definePrompt(
     {
-      "improvementSuggestions": "string"
-    }`;
+      name: 'manufacturingInsightsPrompt',
+      input: {schema: GenerateManufacturingInsightsInputSchema},
+      output: {schema: GenerateManufacturingInsightsOutputSchema},
+      prompt: `You are a manufacturing insights expert. Analyze the following service data and generate improvement suggestions for RCA/CAPA.
 
-  try {
-    const result = await genAI.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json" },
-    });
-    const response = result.response;
-    const jsonString = response.text();
-    return JSON.parse(jsonString) as GenerateManufacturingInsightsOutput;
-  } catch (error) {
-    console.error("Error generating manufacturing insights:", error);
-    throw new Error("Failed to generate manufacturing insights.");
-  }
+Service Data: {{serviceData}}
+
+Provide clear, actionable improvement suggestions.
+`,
+    },
+async input => {
+      const {output} = await ai.generate({
+        prompt: input,
+        model: 'googleai/gemini-1.5-flash',
+        config: {
+          output: {
+            format: 'json',
+            schema: GenerateManufacturingInsightsOutputSchema,
+          },
+        },
+      });
+      return output!;
+    }
+  );
+  return prompt(input);
 }
