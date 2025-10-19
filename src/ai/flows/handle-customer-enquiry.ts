@@ -8,7 +8,6 @@ import {
   HandleCustomerEnquiryOutput,
 } from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
-import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 export async function handleCustomerEnquiry(
   input: HandleCustomerEnquiryInput
@@ -31,8 +30,8 @@ Owner: [Owner's reply]
 Provide the final conversation script as a single block of text.
 `;
 
-    const messages: ChatCompletionMessageParam[] = [
-      {role: 'user', content: userPrompt},
+    const messages = [
+      {role: 'user' as const, content: userPrompt},
     ];
 
     const conversationSummary = await openAiClient(messages);

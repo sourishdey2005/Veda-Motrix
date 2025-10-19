@@ -8,7 +8,6 @@ import {
   GenerateManufacturingInsightsOutput,
 } from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
-import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
@@ -19,8 +18,8 @@ export async function generateManufacturingInsights(
 Service Data: ${input.serviceData}
 `;
 
-    const messages: ChatCompletionMessageParam[] = [
-      {role: 'user', content: userPrompt},
+    const messages = [
+      {role: 'user' as const, content: userPrompt},
     ];
 
     const improvementSuggestions = await openAiClient(messages);

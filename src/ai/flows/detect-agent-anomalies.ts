@@ -9,7 +9,7 @@ import {
   DetectAgentAnomaliesOutputSchema,
 } from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
-import {ChatCompletionMessageParam} from 'openai/resources/chat';
+import {z} from 'zod';
 
 export async function detectAgentAnomalies(
   input: DetectAgentAnomaliesInput
@@ -17,7 +17,11 @@ export async function detectAgentAnomalies(
   try {
     const systemPrompt = `You are a UEBA (User and Entity Behavior Analytics) security agent. Analyze the provided agent actions and determine if the behavior is anomalous.
 Respond with a JSON object that strictly follows this Zod schema, providing a boolean for isAnomalous, a score from 0.0 to 1.0, and a brief explanation:
-${JSON.stringify(DetectAgentAnomaliesOutputSchema.shape, null, 2)}
+${JSON.stringify(
+  DetectAgentAnomaliesOutputSchema.describe(),
+  null,
+  2
+)}
 `;
 
     const userPrompt = `Analyze based on an anomaly threshold of ${
@@ -29,9 +33,9 @@ Agent Actions:
 ${input.agentActions.map((action) => `- ${action}`).join('\n')}
 `;
 
-    const messages: ChatCompletionMessageParam[] = [
-      {role: 'system', content: systemPrompt},
-      {role: 'user', content: userPrompt},
+    const messages = [
+      {role: 'system' as const, content: systemPrompt},
+      {role: 'user' as const, content: userPrompt},
     ];
 
     const rawResponse = await openAiClient(messages, true);

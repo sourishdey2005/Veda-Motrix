@@ -5,7 +5,6 @@
  */
 import {AnalyzeDocumentInput, AnalyzeDocumentOutput} from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
-import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 const CHUNK_SIZE = 16000; // Max characters per chunk, safely below token limit
 
@@ -41,8 +40,8 @@ ${chunk}
 \`\`\`
 `;
 
-  const messages: ChatCompletionMessageParam[] = [
-    {role: 'system', content: systemPrompt},
+  const messages = [
+    {role: 'system' as const, content: systemPrompt},
   ];
   return openAiClient(messages);
 }
@@ -62,8 +61,8 @@ ${summaries.join('\n\n---\n\n')}
 
 Based on these summaries, provide a clear, well-structured, and final analysis in Markdown format that answers the user's prompt. Do not mention the chunking or summarization process in your final output.
 `;
-  const messages: ChatCompletionMessageParam[] = [
-    {role: 'user', content: userPrompt},
+  const messages = [
+    {role: 'user' as const, content: userPrompt},
   ];
   const rawResponse = await openAiClient(messages);
   return rawResponse;
@@ -83,9 +82,9 @@ export async function analyzeDocument(
     let analysis: string;
 
     if (mimeType.startsWith('image/')) {
-      const messages: ChatCompletionMessageParam[] = [
+      const messages = [
         {
-          role: 'user',
+          role: 'user' as const,
           content: [
             {
               type: 'text',
@@ -117,8 +116,8 @@ Document Content:
 ${documentContent}
 \`\`\`
 `;
-        const messages: ChatCompletionMessageParam[] = [
-          {role: 'user', content: userPrompt},
+        const messages = [
+          {role: 'user' as const, content: userPrompt},
         ];
         analysis = await openAiClient(messages);
       } else {
@@ -148,20 +147,14 @@ ${documentContent}
   } catch (error: any) {
     console.error('Error in document analysis flow:', error);
     let errorMessage = `An unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${error.message}`;
-    if (error.response?.data?.error?.message) {
-      errorMessage = error.response.data.error.message;
-    } else if (error.message) {
-      errorMessage = error.message;
+    if (error.message?.includes('429')) {
+      errorMessage = `The document analysis process is being rate-limited by the AI provider. Please wait a moment and try again.\n\nDetails: ${error.message}`;
     }
-    
-    if (errorMessage.includes('429')) {
-      errorMessage = `The document analysis process is being rate-limited by the AI provider. Please wait a moment and try again.\n\nDetails: ${errorMessage}`;
-    }
-    if (errorMessage.includes('Invalid data URI')) {
+    if (error.message?.includes('Invalid data URI')) {
       errorMessage = 'The uploaded file could not be read. It might be corrupted or in a format the system cannot process.';
     }
-    if (errorMessage.includes('context length')) {
-      errorMessage = `The document is too large to be analyzed, even after attempting to split it into smaller parts. Please try with a smaller document. \n\nDetails: ${errorMessage}`;
+    if (error.message?.includes('context length')) {
+      errorMessage = `The document is too large to be analyzed, even after attempting to split it into smaller parts. Please try with a smaller document. \n\nDetails: ${error.message}`;
     }
     return {
       analysis: `#### Error\n${errorMessage}`,

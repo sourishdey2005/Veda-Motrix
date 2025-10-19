@@ -9,7 +9,7 @@ import {
   PredictVehicleFailureOutputSchema,
 } from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
-import {ChatCompletionMessageParam} from 'openai/resources/chat';
+import {z} from 'zod';
 
 export async function predictVehicleFailure(
   input: PredictVehicleFailureInput
@@ -20,7 +20,7 @@ Analyze the provided sensor data and maintenance logs to predict up to 3 potenti
 
 Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
 ${JSON.stringify(
-  {predictedFailures: PredictVehicleFailureOutputSchema.shape.predictedFailures},
+  PredictVehicleFailureOutputSchema.describe(),
   null,
   2
 )}
@@ -31,9 +31,9 @@ Sensor Data (JSON): ${input.sensorDataJson}
 Maintenance Logs: ${input.maintenanceLogs}
 `;
 
-    const messages: ChatCompletionMessageParam[] = [
-      {role: 'system', content: systemPrompt},
-      {role: 'user', content: userPrompt},
+    const messages = [
+      {role: 'system' as const, content: systemPrompt},
+      {role: 'user' as const, content: userPrompt},
     ];
 
     const rawResponse = await openAiClient(messages, true);

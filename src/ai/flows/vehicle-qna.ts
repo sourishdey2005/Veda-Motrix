@@ -6,7 +6,6 @@
 import {qnaData} from '@/lib/chatbot-qna';
 import {AnswerQuestionInput, AnswerQuestionOutput, Message} from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
-import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 export async function answerQuestion(
   input: AnswerQuestionInput
@@ -30,11 +29,11 @@ ${qnaData
 ---
 `;
 
-    const messages: ChatCompletionMessageParam[] = [
-      {role: 'system', content: systemPrompt},
+    const messages = [
+      {role: 'system' as const, content: systemPrompt},
       // Assuming input.conversationHistory is compatible with ChatCompletionMessageParam
-      ...(input.conversationHistory as ChatCompletionMessageParam[]),
-      {role: 'user', content: input.question},
+      ...input.conversationHistory.map(m => ({role: m.role as 'user' | 'assistant', content: m.content})),
+      {role: 'user' as const, content: input.question},
     ];
 
     const answer = await openAiClient(messages);

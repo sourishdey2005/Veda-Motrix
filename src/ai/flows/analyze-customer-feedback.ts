@@ -9,7 +9,7 @@ import {
   AnalyzeCustomerFeedbackOutputSchema,
 } from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
-import {ChatCompletionMessageParam} from 'openai/resources/chat';
+import {z} from 'zod';
 
 export async function analyzeCustomerFeedback(
   input: AnalyzeCustomerFeedbackInput
@@ -17,15 +17,19 @@ export async function analyzeCustomerFeedback(
   try {
     const systemPrompt = `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements.
 Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
-${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.shape, null, 2)}
+${JSON.stringify(
+  AnalyzeCustomerFeedbackOutputSchema.describe(),
+  null,
+  2
+)}
 `;
 
     const userPrompt = `Analyze the following customer feedback:
 Feedback: "${input.feedbackText}"`;
 
-    const messages: ChatCompletionMessageParam[] = [
-      {role: 'system', content: systemPrompt},
-      {role: 'user', content: userPrompt},
+    const messages = [
+      {role: 'system' as const, content: systemPrompt},
+      {role: 'user' as const, content: userPrompt},
     ];
 
     const rawResponse = await openAiClient(messages, true); // Enable JSON mode

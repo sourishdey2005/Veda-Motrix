@@ -9,7 +9,7 @@ import {
   AnalyzeVehicleDataOutputSchema,
 } from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
-import {ChatCompletionMessageParam} from 'openai/resources/chat';
+import {z} from 'zod';
 
 export async function analyzeVehicleData(
   input: AnalyzeVehicleDataInput
@@ -17,7 +17,11 @@ export async function analyzeVehicleData(
   try {
     const systemPrompt = `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs.
 Respond with a JSON object that strictly follows this Zod schema. Do not include any extra text or formatting outside of the JSON object itself:
-${JSON.stringify(AnalyzeVehicleDataOutputSchema.shape, null, 2)}
+${JSON.stringify(
+  AnalyzeVehicleDataOutputSchema.describe(),
+  null,
+  2
+)}
 
 Your response should contain a list of detected anomalies and a list of suggested maintenance needs. If none are found, return empty arrays.
 `;
@@ -29,9 +33,9 @@ Sensor Data (JSON): ${input.sensorDataJson}
 Maintenance Logs: ${input.maintenanceLogs}
 `;
 
-    const messages: ChatCompletionMessageParam[] = [
-      {role: 'system', content: systemPrompt},
-      {role: 'user', content: userPrompt},
+    const messages = [
+      {role: 'system' as const, content: systemPrompt},
+      {role: 'user' as const, content: userPrompt},
     ];
 
     const rawResponse = await openAiClient(messages, true);

@@ -8,7 +8,6 @@ import {
   GenerateExecutiveSummaryOutput,
 } from '@/ai/types';
 import {openAiClient} from '@/ai/genkit';
-import {ChatCompletionMessageParam} from 'openai/resources/chat';
 
 export async function generateExecutiveSummary(
   input: GenerateExecutiveSummaryInput
@@ -23,8 +22,8 @@ ${input.reportData}
 Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).
 `;
 
-    const messages: ChatCompletionMessageParam[] = [
-      {role: 'user', content: userPrompt},
+    const messages = [
+      {role: 'user' as const, content: userPrompt},
     ];
 
     const summary = await openAiClient(messages);

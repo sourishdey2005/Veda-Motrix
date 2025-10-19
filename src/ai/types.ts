@@ -23,7 +23,7 @@ export const AnalyzeCustomerFeedbackOutputSchema = z.object({
   suggestions: z
     .string()
     .describe('Suggestions for improvement based on the customer feedback.'),
-});
+}).describe('Schema for the output of the customer feedback analysis AI agent.');
 export type AnalyzeCustomerFeedbackOutput = z.infer<
   typeof AnalyzeCustomerFeedbackOutputSchema
 >;
@@ -53,7 +53,7 @@ export type AnalyzeVehicleDataInput = z.infer<
 export const AnalyzeVehicleDataOutputSchema = z.object({
   anomalies: z.array(z.string()),
   maintenanceNeeds: z.array(z.string()),
-});
+}).describe('Schema for the output of the vehicle data analysis AI agent.');
 export type AnalyzeVehicleDataOutput = z.infer<
   typeof AnalyzeVehicleDataOutputSchema
 >;
@@ -72,7 +72,7 @@ export const DetectAgentAnomaliesOutputSchema = z.object({
   isAnomalous: z.boolean(),
   anomalyScore: z.number(),
   explanation: z.string(),
-});
+}).describe('Schema for the output of the agent anomaly detection AI agent.');
 export type DetectAgentAnomaliesOutput = z.infer<
   typeof DetectAgentAnomaliesOutputSchema
 >;
@@ -149,14 +149,14 @@ export type PredictedFailure = z.infer<typeof PredictedFailureSchema>;
 
 export const PredictVehicleFailureOutputSchema = z.object({
   predictedFailures: z.array(PredictedFailureSchema),
-});
+}).describe('Schema for the output of the vehicle failure prediction AI agent.');
 export type PredictVehicleFailureOutput = z.infer<
   typeof PredictVehicleFailureOutputSchema
 >;
 
 // vehicle-qna
 const MessageSchema = z.object({
-  role: z.enum(['user', 'assistant']),
+  role: z.enum(['user', 'assistant', 'model']),
   content: z.string(),
 });
 export type Message = z.infer<typeof MessageSchema>;
