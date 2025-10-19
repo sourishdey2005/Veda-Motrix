@@ -12,6 +12,7 @@ import {
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
 import { Message } from "genkit";
+import { z } from 'zod';
 
 const localSearch = (question: string): string | null => {
   const userQuestion = question.toLowerCase().trim();
@@ -41,24 +42,32 @@ ${qnaData
   },
 );
 
-
-export async function answerQuestion(
-  input: AnswerQuestionInput
-): Promise<AnswerQuestionOutput> {
-  const localAnswer = localSearch(input.question);
-  if (localAnswer) {
-    return {answer: localAnswer};
-  }
-  
-  try {
-    const history: Message[] = input.conversationHistory.map(msg => ({
+const qnaFlow = ai.defineFlow({
+    name: 'qnaFlow',
+    inputSchema: AnswerQuestionInputSchema,
+    outputSchema: AnswerQuestionOutputSchema,
+}, async ({ question, conversationHistory }) => {
+    const localAnswer = localSearch(question);
+    if (localAnswer) {
+      return { answer: localAnswer };
+    }
+    const history: Message[] = conversationHistory.map(msg => ({
       role: msg.role,
       content: [{ text: msg.content }]
     }));
     
-    const result = await ai.run(qnaPrompt, { question: input.question }, { history });
+    const result = await qnaPrompt({ question }, { history });
 
-    return {answer: result};
+    return { answer: result };
+});
+
+
+export async function answerQuestion(
+  input: AnswerQuestionInput
+): Promise<AnswerQuestionOutput> {
+  try {
+    const result = await qnaFlow(input);
+    return result;
     
   } catch (error) {
     console.error('Error in answerQuestion:', error);

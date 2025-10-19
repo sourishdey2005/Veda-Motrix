@@ -28,11 +28,21 @@ Output a JSON object that conforms to the schema.`,
   },
 );
 
+const summaryFlow = ai.defineFlow({
+    name: 'summaryFlow',
+    inputSchema: GenerateExecutiveSummaryInputSchema,
+    outputSchema: GenerateExecutiveSummaryOutputSchema,
+}, async (input) => {
+    const result = await summaryPrompt(input);
+    return result;
+});
+
+
 export async function generateExecutiveSummary(
   input: GenerateExecutiveSummaryInput
 ): Promise<GenerateExecutiveSummaryOutput> {
   try {
-    const result = await ai.run(summaryPrompt, input);
+    const result = await summaryFlow(input);
     return result;
   } catch (error) {
     console.error("Error in generateExecutiveSummary:", error);

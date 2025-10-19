@@ -47,6 +47,15 @@ Document Content:
   },
 );
 
+const documentAnalysisFlow = ai.defineFlow({
+    name: 'documentAnalysisFlow',
+    inputSchema: DocumentAnalysisInputInternalSchema,
+    outputSchema: AnalyzeDocumentOutputSchema,
+}, async (input) => {
+    const result = await analysisPrompt(input);
+    return result;
+});
+
 
 // Helper function to parse Data URI
 const parseDataUri = (dataUri: string) => {
@@ -90,7 +99,7 @@ export async function analyzeDocument(
         };
     }
     
-    const result = await ai.run(analysisPrompt, flowInput);
+    const result = await documentAnalysisFlow(flowInput);
     return result;
 
   } catch (error: any) {

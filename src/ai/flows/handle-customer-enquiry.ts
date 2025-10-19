@@ -34,11 +34,21 @@ Output a JSON object that conforms to the schema.`,
   },
 );
 
+const enquiryFlow = ai.defineFlow({
+    name: 'enquiryFlow',
+    inputSchema: HandleCustomerEnquiryInputSchema,
+    outputSchema: HandleCustomerEnquiryOutputSchema,
+}, async (input) => {
+    const result = await enquiryPrompt(input);
+    return result;
+});
+
+
 export async function handleCustomerEnquiry(
   input: HandleCustomerEnquiryInput
 ): Promise<HandleCustomerEnquiryOutput> {
   try {
-    const result = await ai.run(enquiryPrompt, input);
+    const result = await enquiryFlow(input);
     return result;
   } catch (error) {
     console.error("Error in handleCustomerEnquiry:", error);

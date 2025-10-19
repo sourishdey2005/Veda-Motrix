@@ -26,11 +26,20 @@ Output a JSON object that conforms to the schema.`,
   },
 );
 
+const insightsFlow = ai.defineFlow({
+    name: 'insightsFlow',
+    inputSchema: GenerateManufacturingInsightsInputSchema,
+    outputSchema: GenerateManufacturingInsightsOutputSchema,
+}, async (input) => {
+    const result = await insightsPrompt(input);
+    return result;
+});
+
 export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
 ): Promise<GenerateManufacturingInsightsOutput> {
   try {
-    const result = await ai.run(insightsPrompt, input);
+    const result = await insightsFlow(input);
     return result;
   } catch (error) {
     console.error("Error in generateManufacturingInsights:", error);

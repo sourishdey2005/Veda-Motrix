@@ -25,11 +25,24 @@ Output a JSON object that conforms to the schema.`,
   },
 );
 
+const analysisFlow = ai.defineFlow(
+  {
+    name: 'analysisFlow',
+    inputSchema: AnalyzeCustomerFeedbackInputSchema,
+    outputSchema: AnalyzeCustomerFeedbackOutputSchema,
+  },
+  async (input) => {
+    const result = await analysisPrompt(input);
+    return result;
+  }
+);
+
+
 export async function analyzeCustomerFeedback(
   input: AnalyzeCustomerFeedbackInput
 ): Promise<AnalyzeCustomerFeedbackOutput> {
   try {
-    const result = await ai.run(analysisPrompt, input);
+    const result = await analysisFlow(input);
     return result;
   } catch (error) {
     console.error("Error in analyzeCustomerFeedback:", error);

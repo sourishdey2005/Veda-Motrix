@@ -28,11 +28,21 @@ Output a JSON object that conforms to the schema.`,
   },
 );
 
+const predictionFlow = ai.defineFlow({
+    name: 'predictionFlow',
+    inputSchema: PredictVehicleFailureInputSchema,
+    outputSchema: PredictVehicleFailureOutputSchema,
+}, async (input) => {
+    const result = await predictionPrompt(input);
+    return result;
+});
+
+
 export async function predictVehicleFailure(
   input: PredictVehicleFailureInput
 ): Promise<PredictVehicleFailureOutput> {
   try {
-    const result = await ai.run(predictionPrompt, input);
+    const result = await predictionFlow(input);
     return result;
   } catch (error) {
     console.error("Error in predictVehicleFailure:", error);

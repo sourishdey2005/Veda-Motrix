@@ -10,7 +10,6 @@ import {
   DetectAgentAnomaliesOutputSchema,
 } from '@/ai/types';
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
 
 const detectAnomaliesPrompt = ai.definePrompt(
   {
@@ -35,12 +34,21 @@ Output a JSON object that conforms to the schema.`,
   },
 );
 
+const detectAnomaliesFlow = ai.defineFlow({
+    name: 'detectAnomaliesFlow',
+    inputSchema: DetectAgentAnomaliesInputSchema,
+    outputSchema: DetectAgentAnomaliesOutputSchema,
+}, async (input) => {
+    const result = await detectAnomaliesPrompt(input);
+    return result;
+});
+
 
 export async function detectAgentAnomalies(
   input: DetectAgentAnomaliesInput
 ): Promise<DetectAgentAnomaliesOutput> {
   try {
-    const result = await ai.run(detectAnomaliesPrompt, input);
+    const result = await detectAnomaliesFlow(input);
     return result;
   } catch (error) {
     console.error("Error in detectAgentAnomalies:", error);
