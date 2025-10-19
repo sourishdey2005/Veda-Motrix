@@ -28,7 +28,7 @@ export async function openAiClient(
 ): Promise<string> {
   try {
     const completion = await openai.chat.completions.create({
-      model: 'deepseek/deepseek-chat-v3.1:free',
+      model: 'mistralai/mistral-7b-instruct:free',
       messages: messages,
       response_format: isJsonMode ? {type: 'json_object'} : {type: 'text'},
     });
