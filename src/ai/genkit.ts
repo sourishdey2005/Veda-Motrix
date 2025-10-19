@@ -42,7 +42,8 @@ export async function geminiClient(
     imageDataUri?: string
 ): Promise<string> {
     try {
-        const modelName = 'gemini-1.5-flash'; // Corrected stable model name
+        const isVision = !!imageDataUri;
+        const modelName = isVision ? 'gemini-pro-vision' : 'gemini-pro';
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
 
         const userParts: Part[] = [{ text: prompt }];
@@ -91,6 +92,11 @@ export async function geminiClient(
         
         if (data.candidates && data.candidates.length > 0 && data.candidates[0].content.parts.length > 0) {
             return data.candidates[0].content.parts[0].text;
+        }
+
+        // Handle cases where the model might return no content (e.g., safety blocks)
+        if (data.candidates && data.candidates.length > 0) {
+            return "The model returned a response with no text content.";
         }
 
         throw new Error('No response content returned from the API.');
