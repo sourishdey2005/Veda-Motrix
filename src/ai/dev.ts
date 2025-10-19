@@ -1,3 +1,6 @@
+import { initGenkit } from '@/ai/client';
+initGenkit();
+
 import '@/ai/flows/analyze-vehicle-data.ts';
 import '@/ai/flows/predict-vehicle-failures.ts';
 import '@/ai/flows/handle-customer-enquiry.ts';
