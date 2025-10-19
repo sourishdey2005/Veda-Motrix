@@ -20,8 +20,10 @@ export async function openAiClient(
   isJsonMode: boolean = false
 ): Promise<string> {
   try {
+    const isVisionRequest = messages.some(m => Array.isArray(m.content) && m.content.some(c => c.type === 'image_url'));
+
     const body = {
-      model: 'openai/gpt-4o-mini:free',
+      model: isVisionRequest ? 'openai/gpt-4o-mini:free' : 'mistralai/mistral-7b-instruct:free',
       messages: messages,
       response_format: isJsonMode ? { type: 'json_object' } : { type: 'text' },
     };

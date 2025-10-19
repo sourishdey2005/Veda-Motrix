@@ -137,6 +137,8 @@ ${documentContent}
             chunks.length
           );
           summaries.push(summary);
+          // Add a small delay to be respectful of free-tier rate limits
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
         
         analysis = await synthesizeSummaries(summaries, input.prompt);
