@@ -20,7 +20,7 @@ const customerFeedbackFlow = ai.defineFlow(
   },
   async (input: AnalyzeCustomerFeedbackInput) => {
     const llmResponse = await ai.generate({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-pro',
       prompt: `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements. Analyze the following customer feedback: "${input.feedbackText}"`,
       output: {
         schema: AnalyzeCustomerFeedbackOutputSchema,

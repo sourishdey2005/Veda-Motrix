@@ -20,7 +20,7 @@ const executiveSummaryFlow = ai.defineFlow(
   },
   async (input: GenerateExecutiveSummaryInput) => {
     const llmResponse = await ai.generate({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-pro',
       prompt: `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Analyze the provided JSON data and generate a clear, concise, and insightful summary in plain text for a management audience.
 Focus on key takeaways, trends, and significant metrics.
 

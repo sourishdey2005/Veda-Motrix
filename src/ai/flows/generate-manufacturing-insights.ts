@@ -20,7 +20,7 @@ const manufacturingInsightsFlow = ai.defineFlow(
   },
   async (input: GenerateManufacturingInsightsInput) => {
     const llmResponse = await ai.generate({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-pro',
       prompt: `You are a manufacturing insights expert. Analyze the following service data and generate clear, actionable improvement suggestions for RCA/CAPA.
 
 Service Data: ${input.serviceData}`,

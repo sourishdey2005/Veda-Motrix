@@ -42,7 +42,7 @@ ${qnaData
 `;
 
     const llmResponse = await ai.generate({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-pro',
       history: history,
       prompt: input.question,
       config: {

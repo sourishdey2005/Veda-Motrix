@@ -20,7 +20,7 @@ const vehicleDataFlow = ai.defineFlow(
   },
   async (input: AnalyzeVehicleDataInput) => {
     const llmResponse = await ai.generate({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-pro',
       prompt: `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs. Analyze the provided sensor data and logs to identify potential issues. If none are found, return empty arrays.
 
 Vehicle ID: ${input.vehicleId}
