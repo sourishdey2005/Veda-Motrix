@@ -11,7 +11,6 @@ import {
   GenerateManufacturingInsightsOutput,
   GenerateManufacturingInsightsOutputSchema,
 } from '@/ai/types';
-import {gemini15Flash} from '@genkit-ai/google-genai';
 
 const manufacturingInsightsFlow = ai.defineFlow(
   {
@@ -21,7 +20,7 @@ const manufacturingInsightsFlow = ai.defineFlow(
   },
   async (input: GenerateManufacturingInsightsInput) => {
     const llmResponse = await ai.generate({
-      model: 'gemini-1.5-flash-latest',
+      model: 'gemini-1.5-flash',
       prompt: `You are a manufacturing insights expert. Analyze the following service data and generate clear, actionable improvement suggestions for RCA/CAPA.
 
 Service Data: ${input.serviceData}`,
