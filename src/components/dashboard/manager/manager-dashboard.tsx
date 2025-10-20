@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -20,7 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { AddVehicleForm } from "./add-vehicle-form"
-import { AreaChart, Area, PieChart, Pie, Cell, BarChart, CartesianGrid, XAxis, YAxis, Bar, LabelList } from "recharts"
+import { AreaChart, Area, PieChart, Pie, Cell, BarChart, CartesianGrid, XAxis, YAxis, Bar, LabelList, Legend as RechartsLegend } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, RechartsPrimitive } from "@/components/ui/chart"
 import type { ChartConfig } from "@/components/ui/chart"
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "@/components/ui/table"
@@ -355,7 +356,7 @@ export function ManagerDashboard() {
                                 <Cell key={`cell-${entry.name}`} fill={entry.fill} />
                             ))}
                          </Pie>
-                         <RechartsPrimitive.Legend />
+                         <RechartsLegend />
                     </PieChart>
                  </ChartContainer>
             </CardContent>
@@ -391,7 +392,7 @@ export function ManagerDashboard() {
                             </linearGradient>
                         </defs>
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <RechartsPrimitive.Legend />
+                        <RechartsLegend />
                         <Area type="monotone" dataKey="predictive" stackId="1" stroke="var(--color-predictive)" fill="url(#fillPredictive)" />
                         <Area type="monotone" dataKey="reactive" stackId="1" stroke="var(--color-reactive)" fill="url(#fillReactive)" />
                     </AreaChart>
@@ -432,7 +433,7 @@ export function ManagerDashboard() {
                         <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} />
                         <YAxis />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                        <RechartsPrimitive.Legend />
+                        <RechartsLegend />
                         <Bar dataKey="workload" stackId="a" fill="var(--color-workload)" radius={[4, 4, 0, 0]} >
                             <LabelList dataKey="workload" position="top" offset={4} className="fill-foreground" fontSize={10} />
                         </Bar>
@@ -491,7 +492,7 @@ export function ManagerDashboard() {
                       <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
                       <YAxis tickFormatter={(val) => `₹${val/1000}k`} />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      <RechartsPrimitive.Legend />
+                      <RechartsLegend />
                       <Bar dataKey="beforeAI" fill="var(--color-beforeAI)" radius={4} />
                       <Bar dataKey="afterAI" fill="var(--color-afterAI)" radius={4} />
                   </BarChart>
@@ -510,7 +511,7 @@ export function ManagerDashboard() {
                         <XAxis dataKey="model" />
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <RechartsPrimitive.Legend />
+                        <RechartsLegend />
                         <Bar dataKey="2023" fill="var(--color-2023)" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="2024" fill="var(--color-2024)" radius={[4, 4, 0, 0]} />
                     </BarChart>
