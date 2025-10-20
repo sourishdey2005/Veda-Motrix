@@ -28,18 +28,6 @@ export type AnalyzeCustomerFeedbackOutput = z.infer<
   typeof AnalyzeCustomerFeedbackOutputSchema
 >;
 
-// analyze-document
-export const AnalyzeDocumentInputSchema = z.object({
-  documentDataUri: z.string().describe("A data URI of the document to analyze. Must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
-  prompt: z.string(),
-});
-export type AnalyzeDocumentInput = z.infer<typeof AnalyzeDocumentInputSchema>;
-
-export const AnalyzeDocumentOutputSchema = z.object({
-  analysis: z.string().describe("The detailed analysis of the document, formatted in Markdown."),
-});
-export type AnalyzeDocumentOutput = z.infer<typeof AnalyzeDocumentOutputSchema>;
-
 // analyze-vehicle-data
 export const AnalyzeVehicleDataInputSchema = z.object({
   vehicleId: z.string(),
@@ -132,7 +120,7 @@ export type HandleCustomerEnquiryOutput = z.infer<
 export const PredictVehicleFailureInputSchema = z.object({
   vehicleId: z.string(),
   sensorDataJson: z.string(),
-  maintenanceLogs: z.string(),
+  maintenanceLogs: zstring(),
 });
 export type PredictVehicleFailureInput = z.infer<
   typeof PredictVehicleFailureInputSchema
