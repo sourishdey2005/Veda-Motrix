@@ -434,11 +434,11 @@ export function ManagerDashboard() {
                         <YAxis />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                         <RechartsLegend />
-                        <Bar dataKey="workload" stackId="a" fill="var(--color-workload)" radius={[4, 4, 0, 0]} >
-                            <LabelList dataKey="workload" position="top" offset={4} className="fill-foreground" fontSize={10} />
+                        <Bar dataKey="workload" stackId="a" fill="var(--color-workload)" radius={[0, 0, 0, 0]} >
+                            <LabelList dataKey="workload" position="center" className="fill-white" fontSize={10} />
                         </Bar>
                          <Bar dataKey="backlog" stackId="a" fill="var(--color-backlog)" radius={[4, 4, 0, 0]}>
-                            <LabelList dataKey="backlog" position="top" offset={4} className="fill-foreground" fontSize={10} />
+                            <LabelList dataKey="backlog" position="center" className="fill-white" fontSize={10} />
                         </Bar>
                     </BarChart>
                 </ChartContainer>
