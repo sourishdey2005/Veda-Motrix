@@ -4,7 +4,6 @@
  * @fileoverview An AI flow that simulates a customer engagement conversation.
  */
 import { aiClient, textModel } from '@/ai/genkit';
-import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   HandleCustomerEnquiryInput,
   HandleCustomerEnquiryOutput,
@@ -30,21 +29,14 @@ Owner: [Owner's reply]
 
 Provide the final conversation script as a single block of text.`;
 
-    const response = await aiClient.path("/chat/completions").post({
-      body: {
-        model: textModel,
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-        top_p: 1,
-      }
+    const response = await aiClient.chat.completions.create({
+      model: textModel,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      top_p: 1,
     });
 
-    if (isUnexpected(response)) {
-      const errorBody = response.body as any;
-      throw new Error(errorBody?.error?.message || 'An unexpected error occurred.');
-    }
-
-    const conversationSummary = response.body.choices[0]?.message?.content;
+    const conversationSummary = response.choices[0]?.message?.content;
 
     return { conversationSummary: conversationSummary || "The AI could not generate a conversation." };
   } catch (error) {

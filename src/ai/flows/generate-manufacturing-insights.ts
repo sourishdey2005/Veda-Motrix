@@ -4,7 +4,6 @@
  * @fileoverview An AI flow that generates manufacturing insights from service data.
  */
 import { aiClient, textModel } from '@/ai/genkit';
-import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   GenerateManufacturingInsightsInput,
   GenerateManufacturingInsightsOutput,
@@ -18,21 +17,14 @@ export async function generateManufacturingInsights(
 
 Service Data: ${input.serviceData}`;
 
-    const response = await aiClient.path("/chat/completions").post({
-      body: {
-        model: textModel,
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.6,
-        top_p: 1,
-      }
+    const response = await aiClient.chat.completions.create({
+      model: textModel,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.6,
+      top_p: 1,
     });
 
-    if (isUnexpected(response)) {
-      const errorBody = response.body as any;
-      throw new Error(errorBody?.error?.message || 'An unexpected error occurred.');
-    }
-
-    const improvementSuggestions = response.body.choices[0]?.message?.content;
+    const improvementSuggestions = response.choices[0]?.message?.content;
 
     return { improvementSuggestions: improvementSuggestions || "The AI could not generate any insights." };
   } catch (error) {

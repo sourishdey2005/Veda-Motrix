@@ -4,7 +4,6 @@
  * @fileOverview An AI flow that summarizes uploaded documents (e.g., CSV, PDF).
  */
 import { aiClient, visionModel } from '@/ai/genkit';
-import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   AnalyzeDocumentInput,
   AnalyzeDocumentOutput,
@@ -19,36 +18,33 @@ export async function analyzeDocument(
   input: AnalyzeDocumentInput
 ): Promise<AnalyzeDocumentOutput> {
   try {
-    const prompt = 'Summarize the following document, providing a concise overview of its key points and structure. If it is a CSV, describe the columns and provide a summary of the data.';
+    // Since we are using a text model, we extract text content.
+    // A true multi-modal implementation would pass the data URI differently.
+    const decodedContent = Buffer.from(input.documentDataUri.split(',')[1], 'base64').toString('utf8');
+
+    const prompt = `Summarize the following document content, providing a concise overview of its key points and structure. If it is a CSV, describe the columns and provide a summary of the data.
+
+Document Content:
+---
+${decodedContent.substring(0, 4000)}... 
+---
+`;
     
-    const response = await aiClient.path("/chat/completions").post({
-      body: {
-        model: visionModel, // Use a vision-capable model
-        messages: [
-          { 
-            role: 'user',
-            content: [
-              { type: 'text', text: prompt },
-              { type: 'image_url', image_url: { url: input.documentDataUri } }
-            ]
-          }
-        ],
-        temperature: 0.2,
-        top_p: 1,
-        max_tokens: 1024,
-      }
+    const response = await aiClient.chat.completions.create({
+      model: visionModel, 
+      messages: [
+        { 
+          role: 'user',
+          content: prompt,
+        }
+      ],
+      temperature: 0.2,
+      top_p: 1,
+      max_tokens: 1024,
     });
 
-    if (isUnexpected(response)) {
-      const errorBody = response.body as any;
-      const errorMessage = errorBody?.error?.message || 'An unexpected response was received from the server.';
-      // Ensure we return a structured error, not throw
-      return {
-        analysis: `Error: ${errorMessage}`,
-      };
-    }
 
-    const analysisText = response.body.choices[0]?.message?.content;
+    const analysisText = response.choices[0]?.message?.content;
 
     return {
       analysis:

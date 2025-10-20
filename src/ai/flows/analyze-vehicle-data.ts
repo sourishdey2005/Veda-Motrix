@@ -4,7 +4,6 @@
  * @fileoverview An AI flow that analyzes vehicle sensor data for anomalies and maintenance needs.
  */
 import { aiClient, textModel } from '@/ai/genkit';
-import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   AnalyzeVehicleDataInput,
   AnalyzeVehicleDataOutput,
@@ -21,24 +20,17 @@ Vehicle ID: ${input.vehicleId}
 Sensor Data (JSON): ${input.sensorDataJson}
 Maintenance Logs: ${input.maintenanceLogs}`;
 
-    const response = await aiClient.path("/chat/completions").post({
-      body: {
-        model: textModel,
-        messages: [
-          { role: 'system', content: 'You are a helpful assistant that only returns valid JSON.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0,
-        top_p: 1,
-      }
+    const response = await aiClient.chat.completions.create({
+      model: textModel,
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant that only returns valid JSON.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0,
+      top_p: 1,
     });
     
-    if (isUnexpected(response)) {
-      const errorBody = response.body as any;
-      throw new Error(errorBody?.error?.message || 'An unexpected error occurred.');
-    }
-
-    const message = response.body.choices[0]?.message?.content;
+    const message = response.choices[0]?.message?.content;
     if (!message) {
       throw new Error('AI returned an empty response.');
     }

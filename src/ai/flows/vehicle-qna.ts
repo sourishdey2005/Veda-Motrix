@@ -4,7 +4,6 @@
  * @fileoverview An AI flow that answers user questions about vehicles, using a knowledge base and conversation history.
  */
 import { aiClient, textModel } from '@/ai/genkit';
-import { isUnexpected } from '@azure-rest/ai-inference';
 import { qnaData } from '@/lib/chatbot-qna';
 import type { AnswerQuestionInput } from '@/ai/types';
 
@@ -32,26 +31,19 @@ ${qnaData
 `;
 
     const messages = [
-        { role: 'system', content: systemPrompt },
+        { role: 'system' as const, content: systemPrompt },
         ...input.conversationHistory.map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
-        { role: 'user', content: input.question }
+        { role: 'user' as const, content: input.question }
     ];
     
-    const response = await aiClient.path("/chat/completions").post({
-        body: {
-            model: textModel,
-            messages: messages,
-            temperature: 0.6,
-            top_p: 1,
-        }
+    const response = await aiClient.chat.completions.create({
+        model: textModel,
+        messages: messages,
+        temperature: 0.6,
+        top_p: 1,
     });
 
-    if (isUnexpected(response)) {
-      const errorBody = response.body as any;
-      throw new Error(errorBody?.error?.message || 'An unexpected error occurred.');
-    }
-
-    const answer = response.body.choices[0]?.message?.content;
+    const answer = response.choices[0]?.message?.content;
 
     return { answer: answer || "I'm sorry, I could not find an answer." };
   } catch (error) {

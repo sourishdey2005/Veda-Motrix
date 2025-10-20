@@ -4,7 +4,6 @@
  * @fileoverview A flow that generates an executive summary from business intelligence data.
  */
 import { aiClient, textModel } from '@/ai/genkit';
-import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   GenerateExecutiveSummaryInput,
   GenerateExecutiveSummaryOutput,
@@ -22,21 +21,14 @@ ${input.reportData}
 
 Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).`;
 
-    const response = await aiClient.path("/chat/completions").post({
-      body: {
-        model: textModel,
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.5,
-        top_p: 1,
-      }
+    const response = await aiClient.chat.completions.create({
+      model: textModel,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.5,
+      top_p: 1,
     });
 
-    if (isUnexpected(response)) {
-      const errorBody = response.body as any;
-      throw new Error(errorBody?.error?.message || 'An unexpected error occurred.');
-    }
-
-    const summary = response.body.choices[0]?.message?.content;
+    const summary = response.choices[0]?.message?.content;
 
     return { summary: summary || "The AI could not generate a summary." };
   } catch (error) {
