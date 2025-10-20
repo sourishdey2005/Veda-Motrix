@@ -565,7 +565,4 @@ export function ManagerDashboard() {
       </div>
     </div>
   )
-
-    
-
-    
+}
