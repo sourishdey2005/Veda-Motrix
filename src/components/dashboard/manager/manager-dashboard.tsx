@@ -6,7 +6,7 @@ import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/com
 import { AlertTriangle, Bot, Cpu, Car, Eye, PlusCircle, DollarSign, TrendingUp, TrendingDown, ShieldAlert, Legend as LegendIcon, Wrench } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useEffect, useMemo, useCallback } from "react"
-import { executiveAnalyticsData, predictedIssues, vehicles as allVehicles } from "@/lib/data"
+import { executiveAnalyticsData, predictedIssues, vehicles as allVehicles, serviceCenters } from "@/lib/data"
 import type { Vehicle, DiagnosticTroubleCode } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -185,17 +185,23 @@ export function ManagerDashboard() {
     breakdownReduction: d.breakdownReduction + Math.random() * 0.05
   }));
 
-  const [serviceLoad, setServiceLoad] = useState(executiveAnalyticsData.serviceLoad);
+  const initialServiceLoad = serviceCenters.slice(0, 5).map(sc => ({
+      name: sc.city,
+      workload: sc.workload ?? 80,
+      backlog: Math.floor((sc.workload ?? 80) / 5 + Math.random() * 5),
+  }));
+
+  const [serviceLoad, setServiceLoad] = useState(initialServiceLoad);
     useEffect(() => {
       const interval = setInterval(() => {
         setServiceLoad(prevData =>
           prevData.map(item => ({
             ...item,
-            workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
-            backlog: Math.max(0, item.backlog + Math.floor((Math.random() - 0.45) * 5))
+            workload: Math.max(20, Math.min(100, item.workload + Math.floor((Math.random() - 0.45) * 10))),
+            backlog: Math.max(0, Math.min(30, item.backlog + Math.floor((Math.random() - 0.48) * 5)))
           }))
         );
-      }, 3000);
+      }, 3500);
       return () => clearInterval(interval);
     }, []);
 
@@ -434,11 +440,11 @@ export function ManagerDashboard() {
                         <YAxis />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                         <RechartsLegend />
-                        <Bar dataKey="workload" stackId="a" fill="var(--color-workload)" radius={[0, 0, 0, 0]} >
-                            <LabelList dataKey="workload" position="center" className="fill-white" fontSize={10} />
+                        <Bar dataKey="workload" stackId="a" fill="var(--color-workload)" radius={[0, 0, 4, 4]} >
+                            <LabelList dataKey="workload" position="center" className="fill-background" fontSize={10} />
                         </Bar>
                          <Bar dataKey="backlog" stackId="a" fill="var(--color-backlog)" radius={[4, 4, 0, 0]}>
-                            <LabelList dataKey="backlog" position="center" className="fill-white" fontSize={10} />
+                            <LabelList dataKey="backlog" position="center" className="fill-background" fontSize={10} />
                         </Bar>
                     </BarChart>
                 </ChartContainer>
