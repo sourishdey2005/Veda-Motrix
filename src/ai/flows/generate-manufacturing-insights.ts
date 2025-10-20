@@ -13,7 +13,13 @@ export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
 ): Promise<GenerateManufacturingInsightsOutput> {
   try {
-    const prompt = `You are a manufacturing insights expert. Analyze the following service data and generate clear, actionable improvement suggestions for RCA/CAPA.
+    const prompt = `You are a manufacturing insights expert. Analyze the following service data and generate a detailed and elaborate report with clear, actionable improvement suggestions for RCA/CAPA (Root Cause Analysis / Corrective and Preventive Action).
+
+Your report should include:
+1.  **Trend Identification**: Identify recurring failure patterns or component issues from the data.
+2.  **Root Cause Hypothesis**: For each trend, propose a potential root cause in the manufacturing or design process.
+3.  **Detailed CAPA Suggestions**: Provide specific, actionable steps for the engineering and manufacturing teams to investigate and resolve the issue.
+4.  **Predicted Impact**: Estimate the potential impact of implementing your suggestions (e.g., cost savings, failure rate reduction).
 
 Service Data: ${input.serviceData}`;
 

@@ -13,21 +13,23 @@ export async function handleCustomerEnquiry(
   input: HandleCustomerEnquiryInput
 ): Promise<HandleCustomerEnquiryOutput> {
   try {
-    const prompt = `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.
+    const prompt = `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful, detailed, and empathetic manner.
 
-Generate a short, simulated conversation script (5-6 lines) between the AI Agent and the Owner based on the following details. The script should start with a greeting, explain the issue and the recommended maintenance, offer assistance with scheduling, and end after the owner replies.
+Generate a comprehensive, simulated conversation script (at least 8-10 lines) between the AI Agent and the Owner based on the following details. The script should start with a friendly greeting, explain the issue and the recommended maintenance in detail, explain the benefits of proactive repair, offer assistance with scheduling, and end after the owner replies.
 
 Vehicle Owner's Name: ${input.userName}
 Vehicle Issue: ${input.vehicleIssue}
 Recommended Maintenance: ${input.recommendedMaintenance}
 
 Example Format:
-Agent: [Your greeting and explanation]
-Owner: [Owner's response]
-Agent: [Offer assistance with scheduling]
-Owner: [Owner's reply]
+Agent: [Your friendly greeting and detailed explanation of the issue.]
+Owner: [Owner's response, maybe with a question.]
+Agent: [Answer the question and explain the benefits of the recommended maintenance.]
+Owner: [Owner's reply.]
+Agent: [Offer clear assistance with scheduling an appointment.]
+Owner: [Owner's confirmation.]
 
-Provide the final conversation script as a single block of text.`;
+Provide the final, elaborate conversation script as a single block of text.`;
 
     const response = await aiClient.chat.completions.create({
       model: textModel,

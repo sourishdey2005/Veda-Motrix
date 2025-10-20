@@ -14,7 +14,12 @@ export async function analyzeVehicleData(
   input: AnalyzeVehicleDataInput
 ): Promise<AnalyzeVehicleDataOutput> {
   try {
-    const prompt = `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs. Analyze the provided sensor data and logs to identify potential issues. If none are found, return empty arrays. Respond with a valid JSON object matching this schema: ${JSON.stringify(AnalyzeVehicleDataOutputSchema.shape)}.
+    const prompt = `You are a master diagnostic agent for vehicles. Perform an in-depth analysis of the provided vehicle sensor data and maintenance logs.
+- Identify any and all data anomalies, providing context for why they are anomalous.
+- Suggest detailed, prioritized maintenance tasks based on your findings. Explain the reasoning for each suggestion.
+- If no issues are found, confirm that all systems are operating within normal parameters.
+
+Respond with a valid JSON object matching this schema: ${JSON.stringify(AnalyzeVehicleDataOutputSchema.shape)}.
 
 Vehicle ID: ${input.vehicleId}
 Sensor Data (JSON): ${input.sensorDataJson}
@@ -26,7 +31,7 @@ Maintenance Logs: ${input.maintenanceLogs}`;
         { role: 'system', content: 'You are a helpful assistant that only returns valid JSON.' },
         { role: 'user', content: prompt }
       ],
-      temperature: 0,
+      temperature: 0.1,
       top_p: 1,
     });
     

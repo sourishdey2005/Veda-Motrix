@@ -20,11 +20,14 @@ export async function analyzeDocument(
   try {
     const decodedContent = Buffer.from(input.documentDataUri.split(',')[1], 'base64').toString('utf8');
 
-    const prompt = `Summarize the following document content, providing a concise overview of its key points and structure. If it is a CSV, describe the columns and provide a summary of the data.
+    const prompt = `Provide a detailed and elaborate analysis of the following document content. 
+- Give a comprehensive overview of its key points, structure, and purpose. 
+- If it is a CSV, describe each column in detail, identify trends, and provide a summary of the data insights.
+- If it is a report, extract key metrics, conclusions, and recommendations.
 
 Document Content:
 ---
-${decodedContent.substring(0, 4000)}... 
+${decodedContent.substring(0, 8000)}... 
 ---
 `;
     

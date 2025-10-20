@@ -15,7 +15,7 @@ export async function predictVehicleFailure(
 ): Promise<PredictVehicleFailureOutput> {
   try {
     const prompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
-Analyze the provided sensor data and maintenance logs to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions. Respond with a valid JSON object matching this schema: ${JSON.stringify(PredictVehicleFailureOutputSchema.shape)}.
+Analyze the provided sensor data and maintenance logs to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and a detailed set of suggested actions, including diagnostic steps and potential parts needed. Respond with a valid JSON object matching this schema: ${JSON.stringify(PredictVehicleFailureOutputSchema.shape)}.
 
 Vehicle ID ${input.vehicleId}
 Sensor Data (JSON): ${input.sensorDataJson}
