@@ -8,7 +8,7 @@ import {z} from 'zod';
 import {qnaData} from '@/lib/chatbot-qna';
 import type {AnswerQuestionInput} from '@/ai/types';
 import {AnswerQuestionInputSchema} from '@/ai/types';
-import {gemini15Flash} from 'genkitx-googleai';
+import {gemini15Flash} from '@genkit-ai/google-genai';
 
 const qnaFlow = ai.defineFlow(
   {
@@ -43,7 +43,7 @@ ${qnaData
 `;
 
     const llmResponse = await ai.generate({
-      model: gemini15Flash,
+      model: 'gemini-1.5-flash-latest',
       history: history,
       prompt: input.question,
       config: {

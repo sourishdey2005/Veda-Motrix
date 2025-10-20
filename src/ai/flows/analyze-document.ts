@@ -11,7 +11,7 @@ import {
   AnalyzeDocumentOutput,
   AnalyzeDocumentOutputSchema,
 } from '@/ai/types';
-import {gemini15Flash} from 'genkitx-googleai';
+import {gemini15Flash} from '@genkit-ai/google-genai';
 
 // Define the document analysis flow using Genkit
 const analyzeDocumentFlow = ai.defineFlow(
@@ -23,7 +23,7 @@ const analyzeDocumentFlow = ai.defineFlow(
   async (input: AnalyzeDocumentInput) => {
     // Generate content using the Gemini 1.5 Flash model
     const llmResponse = await ai.generate({
-      model: gemini15Flash,
+      model: 'gemini-1.5-flash-latest',
       prompt: {
         text: 'Summarize the following document, providing a concise overview of its key points and structure. If it is a CSV, describe the columns and provide a summary of the data.',
         media: [

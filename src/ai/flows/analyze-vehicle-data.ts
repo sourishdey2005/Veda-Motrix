@@ -11,7 +11,7 @@ import {
   AnalyzeVehicleDataOutput,
   AnalyzeVehicleDataOutputSchema,
 } from '@/ai/types';
-import {gemini15Flash} from 'genkitx-googleai';
+import {gemini15Flash} from '@genkit-ai/google-genai';
 
 const vehicleDataFlow = ai.defineFlow(
   {
@@ -21,7 +21,7 @@ const vehicleDataFlow = ai.defineFlow(
   },
   async (input: AnalyzeVehicleDataInput) => {
     const llmResponse = await ai.generate({
-      model: gemini15Flash,
+      model: 'gemini-1.5-flash-latest',
       prompt: `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs. Analyze the provided sensor data and logs to identify potential issues. If none are found, return empty arrays.
 
 Vehicle ID: ${input.vehicleId}

@@ -11,7 +11,7 @@ import {
   GenerateExecutiveSummaryOutput,
   GenerateExecutiveSummaryOutputSchema,
 } from '@/ai/types';
-import {gemini15Flash} from 'genkitx-googleai';
+import {gemini15Flash} from '@genkit-ai/google-genai';
 
 const executiveSummaryFlow = ai.defineFlow(
   {
@@ -21,7 +21,7 @@ const executiveSummaryFlow = ai.defineFlow(
   },
   async (input: GenerateExecutiveSummaryInput) => {
     const llmResponse = await ai.generate({
-      model: gemini15Flash,
+      model: 'gemini-1.5-flash-latest',
       prompt: `You are an AI assistant specialized in creating executive summaries for business intelligence dashboards. Analyze the provided JSON data and generate a clear, concise, and insightful summary in plain text for a management audience.
 Focus on key takeaways, trends, and significant metrics.
 

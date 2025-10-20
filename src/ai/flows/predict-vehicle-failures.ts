@@ -11,7 +11,7 @@ import {
   PredictVehicleFailureOutput,
   PredictVehicleFailureOutputSchema,
 } from '@/ai/types';
-import {gemini15Flash} from 'genkitx-googleai';
+import {gemini15Flash} from '@genkit-ai/google-genai';
 
 const predictFailureFlow = ai.defineFlow(
   {
@@ -21,7 +21,7 @@ const predictFailureFlow = ai.defineFlow(
   },
   async (input: PredictVehicleFailureInput) => {
     const llmResponse = await ai.generate({
-      model: gemini15Flash,
+      model: 'gemini-1.5-flash-latest',
       prompt: `You are an AI diagnosis agent specializing in predicting vehicle failures.
 Analyze the provided sensor data and maintenance logs to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions.
 

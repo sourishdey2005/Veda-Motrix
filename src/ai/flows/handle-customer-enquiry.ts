@@ -11,7 +11,7 @@ import {
   HandleCustomerEnquiryOutput,
   HandleCustomerEnquiryOutputSchema,
 } from '@/ai/types';
-import {gemini15Flash} from 'genkitx-googleai';
+import {gemini15Flash} from '@genkit-ai/google-genai';
 
 const customerEnquiryFlow = ai.defineFlow(
   {
@@ -21,7 +21,7 @@ const customerEnquiryFlow = ai.defineFlow(
   },
   async (input: HandleCustomerEnquiryInput) => {
     const llmResponse = await ai.generate({
-      model: gemini15Flash,
+      model: 'gemini-1.5-flash-latest',
       prompt: `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.
 
 Generate a short, simulated conversation script (5-6 lines) between the AI Agent and the Owner based on the following details. The script should start with a greeting, explain the issue and the recommended maintenance, offer assistance with scheduling, and end after the owner replies.
