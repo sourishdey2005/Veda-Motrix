@@ -11,7 +11,7 @@ import { useState, useEffect, useMemo } from "react"
 import { ArrowDown, ArrowUp, IndianRupee } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { analyticsData } from "@/lib/data"
+import { analyticsData, executiveAnalyticsData } from "@/lib/data"
 import { cn } from "@/lib/utils"
 
 const chartConfig: ChartConfig = {
@@ -81,7 +81,7 @@ export function AnalyticsDashboard() {
   );
 
   const serviceLoad = useSimulatedData(
-    analyticsData.serviceLoad,
+    executiveAnalyticsData.serviceLoad,
     item => ({ 
         ...item, 
         workload: Math.max(0, item.workload + Math.floor((Math.random() - 0.4) * 10)),
