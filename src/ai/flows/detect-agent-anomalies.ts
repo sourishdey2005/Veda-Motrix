@@ -5,41 +5,34 @@
  */
 import {
   DetectAgentAnomaliesInput,
-  DetectAgentAnomaliesInputSchema,
   DetectAgentAnomaliesOutput,
   DetectAgentAnomaliesOutputSchema,
 } from '@/ai/types';
-import {ai} from '@/ai/genkit';
-import {z} from 'zod';
+import { openAiClient } from '@/ai/genkit';
 
 export async function detectAgentAnomalies(
   input: DetectAgentAnomaliesInput
 ): Promise<DetectAgentAnomaliesOutput> {
-  const detectionFlow = ai.defineFlow(
-    {
-      name: 'agentAnomalyDetectionFlow',
-      inputSchema: DetectAgentAnomaliesInputSchema,
-      outputSchema: DetectAgentAnomaliesOutputSchema,
-    },
-    async ({agentId, agentActions, anomalyThreshold}) => {
-      const llmResponse = await ai.generate({
-        model: 'gemini-1.5-flash-latest',
-        prompt: `You are a UEBA (User and Entity Behavior Analytics) security agent. Analyze the provided agent actions and determine if the behavior is anomalous based on a threshold of ${anomalyThreshold}.
-
-Agent ID: ${agentId}
-Agent Actions:
-${agentActions.map(action => `- ${action}`).join('\n')}
-`,
-        output: {
-          schema: DetectAgentAnomaliesOutputSchema,
-        },
-      });
-      return llmResponse.output()!;
-    }
-  );
-
   try {
-    return await detectionFlow(input);
+    const result = await openAiClient<DetectAgentAnomaliesInput, DetectAgentAnomaliesOutput>({
+      prompt: `You are a UEBA (User and Entity Behavior Analytics) security agent. Analyze the provided agent actions and determine if the behavior is anomalous based on a threshold of ${input.anomalyThreshold}.
+
+Agent ID: ${input.agentId}
+Agent Actions:
+${input.agentActions.map(action => `- ${action}`).join('\n')}
+`,
+      response_model: {
+        schema: DetectAgentAnomaliesOutputSchema,
+        name: 'DetectAgentAnomaliesOutput',
+      },
+    });
+    
+    if (typeof result === 'string' || !result) {
+        throw new Error('AI returned an invalid response format.');
+    }
+    
+    return result;
+    
   } catch (error) {
     console.error('Error in detectAgentAnomalies:', error);
     return {

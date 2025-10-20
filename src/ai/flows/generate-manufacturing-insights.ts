@@ -5,35 +5,22 @@
  */
 import {
   GenerateManufacturingInsightsInput,
-  GenerateManufacturingInsightsInputSchema,
   GenerateManufacturingInsightsOutput,
-  GenerateManufacturingInsightsOutputSchema,
 } from '@/ai/types';
-import {ai} from '@/ai/genkit';
-import {z} from 'zod';
+import { openAiClient } from '@/ai/genkit';
 
 export async function generateManufacturingInsights(
   input: GenerateManufacturingInsightsInput
 ): Promise<GenerateManufacturingInsightsOutput> {
-  const insightsFlow = ai.defineFlow(
-    {
-      name: 'manufacturingInsightsFlow',
-      inputSchema: GenerateManufacturingInsightsInputSchema,
-      outputSchema: GenerateManufacturingInsightsOutputSchema,
-    },
-    async ({serviceData}) => {
-      const llmResponse = await ai.generate({
-        model: 'gemini-1.5-flash-latest',
-        prompt: `You are a manufacturing insights expert. Analyze the following service data and generate clear, actionable improvement suggestions for RCA/CAPA.
-
-Service Data: ${serviceData}`,
-      });
-      return {improvementSuggestions: llmResponse.text()};
-    }
-  );
-
   try {
-    return await insightsFlow(input);
+    const result = await openAiClient({
+      prompt: `You are a manufacturing insights expert. Analyze the following service data and generate clear, actionable improvement suggestions for RCA/CAPA.
+
+Service Data: ${input.serviceData}`,
+    });
+
+    return { improvementSuggestions: result as string };
+
   } catch (error) {
     console.error('Error in generateManufacturingInsights:', error);
     return {
