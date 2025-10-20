@@ -108,15 +108,22 @@ Based on these summaries, provide a clear, well-structured, and final analysis i
         return { analysis: finalAnalysis as string };
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in document analysis flow:', error);
-    let errorMessage = `An unexpected error occurred while analyzing the document. It might be corrupted or in an unsupported format.\n\nDetails: ${error.message}`;
-    if (error.message?.includes('429')) {
-      errorMessage = `The document analysis process is being rate-limited by the AI provider. Please wait a moment and try again.\n\nDetails: ${error.message}`;
+    let errorMessage = 'An unexpected error occurred while analyzing the document. Please try again.';
+
+    if (error instanceof Error) {
+        errorMessage = `An unexpected error occurred: ${error.message}`;
+        if (error.message?.includes('429')) {
+          errorMessage = `The document analysis process is being rate-limited by the AI provider. Please wait a moment and try again. Details: ${error.message}`;
+        }
+        if (error.message?.includes('Invalid data URI')) {
+          errorMessage = 'The uploaded file could not be read. It might be corrupted or in a format the system cannot process.';
+        }
+    } else if (typeof error === 'string') {
+        errorMessage = error;
     }
-    if (error.message?.includes('Invalid data URI')) {
-      errorMessage = 'The uploaded file could not be read. It might be corrupted or in a format the system cannot process.';
-    }
+
     return {
       analysis: `#### Error\n${errorMessage}`,
     };
