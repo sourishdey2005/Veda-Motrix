@@ -30,7 +30,7 @@ ${decodedContent.substring(0, 4000)}...
 ---
 `;
     
-    const response = await aiClient.chat.completions.create({
+    const response = await aiClient.chat.completions({
       model: visionModel, 
       messages: [
         { 

@@ -17,7 +17,7 @@ export async function generateManufacturingInsights(
 
 Service Data: ${input.serviceData}`;
 
-    const response = await aiClient.chat.completions.create({
+    const response = await aiClient.chat.completions({
       model: textModel,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.6,

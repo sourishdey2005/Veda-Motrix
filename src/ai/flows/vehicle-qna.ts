@@ -36,7 +36,7 @@ ${qnaData
         { role: 'user' as const, content: input.question }
     ];
     
-    const response = await aiClient.chat.completions.create({
+    const response = await aiClient.chat.completions({
         model: textModel,
         messages: messages,
         temperature: 0.6,

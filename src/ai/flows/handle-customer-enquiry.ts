@@ -29,7 +29,7 @@ Owner: [Owner's reply]
 
 Provide the final conversation script as a single block of text.`;
 
-    const response = await aiClient.chat.completions.create({
+    const response = await aiClient.chat.completions({
       model: textModel,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,

@@ -22,7 +22,7 @@ Sensor Data (JSON): ${input.sensorDataJson}
 Maintenance Logs: ${input.maintenanceLogs}
 `;
 
-    const response = await aiClient.chat.completions.create({
+    const response = await aiClient.chat.completions({
       model: textModel,
       messages: [
         { role: 'system', content: 'You are a helpful assistant that only returns valid JSON.' },
