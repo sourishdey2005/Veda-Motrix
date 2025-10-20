@@ -18,10 +18,10 @@ const customerFeedbackFlow = ai.defineFlow(
     inputSchema: AnalyzeCustomerFeedbackInputSchema,
     outputSchema: AnalyzeCustomerFeedbackOutputSchema,
   },
-  async (input: AnalyzeCustomerFeedbackInput) => {
+  async (input: AnalyzeCustomerFeedbackInput): Promise<AnalyzeCustomerFeedbackOutput> => {
     const llmResponse = await ai.generate({
       model: 'gemini-pro',
-      prompt: `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements. Analyze the following customer feedback: "${input.feedbackText}"`,
+      prompt: `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements. Analyze the following customer feedback: "${input.feedbackText}". Respond with a valid JSON object matching the requested schema.`,
       output: {
         schema: AnalyzeCustomerFeedbackOutputSchema,
       },
@@ -29,10 +29,22 @@ const customerFeedbackFlow = ai.defineFlow(
 
     const result = llmResponse.output;
 
-    if (!result) {
-      throw new Error('AI returned an invalid response format.');
+    if (result) {
+        return result;
     }
-    return result;
+    
+    // Fallback parsing if structured output fails
+    try {
+        const parsed = AnalyzeCustomerFeedbackOutputSchema.parse(JSON.parse(llmResponse.text));
+        return parsed;
+    } catch(e) {
+        console.error("Failed to get structured output or parse text for customer feedback", e);
+        return {
+            sentiment: 'Error',
+            keyAreas: 'Could not analyze feedback.',
+            suggestions: 'The AI failed to return a valid response. Please try again.',
+        }
+    }
   }
 );
 

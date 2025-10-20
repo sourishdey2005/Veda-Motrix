@@ -18,10 +18,10 @@ const vehicleDataFlow = ai.defineFlow(
     inputSchema: AnalyzeVehicleDataInputSchema,
     outputSchema: AnalyzeVehicleDataOutputSchema,
   },
-  async (input: AnalyzeVehicleDataInput) => {
+  async (input: AnalyzeVehicleDataInput): Promise<AnalyzeVehicleDataOutput> => {
     const llmResponse = await ai.generate({
       model: 'gemini-pro',
-      prompt: `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs. Analyze the provided sensor data and logs to identify potential issues. If none are found, return empty arrays.
+      prompt: `You are a master agent responsible for analyzing vehicle sensor data for anomalies and maintenance needs. Analyze the provided sensor data and logs to identify potential issues. If none are found, return empty arrays. Respond with a valid JSON object matching the requested schema.
 
 Vehicle ID: ${input.vehicleId}
 Sensor Data (JSON): ${input.sensorDataJson}
@@ -33,20 +33,33 @@ Maintenance Logs: ${input.maintenanceLogs}`,
 
     const result = llmResponse.output;
 
-    if (!result) {
-      throw new Error('AI returned an invalid response format.');
+    if (result) {
+      return {
+        anomalies:
+          result.anomalies && result.anomalies.length > 0
+            ? result.anomalies
+            : ['No anomalies detected.'],
+        maintenanceNeeds:
+          result.maintenanceNeeds && result.maintenanceNeeds.length > 0
+            ? result.maintenanceNeeds
+            : ['No immediate maintenance needs identified.'],
+      };
     }
-
-    return {
-      anomalies:
-        result.anomalies && result.anomalies.length > 0
-          ? result.anomalies
-          : ['No anomalies detected.'],
-      maintenanceNeeds:
-        result.maintenanceNeeds && result.maintenanceNeeds.length > 0
-          ? result.maintenanceNeeds
-          : ['No immediate maintenance needs identified.'],
-    };
+    
+    // Fallback parsing if structured output fails
+    try {
+        const parsed = AnalyzeVehicleDataOutputSchema.parse(JSON.parse(llmResponse.text));
+        return {
+            anomalies: parsed.anomalies.length > 0 ? parsed.anomalies : ['No anomalies detected.'],
+            maintenanceNeeds: parsed.maintenanceNeeds.length > 0 ? parsed.maintenanceNeeds : ['No immediate maintenance needs identified.']
+        };
+    } catch(e) {
+        console.error("Failed to get structured output or parse text for vehicle data", e);
+        return {
+            anomalies: ['Error: Analysis Failed'],
+            maintenanceNeeds: ['The AI failed to return a valid response. Please try again.'],
+        }
+    }
   }
 );
 
