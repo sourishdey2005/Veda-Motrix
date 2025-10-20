@@ -3,7 +3,7 @@
 /**
  * @fileoverview An AI flow that answers user questions about vehicles, using a knowledge base and conversation history.
  */
-import { aiClient, textModel } from '@/ai/client';
+import { aiClient, textModel } from '@/ai/genkit';
 import { isUnexpected } from '@azure-rest/ai-inference';
 import { qnaData } from '@/lib/chatbot-qna';
 import type { AnswerQuestionInput } from '@/ai/types';

@@ -3,7 +3,7 @@
 /**
  * @fileoverview An AI flow that simulates a customer engagement conversation.
  */
-import { aiClient, textModel } from '@/ai/client';
+import { aiClient, textModel } from '@/ai/genkit';
 import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   HandleCustomerEnquiryInput,

@@ -3,7 +3,7 @@
 /**
  * @fileoverview An AI flow that generates manufacturing insights from service data.
  */
-import { aiClient, textModel } from '@/ai/client';
+import { aiClient, textModel } from '@/ai/genkit';
 import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   GenerateManufacturingInsightsInput,

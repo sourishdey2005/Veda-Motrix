@@ -3,7 +3,7 @@
 /**
  * @fileoverview An AI flow that analyzes customer feedback for sentiment and actionable insights.
  */
-import { aiClient, textModel } from '@/ai/client';
+import { aiClient, textModel } from '@/ai/genkit';
 import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   AnalyzeCustomerFeedbackInput,
@@ -45,7 +45,11 @@ export async function analyzeCustomerFeedback(
       return parsed;
     } catch (e) {
       console.error("Failed to parse AI JSON response:", e);
-      throw new Error('AI returned an invalid response format.');
+      return {
+        sentiment: 'Error',
+        keyAreas: 'Could not analyze feedback.',
+        suggestions: `AI returned an invalid response format. Raw response: ${message}`,
+      };
     }
 
   } catch (error) {

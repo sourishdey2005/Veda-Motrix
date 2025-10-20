@@ -3,7 +3,7 @@
 /**
  * @fileoverview An AI flow that detects anomalous behavior from other AI agents.
  */
-import { aiClient, textModel } from '@/ai/client';
+import { aiClient, textModel } from '@/ai/genkit';
 import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   DetectAgentAnomaliesInput,
@@ -49,7 +49,11 @@ ${input.agentActions.map(action => `- ${action}`).join('\n')}
       return parsed;
     } catch (e) {
       console.error("Failed to parse AI JSON response:", e);
-      throw new Error('AI returned an invalid response format.');
+       return {
+        isAnomalous: true,
+        anomalyScore: 1.0,
+        explanation: `AI returned an invalid response format. Raw response: ${message}`,
+      };
     }
 
   } catch (error) {

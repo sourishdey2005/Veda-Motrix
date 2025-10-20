@@ -3,7 +3,7 @@
 /**
  * @fileOverview An AI flow that summarizes uploaded documents (e.g., CSV, PDF).
  */
-import { aiClient, visionModel } from '@/ai/client';
+import { aiClient, visionModel } from '@/ai/genkit';
 import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   AnalyzeDocumentInput,
@@ -41,7 +41,11 @@ export async function analyzeDocument(
 
     if (isUnexpected(response)) {
       const errorBody = response.body as any;
-      throw new Error(errorBody?.error?.message || 'An unexpected error occurred during document analysis.');
+      const errorMessage = errorBody?.error?.message || 'An unexpected response was received from the server.';
+      // Ensure we return a structured error, not throw
+      return {
+        analysis: `Error: ${errorMessage}`,
+      };
     }
 
     const analysisText = response.body.choices[0]?.message?.content;

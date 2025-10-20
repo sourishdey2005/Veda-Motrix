@@ -3,7 +3,7 @@
 /**
  * @fileoverview A flow that generates an executive summary from business intelligence data.
  */
-import { aiClient, textModel } from '@/ai/client';
+import { aiClient, textModel } from '@/ai/genkit';
 import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   GenerateExecutiveSummaryInput,

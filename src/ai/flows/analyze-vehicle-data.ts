@@ -3,7 +3,7 @@
 /**
  * @fileoverview An AI flow that analyzes vehicle sensor data for anomalies and maintenance needs.
  */
-import { aiClient, textModel } from '@/ai/client';
+import { aiClient, textModel } from '@/ai/genkit';
 import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   AnalyzeVehicleDataInput,
@@ -51,7 +51,10 @@ Maintenance Logs: ${input.maintenanceLogs}`;
       };
     } catch (e) {
       console.error("Failed to parse AI JSON response:", e);
-      throw new Error('AI returned an invalid response format.');
+      return {
+        anomalies: ['Error: Analysis Failed'],
+        maintenanceNeeds: [ `AI returned an invalid response format. Raw response: ${message}`],
+      };
     }
 
   } catch (error) {

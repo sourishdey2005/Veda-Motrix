@@ -3,7 +3,7 @@
 /**
  * @fileoverview An AI flow that predicts vehicle failures from sensor data and maintenance logs.
  */
-import { aiClient, textModel } from '@/ai/client';
+import { aiClient, textModel } from '@/ai/genkit';
 import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   PredictVehicleFailureInput,
@@ -50,7 +50,17 @@ Maintenance Logs: ${input.maintenanceLogs}
       return parsed;
     } catch (e) {
       console.error("Failed to parse AI JSON response:", e);
-      throw new Error('AI returned an invalid response format.');
+      return {
+        predictedFailures: [
+          {
+            component: 'System',
+            failureType: 'Analysis Error',
+            priority: 'HIGH',
+            confidence: 1.0,
+            suggestedActions: `AI returned an invalid response format. Raw response: ${message}`,
+          },
+        ],
+      };
     }
 
   } catch (error) {
