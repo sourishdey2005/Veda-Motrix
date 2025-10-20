@@ -1,8 +1,10 @@
+
 'use server';
 /**
  * @fileoverview An AI flow that analyzes customer feedback for sentiment and actionable insights.
  */
-import { genAI } from '@/ai/genkit';
+import { aiClient, textModel } from '@/ai/client';
+import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   AnalyzeCustomerFeedbackInput,
   AnalyzeCustomerFeedbackOutput,
@@ -13,16 +15,39 @@ export async function analyzeCustomerFeedback(
   input: AnalyzeCustomerFeedbackInput
 ): Promise<AnalyzeCustomerFeedbackOutput> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     const prompt = `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements. Analyze the following customer feedback: "${input.feedbackText}". Respond with a valid JSON object matching this schema: ${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.shape)}.`;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    const response = await aiClient.path("/chat/completions").post({
+      body: {
+        model: textModel,
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant that only returns valid JSON.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 1,
+      },
+    });
 
-    const parsed = AnalyzeCustomerFeedbackOutputSchema.parse(
-      JSON.parse(responseText)
-    );
-    return parsed;
+    if (isUnexpected(response)) {
+      const errorBody = response.body as any;
+      throw new Error(errorBody?.error?.message || 'An unexpected error occurred.');
+    }
+
+    const message = response.body.choices[0]?.message?.content;
+    if (!message) {
+      throw new Error('AI returned an empty response.');
+    }
+    
+    // Attempt to parse the JSON response, with robust fallback.
+    try {
+      const parsed = AnalyzeCustomerFeedbackOutputSchema.parse(JSON.parse(message));
+      return parsed;
+    } catch (e) {
+      console.error("Failed to parse AI JSON response:", e);
+      throw new Error('AI returned an invalid response format.');
+    }
+
   } catch (error) {
     console.error('Error in analyzeCustomerFeedback:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);

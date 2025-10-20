@@ -1,28 +1,14 @@
+
 'use server';
 /**
  * @fileOverview An AI flow that summarizes uploaded documents (e.g., CSV, PDF).
  */
-import { genAI } from '@/ai/genkit';
+import { aiClient, visionModel } from '@/ai/client';
+import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   AnalyzeDocumentInput,
   AnalyzeDocumentOutput,
 } from '@/ai/types';
-
-// Helper to convert data URI to GenerativePart
-function fileToGenerativePart(dataUri: string) {
-  const match = dataUri.match(/^data:(.+);base64,(.+)$/);
-  if (!match) {
-    throw new Error('Invalid data URI format');
-  }
-  const mimeType = match[1];
-  const data = match[2];
-  return {
-    inlineData: {
-      mimeType,
-      data,
-    },
-  };
-}
 
 /**
  * Executes the document analysis flow.
@@ -33,14 +19,32 @@ export async function analyzeDocument(
   input: AnalyzeDocumentInput
 ): Promise<AnalyzeDocumentOutput> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
-    
-    const imagePart = fileToGenerativePart(input.documentDataUri);
     const prompt = 'Summarize the following document, providing a concise overview of its key points and structure. If it is a CSV, describe the columns and provide a summary of the data.';
     
-    const result = await model.generateContent([prompt, imagePart]);
-    const response = result.response;
-    const analysisText = response.text();
+    const response = await aiClient.path("/chat/completions").post({
+      body: {
+        model: visionModel, // Use a vision-capable model
+        messages: [
+          { 
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              { type: 'image_url', image_url: { url: input.documentDataUri } }
+            ]
+          }
+        ],
+        temperature: 0.2,
+        top_p: 1,
+        max_tokens: 1024,
+      }
+    });
+
+    if (isUnexpected(response)) {
+      const errorBody = response.body as any;
+      throw new Error(errorBody?.error?.message || 'An unexpected error occurred during document analysis.');
+    }
+
+    const analysisText = response.body.choices[0]?.message?.content;
 
     return {
       analysis:

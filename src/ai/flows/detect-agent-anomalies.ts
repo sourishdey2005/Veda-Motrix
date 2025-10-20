@@ -1,8 +1,10 @@
+
 'use server';
 /**
  * @fileoverview An AI flow that detects anomalous behavior from other AI agents.
  */
-import { genAI } from '@/ai/genkit';
+import { aiClient, textModel } from '@/ai/client';
+import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   DetectAgentAnomaliesInput,
   DetectAgentAnomaliesOutput,
@@ -13,7 +15,6 @@ export async function detectAgentAnomalies(
   input: DetectAgentAnomaliesInput
 ): Promise<DetectAgentAnomaliesOutput> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     const prompt = `You are a UEBA (User and Entity Behavior Analytics) security agent. Analyze the provided agent actions and determine if the behavior is anomalous based on a threshold of ${input.anomalyThreshold}. Respond with a valid JSON object matching this schema: ${JSON.stringify(DetectAgentAnomaliesOutputSchema.shape)}.
 
 Agent ID: ${input.agentId}
@@ -21,11 +22,36 @@ Agent Actions:
 ${input.agentActions.map(action => `- ${action}`).join('\n')}
 `;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    const response = await aiClient.path("/chat/completions").post({
+      body: {
+        model: textModel,
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant that only returns valid JSON.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 1,
+      }
+    });
 
-    const parsed = DetectAgentAnomaliesOutputSchema.parse(JSON.parse(responseText));
-    return parsed;
+    if (isUnexpected(response)) {
+      const errorBody = response.body as any;
+      throw new Error(errorBody?.error?.message || 'An unexpected error occurred.');
+    }
+    
+    const message = response.body.choices[0]?.message?.content;
+    if (!message) {
+      throw new Error('AI returned an empty response.');
+    }
+
+    try {
+      const parsed = DetectAgentAnomaliesOutputSchema.parse(JSON.parse(message));
+      return parsed;
+    } catch (e) {
+      console.error("Failed to parse AI JSON response:", e);
+      throw new Error('AI returned an invalid response format.');
+    }
+
   } catch (error) {
     console.error('Error in detectAgentAnomalies:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);

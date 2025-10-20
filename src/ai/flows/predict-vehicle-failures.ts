@@ -1,8 +1,10 @@
+
 'use server';
 /**
  * @fileoverview An AI flow that predicts vehicle failures from sensor data and maintenance logs.
  */
-import { genAI } from '@/ai/genkit';
+import { aiClient, textModel } from '@/ai/client';
+import { isUnexpected } from '@azure-rest/ai-inference';
 import {
   PredictVehicleFailureInput,
   PredictVehicleFailureOutput,
@@ -13,7 +15,6 @@ export async function predictVehicleFailure(
   input: PredictVehicleFailureInput
 ): Promise<PredictVehicleFailureOutput> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     const prompt = `You are an AI diagnosis agent specializing in predicting vehicle failures.
 Analyze the provided sensor data and maintenance logs to predict up to 3 potential failures. For each prediction, provide the component, failure type, priority (HIGH, MEDIUM, LOW), confidence score (0.0-1.0), and suggested actions. Respond with a valid JSON object matching this schema: ${JSON.stringify(PredictVehicleFailureOutputSchema.shape)}.
 
@@ -22,11 +23,36 @@ Sensor Data (JSON): ${input.sensorDataJson}
 Maintenance Logs: ${input.maintenanceLogs}
 `;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-    const parsed = PredictVehicleFailureOutputSchema.parse(JSON.parse(responseText));
+    const response = await aiClient.path("/chat/completions").post({
+      body: {
+        model: textModel,
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant that only returns valid JSON.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 1,
+      }
+    });
 
-    return parsed;
+    if (isUnexpected(response)) {
+      const errorBody = response.body as any;
+      throw new Error(errorBody?.error?.message || 'An unexpected error occurred.');
+    }
+    
+    const message = response.body.choices[0]?.message?.content;
+    if (!message) {
+      throw new Error('AI returned an empty response.');
+    }
+
+    try {
+      const parsed = PredictVehicleFailureOutputSchema.parse(JSON.parse(message));
+      return parsed;
+    } catch (e) {
+      console.error("Failed to parse AI JSON response:", e);
+      throw new Error('AI returned an invalid response format.');
+    }
+
   } catch (error) {
     console.error('Error in predictVehicleFailure:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);
