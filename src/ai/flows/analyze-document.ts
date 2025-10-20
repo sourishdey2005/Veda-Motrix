@@ -46,7 +46,7 @@ User Prompt: "${prompt}"`,
       
       const analysis = await openAiClient({
         prompt: messages,
-        model: 'google/gemini-flash-1.5', // Vision-capable model
+        model: 'nvidia/neva-22b', // Vision-capable model
       });
 
       return { analysis: analysis as string };
