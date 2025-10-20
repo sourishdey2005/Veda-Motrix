@@ -22,14 +22,14 @@ Sensor Data (JSON): ${input.sensorDataJson}
 Maintenance Logs: ${input.maintenanceLogs}
 `;
 
-    const response = await aiClient.chat({
+    const response = await aiClient.chat.completions.create({
       model: textModel,
       messages: [
         { role: 'system', content: 'You are a helpful assistant that only returns valid JSON.' },
         { role: 'user', content: prompt }
       ],
       temperature: 0,
-      topP: 1,
+      top_p: 1,
     });
 
     const message = response.choices[0]?.message?.content;

@@ -1,5 +1,5 @@
 
-import MistralClient from '@mistralai/mistralai';
+import OpenAI from "openai";
 
 const token = process.env["GITHUB_TOKEN"];
 const endpoint = "https://models.github.ai/inference";
@@ -8,7 +8,7 @@ if (!token) {
   throw new Error("GITHUB_TOKEN is not set in the environment variables.");
 }
 
-export const aiClient = new MistralClient({apiKey: token, serverURL: endpoint});
+export const aiClient = new OpenAI({ baseURL: endpoint, apiKey: token });
 
-export const textModel = "mistral-ai/mistral-small-2503";
-export const visionModel = "mistral-ai/mistral-small-2503"; // Using text model for doc summary
+export const textModel = "openai/gpt-4o-mini";
+export const visionModel = "openai/gpt-4o";

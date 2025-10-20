@@ -21,11 +21,11 @@ ${input.reportData}
 
 Generate a summary that highlights the most important findings. Structure it with a brief overview, followed by 2-3 bullet points on key areas (e.g., ROI, System Reliability, Cost Reduction).`;
 
-    const response = await aiClient.chat({
+    const response = await aiClient.chat.completions.create({
       model: textModel,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.5,
-      topP: 1,
+      top_p: 1,
     });
 
     const summary = response.choices[0]?.message?.content;

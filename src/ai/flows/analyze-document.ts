@@ -28,7 +28,7 @@ ${decodedContent.substring(0, 4000)}...
 ---
 `;
     
-    const response = await aiClient.chat({
+    const response = await aiClient.chat.completions.create({
       model: visionModel, 
       messages: [
         { 
@@ -37,7 +37,7 @@ ${decodedContent.substring(0, 4000)}...
         }
       ],
       temperature: 0.2,
-      topP: 1,
+      top_p: 1,
     });
 
     const analysisText = response.choices[0]?.message?.content;

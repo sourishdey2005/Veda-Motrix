@@ -16,14 +16,14 @@ export async function analyzeCustomerFeedback(
   try {
     const prompt = `You are an AI agent specialized in analyzing customer feedback for a vehicle service center. Your task is to determine the sentiment of the feedback, identify key areas or topics mentioned, and suggest improvements. Analyze the following customer feedback: "${input.feedbackText}". Respond with a valid JSON object matching this schema: ${JSON.stringify(AnalyzeCustomerFeedbackOutputSchema.shape)}.`;
 
-    const response = await aiClient.chat({
+    const response = await aiClient.chat.completions.create({
       model: textModel,
       messages: [
         { role: 'system', content: 'You are a helpful assistant that only returns valid JSON.' },
         { role: 'user', content: prompt }
       ],
       temperature: 0,
-      topP: 1,
+      top_p: 1,
     });
 
     const message = response.choices[0]?.message?.content;
