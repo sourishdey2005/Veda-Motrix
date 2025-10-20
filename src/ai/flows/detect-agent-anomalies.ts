@@ -21,14 +21,14 @@ Agent Actions:
 ${input.agentActions.map(action => `- ${action}`).join('\n')}
 `;
 
-    const response = await aiClient.chat.completions({
+    const response = await aiClient.chat({
       model: textModel,
       messages: [
         { role: 'system', content: 'You are a helpful assistant that only returns valid JSON.' },
         { role: 'user', content: prompt }
       ],
       temperature: 0,
-      top_p: 1,
+      topP: 1,
     });
 
     const message = response.choices[0]?.message?.content;

@@ -18,8 +18,6 @@ export async function analyzeDocument(
   input: AnalyzeDocumentInput
 ): Promise<AnalyzeDocumentOutput> {
   try {
-    // Since we are using a text model, we extract text content.
-    // A true multi-modal implementation would pass the data URI differently.
     const decodedContent = Buffer.from(input.documentDataUri.split(',')[1], 'base64').toString('utf8');
 
     const prompt = `Summarize the following document content, providing a concise overview of its key points and structure. If it is a CSV, describe the columns and provide a summary of the data.
@@ -30,7 +28,7 @@ ${decodedContent.substring(0, 4000)}...
 ---
 `;
     
-    const response = await aiClient.chat.completions({
+    const response = await aiClient.chat({
       model: visionModel, 
       messages: [
         { 
@@ -39,10 +37,8 @@ ${decodedContent.substring(0, 4000)}...
         }
       ],
       temperature: 0.2,
-      top_p: 1,
-      max_tokens: 1024,
+      topP: 1,
     });
-
 
     const analysisText = response.choices[0]?.message?.content;
 

@@ -29,11 +29,11 @@ Owner: [Owner's reply]
 
 Provide the final conversation script as a single block of text.`;
 
-    const response = await aiClient.chat.completions({
+    const response = await aiClient.chat({
       model: textModel,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
-      top_p: 1,
+      topP: 1,
     });
 
     const conversationSummary = response.choices[0]?.message?.content;

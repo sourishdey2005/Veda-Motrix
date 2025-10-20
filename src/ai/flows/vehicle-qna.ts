@@ -36,11 +36,11 @@ ${qnaData
         { role: 'user' as const, content: input.question }
     ];
     
-    const response = await aiClient.chat.completions({
+    const response = await aiClient.chat({
         model: textModel,
         messages: messages,
         temperature: 0.6,
-        top_p: 1,
+        topP: 1,
     });
 
     const answer = response.choices[0]?.message?.content;

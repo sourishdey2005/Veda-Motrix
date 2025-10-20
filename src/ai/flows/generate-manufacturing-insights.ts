@@ -17,11 +17,11 @@ export async function generateManufacturingInsights(
 
 Service Data: ${input.serviceData}`;
 
-    const response = await aiClient.chat.completions({
+    const response = await aiClient.chat({
       model: textModel,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.6,
-      top_p: 1,
+      topP: 1,
     });
 
     const improvementSuggestions = response.choices[0]?.message?.content;
