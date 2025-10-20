@@ -162,7 +162,7 @@ export function AppointmentKanbanBoard() {
             {columns.map(status => (
                 <KanbanColumn
                 key={status}
-                status={boardData.filter(app => app.status === status)}
+                status={status}
                 appointments={boardData.filter(app => app.status === status)}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
@@ -222,3 +222,4 @@ export function AppointmentKanbanBoard() {
     </Card>
   );
 }
+
