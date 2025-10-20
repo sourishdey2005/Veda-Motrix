@@ -1,5 +1,4 @@
 
-
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -35,11 +34,6 @@ const statusChartConfig: ChartConfig = {
   Good: { label: "Good", color: "hsl(var(--chart-2))" },
   Warning: { label: "Warning", color: "hsl(var(--chart-3))" },
   Critical: { label: "Critical", color: "hsl(var(--chart-5))" },
-}
-
-const serviceLoadChartConfig: ChartConfig = {
-  workload: { label: "Workload", color: "hsl(var(--chart-1))" },
-  backlog: { label: "Backlog", color: "hsl(var(--chart-2))" },
 }
 
 const warrantyChartConfig: ChartConfig = {
@@ -184,26 +178,6 @@ export function ManagerDashboard() {
     timeSavings: d.timeSavings + Math.random() * 0.1,
     breakdownReduction: d.breakdownReduction + Math.random() * 0.05
   }));
-
-  const initialServiceLoad = serviceCenters.slice(0, 5).map(sc => ({
-      name: sc.city,
-      workload: sc.workload ?? 80,
-      backlog: Math.floor((sc.workload ?? 80) / 5 + Math.random() * 5),
-  }));
-
-  const [serviceLoad, setServiceLoad] = useState(initialServiceLoad);
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setServiceLoad(prevData =>
-          prevData.map(item => ({
-            ...item,
-            workload: Math.max(20, Math.min(100, item.workload + Math.floor((Math.random() - 0.45) * 10))),
-            backlog: Math.max(0, Math.min(30, item.backlog + Math.floor((Math.random() - 0.48) * 5)))
-          }))
-        );
-      }, 3500);
-      return () => clearInterval(interval);
-    }, []);
 
   const globalHealthIndex = useMemo(() => {
     if (simulatedVehicles.length === 0) return 0;
@@ -429,23 +403,74 @@ export function ManagerDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
             <CardHeader>
-                <CardTitle>Service Center Load Distribution</CardTitle>
-                <CardDescription>Comparison of service center workloads and backlogs.</CardDescription>
+                <CardTitle>Highest Risk Vehicles</CardTitle>
+                <CardDescription>Vehicles with the lowest health scores requiring attention.</CardDescription>
             </CardHeader>
             <CardContent>
-                <ChartContainer config={serviceLoadChartConfig} className="h-64">
-                    <BarChart data={serviceLoad}>
+                <Table>
+                    <TableBody>
+                        {highestRiskVehicles.map(vehicle => (
+                            <TableRow key={vehicle.id}>
+                                <TableCell>
+                                    <div className="font-medium">{vehicle.make} {vehicle.model}</div>
+                                    <div className="text-xs text-muted-foreground">{vehicle.vin}</div>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <div className={cn("font-bold", getHealthColor(vehicle.healthScore))}>
+                                        {vehicle.healthScore.toFixed(0)}%
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">{vehicle.healthStatus}</div>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                     <Link href={`/dashboard/vehicles/${vehicle.id}`}>
+                                        <Button variant="ghost" size="sm">
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                    </Link>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+              <CardTitle>Warranty Cost Reduction Graph</CardTitle>
+              <CardDescription>Visual comparison of warranty claims before vs. after AI integration.</CardDescription>
+          </CardHeader>
+          <CardContent>
+              <ChartContainer config={warrantyChartConfig} className="h-64">
+                  <BarChart data={warrantyCost}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
+                      <YAxis tickFormatter={(val) => `₹${val/1000}k`} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <RechartsLegend />
+                      <Bar dataKey="beforeAI" fill="var(--color-beforeAI)" radius={4} />
+                      <Bar dataKey="afterAI" fill="var(--color-afterAI)" radius={4} />
+                  </BarChart>
+              </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+            <CardHeader>
+                <CardTitle>Fleet Reliability Comparison</CardTitle>
+                <CardDescription>“Model XUV700 shows 15% fewer failures than 2023 after CAPA.”</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={reliabilityChartConfig} className="h-64">
+                    <BarChart data={reliabilityComparison}>
                         <CartesianGrid vertical={false} />
-                        <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} />
+                        <XAxis dataKey="model" />
                         <YAxis />
-                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
                         <RechartsLegend />
-                        <Bar dataKey="workload" stackId="a" fill="var(--color-workload)" radius={[0, 0, 4, 4]} >
-                            <LabelList dataKey="workload" position="center" className="fill-background" fontSize={10} />
-                        </Bar>
-                         <Bar dataKey="backlog" stackId="a" fill="var(--color-backlog)" radius={[4, 4, 0, 0]}>
-                            <LabelList dataKey="backlog" position="center" className="fill-background" fontSize={10} />
-                        </Bar>
+                        <Bar dataKey="2023" fill="var(--color-2023)" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="2024" fill="var(--color-2024)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ChartContainer>
             </CardContent>
@@ -481,47 +506,6 @@ export function ManagerDashboard() {
                         ))}
                     </TableBody>
                 </Table>
-            </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-              <CardTitle>Warranty Cost Reduction Graph</CardTitle>
-              <CardDescription>Visual comparison of warranty claims before vs. after AI integration.</CardDescription>
-          </CardHeader>
-          <CardContent>
-              <ChartContainer config={warrantyChartConfig} className="h-64">
-                  <BarChart data={warrantyCost}>
-                      <CartesianGrid vertical={false} />
-                      <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
-                      <YAxis tickFormatter={(val) => `₹${val/1000}k`} />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <RechartsLegend />
-                      <Bar dataKey="beforeAI" fill="var(--color-beforeAI)" radius={4} />
-                      <Bar dataKey="afterAI" fill="var(--color-afterAI)" radius={4} />
-                  </BarChart>
-              </ChartContainer>
-          </CardContent>
-        </Card>
-        <Card>
-            <CardHeader>
-                <CardTitle>Fleet Reliability Comparison</CardTitle>
-                <CardDescription>“Model XUV700 shows 15% fewer failures than 2023 after CAPA.”</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={reliabilityChartConfig} className="h-64">
-                    <BarChart data={reliabilityComparison}>
-                        <CartesianGrid vertical={false} />
-                        <XAxis dataKey="model" />
-                        <YAxis />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <RechartsLegend />
-                        <Bar dataKey="2023" fill="var(--color-2023)" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="2024" fill="var(--color-2024)" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                </ChartContainer>
             </CardContent>
         </Card>
       </div>
@@ -581,4 +565,5 @@ export function ManagerDashboard() {
       </div>
     </div>
   )
-}
+
+    
