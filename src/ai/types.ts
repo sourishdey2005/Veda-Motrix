@@ -1,6 +1,23 @@
 
 import {z} from 'zod';
 
+// analyze-document
+export const AnalyzeDocumentInputSchema = z.object({
+  documentDataUri: z
+    .string()
+    .describe(
+      "The document to analyze, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+    ),
+});
+export type AnalyzeDocumentInput = z.infer<typeof AnalyzeDocumentInputSchema>;
+
+export const AnalyzeDocumentOutputSchema = z.object({
+  analysis: z
+    .string()
+    .describe('A concise summary of the provided document.'),
+});
+export type AnalyzeDocumentOutput = z.infer<typeof AnalyzeDocumentOutputSchema>;
+
 // analyze-customer-feedback
 export const AnalyzeCustomerFeedbackInputSchema = z.object({
   feedbackText: z.string(),
@@ -120,7 +137,7 @@ export type HandleCustomerEnquiryOutput = z.infer<
 export const PredictVehicleFailureInputSchema = z.object({
   vehicleId: z.string(),
   sensorDataJson: z.string(),
-  maintenanceLogs: zstring(),
+  maintenanceLogs: z.string(),
 });
 export type PredictVehicleFailureInput = z.infer<
   typeof PredictVehicleFailureInputSchema

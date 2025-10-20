@@ -3,17 +3,25 @@
 /**
  * @fileoverview An AI flow that simulates a customer engagement conversation.
  */
+import {ai} from '@/ai/genkit';
+import {z} from 'zod';
 import {
   HandleCustomerEnquiryInput,
+  HandleCustomerEnquiryInputSchema,
   HandleCustomerEnquiryOutput,
+  HandleCustomerEnquiryOutputSchema,
 } from '@/ai/types';
-import { openAiClient } from '@/ai/genkit';
+import {gemini15Flash} from 'genkitx-googleai';
 
-export async function handleCustomerEnquiry(
-  input: HandleCustomerEnquiryInput
-): Promise<HandleCustomerEnquiryOutput> {
-  try {
-    const result = await openAiClient({
+const customerEnquiryFlow = ai.defineFlow(
+  {
+    name: 'customerEnquiryFlow',
+    inputSchema: HandleCustomerEnquiryInputSchema,
+    outputSchema: HandleCustomerEnquiryOutputSchema,
+  },
+  async (input: HandleCustomerEnquiryInput) => {
+    const llmResponse = await ai.generate({
+      model: gemini15Flash,
       prompt: `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.
 
 Generate a short, simulated conversation script (5-6 lines) between the AI Agent and the Owner based on the following details. The script should start with a greeting, explain the issue and the recommended maintenance, offer assistance with scheduling, and end after the owner replies.
@@ -31,8 +39,15 @@ Owner: [Owner's reply]
 Provide the final conversation script as a single block of text.`,
     });
 
-    return { conversationSummary: result as string };
+    return {conversationSummary: llmResponse.text};
+  }
+);
 
+export async function handleCustomerEnquiry(
+  input: HandleCustomerEnquiryInput
+): Promise<HandleCustomerEnquiryOutput> {
+  try {
+    return await customerEnquiryFlow(input);
   } catch (error) {
     console.error('Error in handleCustomerEnquiry:', error);
     return {

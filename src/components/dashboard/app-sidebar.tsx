@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { VedaMotrixLogo } from "@/components/icons";
@@ -13,7 +12,7 @@ import {
   SidebarFooter,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { ActivitySquare, BarChart, Car, Factory, LayoutDashboard, ShieldCheck, Users, Bot, Briefcase, Smile, Settings, User as UserIcon, Warehouse, Server, Target, Globe } from "lucide-react";
+import { ActivitySquare, BarChart, Car, Factory, LayoutDashboard, ShieldCheck, Users, Bot, Briefcase, Smile, Settings, User as UserIcon, Warehouse, Server, Target, Globe, FileText } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -26,6 +25,7 @@ const managerNav = [
     { name: "Manufacturing", href: "/dashboard/manufacturing", icon: Factory },
     { name: "Customer Experience", href: "/dashboard/customer-experience", icon: Smile },
     { name: "Advanced Analytics", href: "/dashboard/advanced", icon: ActivitySquare },
+    { name: "Document Analysis", href: "/dashboard/document-analysis", icon: FileText },
     { name: "UEBA Security", href: "/dashboard/ueba", icon: ShieldCheck },
 ];
 

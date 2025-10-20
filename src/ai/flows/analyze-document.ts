@@ -1,99 +1,65 @@
-"use client";
 
-import { VedaMotrixLogo } from "@/components/icons";
-import { useAuth } from "@/hooks/use-auth";
+'use server';
+/**
+ * @fileOverview An AI flow that summarizes uploaded documents (e.g., CSV, PDF).
+ */
+import {ai} from '@/ai/genkit';
+import {z} from 'zod';
 import {
-  SidebarContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-  SidebarSeparator,
-} from "@/components/ui/sidebar";
-import { ActivitySquare, BarChart, Car, Factory, LayoutDashboard, ShieldCheck, Users, Bot, Briefcase, Smile, Settings, User as UserIcon, Warehouse, Server, Target, Globe } from "lucide-react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+  AnalyzeDocumentInput,
+  AnalyzeDocumentInputSchema,
+  AnalyzeDocumentOutput,
+  AnalyzeDocumentOutputSchema,
+} from '@/ai/types';
+import {gemini15Flash} from 'genkitx-googleai';
 
-const managerNav = [
-    { name: "Dashboard", href: "/dashboard/manager", icon: LayoutDashboard },
-    { name: "Command Center", href: "/dashboard/command-center", icon: Globe },
-    { name: "Orchestration", href: "/dashboard/orchestration", icon: Bot },
-    { name: "Service Analytics", href: "/dashboard/analytics", icon: BarChart },
-    { name: "Executive Analytics", href: "/dashboard/executive", icon: Briefcase },
-    { name: "Manufacturing", href: "/dashboard/manufacturing", icon: Factory },
-    { name: "Customer Experience", href: "/dashboard/customer-experience", icon: Smile },
-    { name: "Advanced Analytics", href: "/dashboard/advanced", icon: ActivitySquare },
-    { name: "UEBA Security", href: "/dashboard/ueba", icon: ShieldCheck },
-];
+// Define the document analysis flow using Genkit
+const analyzeDocumentFlow = ai.defineFlow(
+  {
+    name: 'analyzeDocumentFlow',
+    inputSchema: AnalyzeDocumentInputSchema,
+    outputSchema: AnalyzeDocumentOutputSchema,
+  },
+  async (input: AnalyzeDocumentInput) => {
+    // Generate content using the Gemini 1.5 Flash model
+    const llmResponse = await ai.generate({
+      model: gemini15Flash,
+      prompt: {
+        text: 'Summarize the following document, providing a concise overview of its key points and structure. If it is a CSV, describe the columns and provide a summary of the data.',
+        media: [
+          {
+            url: input.documentDataUri,
+          },
+        ],
+      },
+    });
 
-const serviceCenterNav = [
-    { name: "Dashboard", href: "/dashboard/service-center", icon: LayoutDashboard },
-    { name: "Analytics", href: "/dashboard/service-center/analytics", icon: BarChart },
-    { name: "Operations", href: "/dashboard/service-center/operations", icon: Server },
-    { name: "Forecasting", href: "/dashboard/service-center/inventory", icon: Warehouse },
-    { name: "Benchmarking", href: "/dashboard/service-center/benchmarking", icon: Target },
-    { name: "Customer Feedback", href: "/dashboard/feedback", icon: Users },
-];
+    const analysisText = llmResponse.text;
 
-const userNav = [
-    { name: "My Vehicle", href: "/dashboard/user", icon: Car },
-];
+    return {
+      analysis:
+        analysisText || 'Could not generate a summary for the document.',
+    };
+  }
+);
 
-const commonNav = [
-    { name: "Profile", href: "/dashboard/profile", icon: UserIcon },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
-];
-
-export function AppSidebar() {
-  const { user } = useAuth();
-  const pathname = usePathname();
-
-  let navItems = userNav;
-  if (user?.role === 'manager') navItems = managerNav;
-  if (user?.role === 'service-center') navItems = serviceCenterNav;
-
-  return (
-    <>
-      <SidebarHeader>
-        <div className="flex items-center gap-2">
-            <VedaMotrixLogo className="w-8 h-8 text-primary" />
-            <span className="text-lg font-semibold font-headline">VEDA-MOTRIX</span>
-        </div>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarMenu>
-            {navItems.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                    <Link href={item.href} className="w-full">
-                      <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.name}>
-                        <div className="flex items-center gap-2">
-                          <item.icon />
-                          <span>{item.name}</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </Link>
-                </SidebarMenuItem>
-            ))}
-        </SidebarMenu>
-      </SidebarContent>
-      <SidebarFooter>
-        <SidebarSeparator />
-        <SidebarMenu>
-           {commonNav.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                    <Link href={item.href} className="w-full">
-                      <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.name}>
-                        <div className="flex items-center gap-2">
-                          <item.icon />
-                          <span>{item.name}</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </Link>
-                </SidebarMenuItem>
-            ))}
-        </SidebarMenu>
-      </SidebarFooter>
-    </>
-  );
+/**
+ * Executes the document analysis flow.
+ * @param input The document data to analyze.
+ * @returns A promise that resolves to the analysis output.
+ */
+export async function analyzeDocument(
+  input: AnalyzeDocumentInput
+): Promise<AnalyzeDocumentOutput> {
+  try {
+    return await analyzeDocumentFlow(input);
+  } catch (error) {
+    console.error('Error in analyzeDocument flow:', error);
+    // Ensure a valid output structure is returned on error
+    return {
+      analysis: `An unexpected error occurred during document analysis: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    };
+  }
 }
