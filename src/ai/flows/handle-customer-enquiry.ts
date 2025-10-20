@@ -1,27 +1,19 @@
-
 'use server';
 /**
  * @fileoverview An AI flow that simulates a customer engagement conversation.
  */
-import {ai} from '@/ai/genkit';
-import {z} from 'zod';
+import { genAI } from '@/ai/genkit';
 import {
   HandleCustomerEnquiryInput,
-  HandleCustomerEnquiryInputSchema,
   HandleCustomerEnquiryOutput,
-  HandleCustomerEnquiryOutputSchema,
 } from '@/ai/types';
 
-const customerEnquiryFlow = ai.defineFlow(
-  {
-    name: 'customerEnquiryFlow',
-    inputSchema: HandleCustomerEnquiryInputSchema,
-    outputSchema: HandleCustomerEnquiryOutputSchema,
-  },
-  async (input: HandleCustomerEnquiryInput) => {
-    const llmResponse = await ai.generate({
-      model: 'gemini-pro',
-      prompt: `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.
+export async function handleCustomerEnquiry(
+  input: HandleCustomerEnquiryInput
+): Promise<HandleCustomerEnquiryOutput> {
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const prompt = `You are a customer engagement agent for VEDA-MOTRIX AI. Your goal is to inform vehicle owners about potential issues and recommended maintenance in a helpful and friendly manner.
 
 Generate a short, simulated conversation script (5-6 lines) between the AI Agent and the Owner based on the following details. The script should start with a greeting, explain the issue and the recommended maintenance, offer assistance with scheduling, and end after the owner replies.
 
@@ -35,24 +27,17 @@ Owner: [Owner's response]
 Agent: [Offer assistance with scheduling]
 Owner: [Owner's reply]
 
-Provide the final conversation script as a single block of text.`,
-    });
+Provide the final conversation script as a single block of text.`;
 
-    return {conversationSummary: llmResponse.text};
-  }
-);
+    const result = await model.generateContent(prompt);
+    const conversationSummary = result.response.text();
 
-export async function handleCustomerEnquiry(
-  input: HandleCustomerEnquiryInput
-): Promise<HandleCustomerEnquiryOutput> {
-  try {
-    return await customerEnquiryFlow(input);
+    return { conversationSummary };
   } catch (error) {
     console.error('Error in handleCustomerEnquiry:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return {
-      conversationSummary: `Failed to generate conversation. Error: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+      conversationSummary: `Failed to generate conversation. Error: ${errorMessage}`,
     };
   }
 }

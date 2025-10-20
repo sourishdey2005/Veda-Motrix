@@ -1,20 +1,14 @@
-
 /**
- * @fileoverview This file initializes the Genkit AI instance with the Google AI plugin.
- * It exports a single `ai` object that is used throughout the application to
+ * @fileoverview This file initializes the Google Generative AI client.
+ * It exports a single `genAI` object that is used throughout the application to
  * interact with the generative AI models.
  */
-import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export const ai = genkit({
-  plugins: [
-    googleAI({
-      apiKey: process.env.GEMINI_API_KEY,
-    }),
-  ],
-  // Log errors to the console.
-  logLevel: 'error',
-  // Perform OpenTelemetry instrumentation and enable traces.
-  enableTracing: true,
-});
+const apiKey = process.env.GEMINI_API_KEY;
+
+if (!apiKey) {
+  throw new Error("GEMINI_API_KEY is not set in the environment variables.");
+}
+
+export const genAI = new GoogleGenerativeAI(apiKey);
