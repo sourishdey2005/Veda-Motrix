@@ -2,7 +2,7 @@
 # VEDA-MOTRIX AI — Predictive Intelligence Hub
 
 <p align="center">
-  <img src=<img width="409" height="179" alt="image" src="https://github.com/user-attachments/assets/3de68c1e-3528-481e-ba4f-66342798eebd" />
+  <img width="409" height="179" alt="image" src="https://github.com/user-attachments/assets/3de68c1e-3528-481e-ba4f-66342798eebd" />
 
   https://app.netlify.com/projects/vedamotrix/deploys
 >
