@@ -13,7 +13,7 @@
 
 ---
 
-## 核心功能 (Core Features)
+## Core Features
 
 VEDA-MOTRIX AI is a multi-faceted platform designed to revolutionize vehicle maintenance and operational management through the power of artificial intelligence.
 
@@ -27,7 +27,7 @@ VEDA-MOTRIX AI is a multi-faceted platform designed to revolutionize vehicle mai
 
 ---
 
-## ✨ 技术栈 (Technology Stack)
+## ✨Technology Stack
 
 This project leverages a modern, robust, and scalable technology stack:
 
@@ -81,7 +81,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 
 ---
 
-## 🔑 角色与凭证 (Roles & Credentials)
+## 🔑Roles & Credentials
 
 The application supports multiple user roles, each with a dedicated dashboard and feature set. Use the following credentials on the login page after selecting the appropriate role:
 
@@ -119,7 +119,7 @@ A personalized portal for vehicle owners to monitor their car's health.
 
 ---
 
-## 🤖 关键AI代理 (Key AI Agents)
+## 🤖 Key AI Agents
 
 The intelligence of VEDA-MOTRIX is driven by a suite of specialized AI agents working in concert:
 
