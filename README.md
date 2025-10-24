@@ -5,15 +5,15 @@
   <img src="public/logo.svg" alt="VEDA-MOTRIX AI Logo" width="120">
 </p>
 
-<h3 align="center">Knowledge in Motion</h3>
+<h3 align="center">Knowledge in Motion: Transforming Vehicle Maintenance with Predictive AI</h3>
 
 <p align="center">
-  A sophisticated, AI-powered predictive maintenance and fleet management dashboard built with Next.js, ShadCN, and cutting-edge generative AI.
+  VEDA-MOTRIX AI is a sophisticated, full-stack predictive maintenance and fleet management platform. It leverages a suite of specialized, interoperable AI agents to analyze vehicle data, predict failures, streamline service operations, and provide deep business intelligence. Built with a modern tech stack including Next.js, ShadCN UI, and generative AI, this project showcases a powerful end-to-end solution for the automotive industry.
 </p>
 
 ---
 
-## 🚀 Core Features
+## 核心功能 (Core Features)
 
 VEDA-MOTRIX AI is a multi-faceted platform designed to revolutionize vehicle maintenance and operational management through the power of artificial intelligence.
 
@@ -27,7 +27,7 @@ VEDA-MOTRIX AI is a multi-faceted platform designed to revolutionize vehicle mai
 
 ---
 
-## ✨ Technology Stack
+## ✨ 技术栈 (Technology Stack)
 
 This project leverages a modern, robust, and scalable technology stack:
 
@@ -41,7 +41,7 @@ This project leverages a modern, robust, and scalable technology stack:
 
 ---
 
-## 🏁 Getting Started
+## 🏁 入门指南 (Getting Started)
 
 Follow these steps to get the project running locally on your machine.
 
@@ -81,7 +81,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 
 ---
 
-## 🔑 Roles & Credentials
+## 🔑 角色与凭证 (Roles & Credentials)
 
 The application supports multiple user roles, each with a dedicated dashboard and feature set. Use the following credentials on the login page after selecting the appropriate role:
 
@@ -93,7 +93,7 @@ The application supports multiple user roles, each with a dedicated dashboard an
 
 ---
 
-##  dashboards Overview
+##  仪表板概览 (Dashboards Overview)
 
 ### 1. Manager Dashboard
 The highest-level view, providing strategic insights across the entire operation.
@@ -119,7 +119,7 @@ A personalized portal for vehicle owners to monitor their car's health.
 
 ---
 
-## 🤖 Key AI Agents
+## 🤖 关键AI代理 (Key AI Agents)
 
 The intelligence of VEDA-MOTRIX is driven by a suite of specialized AI agents working in concert:
 
