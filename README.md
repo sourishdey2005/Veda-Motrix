@@ -2,7 +2,10 @@
 # VEDA-MOTRIX AI — Predictive Intelligence Hub
 
 <p align="center">
-  <img src="public/logo.svg" alt="VEDA-MOTRIX AI Logo" width="120">
+  <img src=<img width="409" height="179" alt="image" src="https://github.com/user-attachments/assets/3de68c1e-3528-481e-ba4f-66342798eebd" />
+
+  https://app.netlify.com/projects/vedamotrix/deploys
+>
 </p>
 
 <h3 align="center">Knowledge in Motion: Transforming Vehicle Maintenance with Predictive AI</h3>
@@ -41,7 +44,7 @@ This project leverages a modern, robust, and scalable technology stack:
 
 ---
 
-## 🏁 入门指南 (Getting Started)
+## 🏁 Getting Started
 
 Follow these steps to get the project running locally on your machine.
 
@@ -93,7 +96,7 @@ The application supports multiple user roles, each with a dedicated dashboard an
 
 ---
 
-##  仪表板概览 (Dashboards Overview)
+## Dashboards Overview
 
 ### 1. Manager Dashboard
 The highest-level view, providing strategic insights across the entire operation.
